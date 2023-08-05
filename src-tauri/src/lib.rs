@@ -198,7 +198,8 @@ pub fn run(mut gamepad: gamepad::Gamepad, mut joy_keyboard: joy_input::JoyKeyboa
                             None
                         },
                         CustomButton::Base(gilrs::Button::LeftTrigger2) => {
-                          quick_lookup_window.open();
+                          // quick_lookup_window.open();
+                          quick_lookup_window.show_or_open();
                           None
                         },
                         CustomButton::Base(gilrs::Button::RightTrigger) => {
@@ -223,7 +224,7 @@ pub fn run(mut gamepad: gamepad::Gamepad, mut joy_keyboard: joy_input::JoyKeyboa
                         CustomButton::Base(gilrs::Button::LeftTrigger) => joy_keyboard.set_l1_mod_is_down(false),
                         CustomButton::Base(gilrs::Button::RightTrigger) => joy_keyboard.set_r1_mod_is_down(false),
                         CustomButton::Base(gilrs::Button::LeftTrigger2) => {
-                          quick_lookup_window.close();
+                          quick_lookup_window.hide();
                         },
                         _other => ()
                     }
