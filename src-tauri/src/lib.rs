@@ -1,7 +1,10 @@
+use quick_lookup_window::QuickLookupWindow;
+
 pub mod joy_input;
 pub mod gamepad;
+pub mod quick_lookup_window;
 
-pub fn run(mut gamepad: gamepad::Gamepad, mut joy_keyboard: joy_input::JoyKeyboard){
+pub fn run(mut gamepad: gamepad::Gamepad, mut joy_keyboard: joy_input::JoyKeyboard, mut quick_lookup_window: QuickLookupWindow){
     use gamepad::CustomButton;
     use joy_input::GamepadKeyConfig;
 
@@ -194,7 +197,10 @@ pub fn run(mut gamepad: gamepad::Gamepad, mut joy_keyboard: joy_input::JoyKeyboa
                             joy_keyboard.set_l1_mod_is_down(true);
                             None
                         },
-                        CustomButton::Base(gilrs::Button::LeftTrigger2) => None,
+                        CustomButton::Base(gilrs::Button::LeftTrigger2) => {
+                          quick_lookup_window.open();
+                          None
+                        },
                         CustomButton::Base(gilrs::Button::RightTrigger) => {
                             joy_keyboard.set_r1_mod_is_down(true);
                             None
@@ -216,6 +222,9 @@ pub fn run(mut gamepad: gamepad::Gamepad, mut joy_keyboard: joy_input::JoyKeyboa
                     match button {
                         CustomButton::Base(gilrs::Button::LeftTrigger) => joy_keyboard.set_l1_mod_is_down(false),
                         CustomButton::Base(gilrs::Button::RightTrigger) => joy_keyboard.set_r1_mod_is_down(false),
+                        CustomButton::Base(gilrs::Button::LeftTrigger2) => {
+                          quick_lookup_window.close();
+                        },
                         _other => ()
                     }
                 },
