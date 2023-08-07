@@ -1,8 +1,3 @@
-<h1>svelte-spa-router sample</h1>
-<h2>Basic routing</h2>
-
-<!-- Show the router -->
-Routes:
 <Router {routes} />
 
 <script>
