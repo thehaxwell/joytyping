@@ -36,6 +36,14 @@ impl JoyKeyboard {
             duration_threshold_to_count_move_to_layer_as_visit: Duration::from_millis(500),
         }
     }
+    
+    pub fn get_current_step(&self)-> Step {
+        self.current_step
+    }
+
+    pub fn get_current_layer(&self)-> Layer {
+        self.current_layer
+    }
 
     pub fn key_click(&mut self, gamepad_key: GamepadKeyConfig,) {
         let key_to_click = match self.current_layer {
@@ -181,22 +189,22 @@ pub struct GamepadKeyConfig {
     pub second_layer_step_4: Option<enigo::Key>,
 }
 
-#[derive(Debug,PartialEq)]
-enum Step {
+#[derive(Debug,PartialEq,Clone,Copy)]
+pub enum Step {
     Step1,
     Step2,
     Step3,
     Step4,
 }
 
-#[derive(Debug,PartialEq)]
-enum StepperButtonDirection {
+#[derive(Debug,PartialEq,Clone,Copy)]
+pub enum StepperButtonDirection {
     Right,
     Left,
 }
 
-#[derive(Debug,PartialEq)]
-struct LayerVisitDetails {
+#[derive(Debug,PartialEq,Clone,Copy)]
+pub struct LayerVisitDetails {
     time_of_visit: std::time::Instant,
     visit_through_stepper_at_direction: StepperButtonDirection,
 }
@@ -209,8 +217,8 @@ impl LayerVisitDetails {
     }
 }
 
-#[derive(Debug,PartialEq)]
-enum Layer {
+#[derive(Debug,PartialEq,Clone,Copy)]
+pub enum Layer {
     First,
     VisitingFirst(LayerVisitDetails),
     Second,

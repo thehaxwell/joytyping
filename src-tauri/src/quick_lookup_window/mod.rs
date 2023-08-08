@@ -5,6 +5,8 @@
 
 use tauri::Manager;
 
+use crate::joy_input::{Layer, Step};
+
 const WINDOW_LABEL: &str = "quick-lookup";
 pub struct QuickLookupWindow {
     tauri_app_handle: tauri::AppHandle,
@@ -26,6 +28,7 @@ impl QuickLookupWindow {
                 WINDOW_LABEL, /* the unique window label */
                 tauri::WindowUrl::App("#/quick-lookup".into())
             )
+            .title("Joytyping Quick Lookup")
             .build()?;
             Ok(())
         }
@@ -38,4 +41,29 @@ impl QuickLookupWindow {
         }
     }
 
+    pub fn update_keyboard(&self, layer: Layer, step: Step) -> Result<(), tauri::Error> {
+        match self.tauri_app_handle.get_window(WINDOW_LABEL) {
+            Some(docs_window) => docs_window.emit("update-keyboard", Payload{
+               layer: match layer {
+                   Layer::First => 1,
+                   Layer::Second => 2,
+                   Layer::VisitingFirst(_) => 1,
+                   Layer::VisitingSecond(_) => 2,
+               },
+               step: match step {
+                   Step::Step1 => 1,
+                   Step::Step2 => 2,
+                   Step::Step3 => 3,
+                   Step::Step4 => 4,
+               },
+            }),
+            None => Ok(()),
+        }
+    }
+}
+
+#[derive(Clone, serde::Serialize)]
+struct Payload {
+  layer: u8,
+  step: u8,
 }

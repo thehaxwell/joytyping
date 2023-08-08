@@ -195,15 +195,23 @@ pub fn run(mut gamepad: gamepad::Gamepad, mut joy_keyboard: joy_input::JoyKeyboa
                         CustomButton::Base(gilrs::Button::Z) => None,
                         CustomButton::Base(gilrs::Button::LeftTrigger) => {
                             joy_keyboard.set_l1_mod_is_down(true);
+                            let _ = quick_lookup_window.update_keyboard(
+                                joy_keyboard.get_current_layer(),
+                                joy_keyboard.get_current_step()
+                            );
                             None
                         },
                         CustomButton::Base(gilrs::Button::LeftTrigger2) => {
                           // quick_lookup_window.open();
-                          quick_lookup_window.show_or_open();
+                          let _ = quick_lookup_window.show_or_open();
                           None
                         },
                         CustomButton::Base(gilrs::Button::RightTrigger) => {
                             joy_keyboard.set_r1_mod_is_down(true);
+                            let _ = quick_lookup_window.update_keyboard(
+                                joy_keyboard.get_current_layer(),
+                                joy_keyboard.get_current_step()
+                            );
                             None
                         },
                         CustomButton::Base(gilrs::Button::RightTrigger2) => None,
@@ -221,10 +229,22 @@ pub fn run(mut gamepad: gamepad::Gamepad, mut joy_keyboard: joy_input::JoyKeyboa
                 gamepad::GamepadEvent::ButtonReleased(button) => {
                     print!("ButtonReleased: {:?}\n",button);
                     match button {
-                        CustomButton::Base(gilrs::Button::LeftTrigger) => joy_keyboard.set_l1_mod_is_down(false),
-                        CustomButton::Base(gilrs::Button::RightTrigger) => joy_keyboard.set_r1_mod_is_down(false),
+                        CustomButton::Base(gilrs::Button::LeftTrigger) => {
+                            joy_keyboard.set_l1_mod_is_down(false);
+                            let _ = quick_lookup_window.update_keyboard(
+                                joy_keyboard.get_current_layer(),
+                                joy_keyboard.get_current_step()
+                            );
+                        },
+                        CustomButton::Base(gilrs::Button::RightTrigger) => {
+                            joy_keyboard.set_r1_mod_is_down(false);
+                            let _ = quick_lookup_window.update_keyboard(
+                                joy_keyboard.get_current_layer(),
+                                joy_keyboard.get_current_step()
+                            );
+                        },
                         CustomButton::Base(gilrs::Button::LeftTrigger2) => {
-                          quick_lookup_window.hide();
+                          let _ = quick_lookup_window.hide();
                         },
                         _other => ()
                     }
