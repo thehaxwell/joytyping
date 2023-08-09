@@ -1,6 +1,6 @@
 <script>
   import { listen } from '@tauri-apps/api/event'
-  import Keyboard2 from "../lib/QuickLookup/Keyboard2.svelte";
+  import Keyboard3 from "../lib/QuickLookup/Keyboard3.svelte";
 
   let stepNum = 1;
   let layerNum = 1;
@@ -16,4 +16,4 @@
 <!--                       {["␣","⌫","e","t","a","o","i","n","↵"," ","E","T","A","O","I","N"]} -->
 <!-- /> -->
 
-<Keyboard2 {layerNum} {stepNum} />
+<Keyboard3 {layerNum} {stepNum} />
