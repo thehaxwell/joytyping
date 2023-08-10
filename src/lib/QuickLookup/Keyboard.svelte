@@ -1,5 +1,6 @@
 <script>
   import LeftButtonsSet from "./LeftButtonsSet.svelte";
+  import RightButtonsSet from "./RightButtonsSet.svelte";
   export let layerNum = 1;
   export let stepNum = 1;
 </script>
@@ -15,7 +16,7 @@
             "z","","","j",    "Z","","","J",
           ]}
         />
-        <!-- <RightButtonsSet 
+        <RightButtonsSet 
           layerIsActive={layerNum==1} 
           activeStepNum={stepNum} 
           labels={[
@@ -24,7 +25,7 @@
             "g","f","v","y",  "G","F","V","Y",
             "q","x","","",    "Q","X","","",
           ]}
-          /> -->
+        />
 </div>
 <div class="flex">
         <LeftButtonsSet 
@@ -38,7 +39,7 @@
           ]}
         />
 
-        <!-- <RightButtonsSet 
+        <RightButtonsSet 
           layerIsActive={layerNum==2} 
           activeStepNum={stepNum} 
           labels={[
@@ -47,7 +48,7 @@
             "Tab","\\","","", "Tab","|","","",
             "","","","",      "","","","",
           ]}
-          /> -->
+        />
 </div>
 
 

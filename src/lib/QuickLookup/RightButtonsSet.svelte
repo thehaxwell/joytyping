@@ -8,23 +8,23 @@
   const SPACING = 10;
   const doubleCrossCoordinates = [
     {
-      x: 4*SQ_LENGTH + SPACING,
+      x: 5*SQ_LENGTH + SPACING/2,
       y: 0,
     },
     {
       x: 8*SQ_LENGTH + 1.5*SPACING,
-      y: 2*SQ_LENGTH + SPACING/2,
+      y: SQ_LENGTH + SPACING/2,
     },
     {
       x: SQ_LENGTH,
-      y: SQ_LENGTH + SPACING/2
+      y: 2*SQ_LENGTH + SPACING/2,
     },
     {
-      x: 5*SQ_LENGTH + SPACING/2,
-      y: 3*SQ_LENGTH + SPACING
+      x: 4*SQ_LENGTH + SPACING,
+      y: 3*SQ_LENGTH + SPACING,
     }
   ];
 </script>
 
 <ButtonSet {activeStepNum} {layerIsActive} {labels}
-        isLeftButtonSet={true} {doubleCrossCoordinates} />
+        isLeftButtonSet={false} {doubleCrossCoordinates} />
