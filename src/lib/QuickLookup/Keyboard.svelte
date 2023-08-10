@@ -1,11 +1,11 @@
 <script>
-  import CardinalButtonsStepsSet1 from "./CardinalButtonsStepsSet1.svelte";
+  import LeftButtonsSet from "./LeftButtonsSet.svelte";
   export let layerNum = 1;
   export let stepNum = 1;
 </script>
 
 <div class="flex">
-        <CardinalButtonsStepsSet1 
+        <LeftButtonsSet 
           layerIsActive={layerNum==1} 
           activeStepNum={stepNum} 
           labels={[
@@ -15,7 +15,7 @@
             "z","","","j",    "Z","","","J",
           ]}
         />
-        <CardinalButtonsStepsSet1 
+        <!-- <RightButtonsSet 
           layerIsActive={layerNum==1} 
           activeStepNum={stepNum} 
           labels={[
@@ -24,17 +24,10 @@
             "g","f","v","y",  "G","F","V","Y",
             "q","x","","",    "Q","X","","",
           ]}
-        />
-
-
-            
-            
-            
-            
-
+          /> -->
 </div>
 <div class="flex">
-        <CardinalButtonsStepsSet1 
+        <LeftButtonsSet 
           layerIsActive={layerNum==2} 
           activeStepNum={stepNum} 
           labels={[
@@ -45,7 +38,7 @@
           ]}
         />
 
-        <CardinalButtonsStepsSet1 
+        <!-- <RightButtonsSet 
           layerIsActive={layerNum==2} 
           activeStepNum={stepNum} 
           labels={[
@@ -54,11 +47,7 @@
             "Tab","\\","","", "Tab","|","","",
             "","","","",      "","","","",
           ]}
-        />
-            
-            
-            
-            
+          /> -->
 </div>
 
 
