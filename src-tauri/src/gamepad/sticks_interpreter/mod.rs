@@ -55,9 +55,9 @@ impl SticksInterpreter {
         x_axis_value: Option<f32>,
         y_axis_value: Option<f32>)-> Option<GamepadEvent> {
         let x_value =
-            if let Some(data) = x_axis_value {data} else {return None};
+            if let Some(data) = x_axis_value {data} else {0.0};
         let y_value =
-            if let Some(data) = y_axis_value {data} else {return None};
+            if let Some(data) = y_axis_value {data} else {0.0};
         self.interpret_stick_move(is_left_stick,x_value,y_value)
     }
 
