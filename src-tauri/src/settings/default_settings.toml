@@ -1,0 +1,147 @@
+[[profiles]]
+name="default"
+[profiles.keyboard_mode.key_mappings.south]
+first_layer_step_1= {char_key= "I"}
+first_layer_step_2= {char_key= "U"}
+first_layer_step_3= {char_key= "V"}
+first_layer_step_4= {}
+second_layer_step_1= {char_key= "&"}
+second_layer_step_2= {char_key= "}"}
+second_layer_step_3= {}
+second_layer_step_4= {}
+[profiles.keyboard_mode.key_mappings.east]
+first_layer_step_1= {key= "Return"}
+first_layer_step_2= {char_key= "S"}
+first_layer_step_3= {char_key= "F"}
+first_layer_step_4= {char_key= "X"}
+second_layer_step_1= {char_key= "^"}
+second_layer_step_2= {char_key= ":"}
+second_layer_step_3= {char_key= "|"}
+second_layer_step_4= {}
+[profiles.keyboard_mode.key_mappings.north]
+first_layer_step_1= {char_key= "E"}
+first_layer_step_2= {char_key= "H"}
+first_layer_step_3= {char_key= "G"}
+first_layer_step_4= {char_key= "Q"}
+second_layer_step_1= {char_key= "%"}
+second_layer_step_2= {char_key= "\""}
+second_layer_step_3= {key= "Tab",modifiers=["Shift"]}
+second_layer_step_4= {}
+[profiles.keyboard_mode.key_mappings.west]
+first_layer_step_1= {char_key= "A"}
+first_layer_step_2= {char_key= "D"}
+first_layer_step_3= {char_key= "Y"}
+first_layer_step_4= {}
+second_layer_step_1= {char_key= "*"}
+second_layer_step_2= {char_key= "{"}
+second_layer_step_3= {}
+second_layer_step_4= {}
+[profiles.keyboard_mode.key_mappings.d_pad_up]
+first_layer_step_1= {char_key= "T"}
+first_layer_step_2= {char_key= "L"}
+first_layer_step_3= {char_key= "W"}
+first_layer_step_4= {char_key= "Z"}
+second_layer_step_1= {char_key= "!"}
+second_layer_step_2= {char_key= "("}
+second_layer_step_3= {char_key= "_"}
+second_layer_step_4= {}
+[profiles.keyboard_mode.key_mappings.d_pad_down]
+first_layer_step_1= {char_key= "N"}
+first_layer_step_2= {char_key= "M"}
+first_layer_step_3= {char_key= "K"}
+first_layer_step_4= {}
+second_layer_step_1= {char_key= "#"}
+second_layer_step_2= {char_key= ">"}
+second_layer_step_3= {char_key= "+"}
+second_layer_step_4= {}
+[profiles.keyboard_mode.key_mappings.d_pad_left]
+first_layer_step_1= {}
+first_layer_step_2= {char_key= "R"}
+first_layer_step_3= {char_key= "P"}
+first_layer_step_4= {char_key= "J"}
+second_layer_step_1= {char_key= "$"}
+second_layer_step_2= {char_key= "<"}
+second_layer_step_3= {char_key= "~"}
+second_layer_step_4= {}
+[profiles.keyboard_mode.key_mappings.d_pad_right]
+first_layer_step_1= {char_key= "O"}
+first_layer_step_2= {char_key= "C"}
+first_layer_step_3= {char_key= "B"}
+first_layer_step_4= {}
+second_layer_step_1= {char_key= "@"}
+second_layer_step_2= {char_key= ")"}
+second_layer_step_3= {char_key= "?"}
+second_layer_step_4= {}
+[profiles.keyboard_mode.key_mappings.left_stick_up]
+first_layer_step_1= {char_key= "t"}
+first_layer_step_2= {char_key= "l"}
+first_layer_step_3= {char_key= "w"}
+first_layer_step_4= {char_key= "z"}
+second_layer_step_1= {char_key= "1"}
+second_layer_step_2= {char_key= "9"}
+second_layer_step_3= {char_key= "_"}
+second_layer_step_4= {}
+[profiles.keyboard_mode.key_mappings.left_stick_down]
+first_layer_step_1= {char_key= "n"}
+first_layer_step_2= {char_key= "m"}
+first_layer_step_3= {char_key= "k"}
+first_layer_step_4= {}
+second_layer_step_1= {char_key= "3"}
+second_layer_step_2= {char_key= "."}
+second_layer_step_3= {char_key= "="}
+second_layer_step_4= {}
+[profiles.keyboard_mode.key_mappings.left_stick_left]
+first_layer_step_1= {key= "Backspace"}
+first_layer_step_2= {char_key= "r"}
+first_layer_step_3= {char_key= "p"}
+first_layer_step_4= {char_key= "j"}
+second_layer_step_1= {char_key= "4"}
+second_layer_step_2= {char_key= ","}
+second_layer_step_3= {char_key= "`"}
+second_layer_step_4= {}
+[profiles.keyboard_mode.key_mappings.left_stick_right]
+first_layer_step_1= {char_key= "o"}
+first_layer_step_2= {char_key= "c"}
+first_layer_step_3= {char_key= "b"}
+first_layer_step_4= {}
+second_layer_step_1= {char_key= "2"}
+second_layer_step_2= {char_key= "0"}
+second_layer_step_3= {char_key= "/"}
+second_layer_step_4= {}
+[profiles.keyboard_mode.key_mappings.right_stick_up]
+first_layer_step_1= {char_key= "e"}
+first_layer_step_2= {char_key= "h"}
+first_layer_step_3= {char_key= "g"}
+first_layer_step_4= {char_key= "q"}
+second_layer_step_1= {char_key= "5"}
+second_layer_step_2= {char_key= "'"}
+second_layer_step_3= {key= "Tab"}
+second_layer_step_4= {}
+[profiles.keyboard_mode.key_mappings.right_stick_down]
+first_layer_step_1= {char_key= "i"}
+first_layer_step_2= {char_key= "u"}
+first_layer_step_3= {char_key= "v"}
+first_layer_step_4= {}
+second_layer_step_1= {char_key= "7"}
+second_layer_step_2= {char_key= "]"}
+second_layer_step_3= {}
+second_layer_step_4= {}
+[profiles.keyboard_mode.key_mappings.right_stick_left]
+first_layer_step_1= {char_key= "a"}
+first_layer_step_2= {char_key= "d"}
+first_layer_step_3= {char_key= "y"}
+first_layer_step_4= {}
+second_layer_step_1= {char_key= "8"}
+second_layer_step_2= {char_key= "["}
+second_layer_step_3= {}
+second_layer_step_4= {}
+[profiles.keyboard_mode.key_mappings.right_stick_right]
+first_layer_step_1= {key= "Space"}
+first_layer_step_2= {char_key= "s"}
+first_layer_step_3= {char_key= "f"}
+first_layer_step_4= {char_key= "x"}
+second_layer_step_1= {char_key= "6"}
+second_layer_step_2= {char_key= ";"}
+second_layer_step_3= {char_key= "\\"}
+second_layer_step_4= {}
+

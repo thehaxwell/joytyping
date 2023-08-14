@@ -1,6 +1,7 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+use joytyping::settings::{Settings,SettingsLoadError,SettingsDependenciesImpl};
 use tauri::Manager;
 use joytyping::joy_input::stepper::StepperButton;
 use joytyping::run;
@@ -48,6 +49,24 @@ fn main() {
                     Box::new(StepperButton::new()),
                     Box::new(StepperButton::new()),
                 );
+                let mut settings = Settings::new(Box::new(SettingsDependenciesImpl));
+                match settings.load() {
+                    Err(e) => {
+                        match e {
+                            SettingsLoadError::FileNotParsable(msg) => {
+                                println!("Error: {}", msg);
+                            },
+                            _ => {
+                                println!("Error!");
+                            }
+                        }
+                    },
+                    Ok(_) => {
+                        println!("Settings loaded");
+                    }
+                }
+                let settings = settings.get_data().unwrap();
+                println!("Settings: {:?}", settings.profiles[0].name);
                 run(gamepad,joy_keyboard,QuickLookupWindow::new(handle));
             });
 
