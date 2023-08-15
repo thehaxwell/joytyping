@@ -1,6 +1,7 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+use joytyping::joy_input::joy_keyboard_keys_config::JoyKeyboardKeysConfig;
 use joytyping::settings::{Settings,SettingsLoadError,SettingsDependenciesImpl};
 use tauri::Manager;
 use joytyping::joy_input::stepper::StepperButton;
@@ -40,15 +41,6 @@ fn main() {
             let handle = app.app_handle();
 
             std::thread::spawn( move || {
-                let gamepad = joytyping::gamepad::Gamepad::new(
-                    Box::new(GilrsWrapper::new()),
-                    Box::new(SticksInterpreter::new()),
-                );
-                let joy_keyboard = joytyping::joy_input::JoyKeyboard::new(
-                    Box::new(EnigoWrapper::new()),
-                    Box::new(StepperButton::new()),
-                    Box::new(StepperButton::new()),
-                );
                 let mut settings = Settings::new(Box::new(SettingsDependenciesImpl));
                 match settings.load() {
                     Err(e) => {
@@ -65,8 +57,20 @@ fn main() {
                         println!("Settings loaded");
                     }
                 }
-                let settings = settings.get_data().unwrap();
-                println!("Settings: {:?}", settings.profiles[0].name);
+                let mut settings_data = settings.get_data().unwrap();
+
+                let gamepad = joytyping::gamepad::Gamepad::new(
+                    Box::new(GilrsWrapper::new()),
+                    Box::new(SticksInterpreter::new()),
+                );
+                let joy_keyboard = joytyping::joy_input::JoyKeyboard::new(
+                    Box::new(EnigoWrapper::new()),
+                    Box::new(StepperButton::new()),
+                    Box::new(StepperButton::new()),
+                    JoyKeyboardKeysConfig::from(
+                        settings_data.profiles.remove(0).keyboard_mode.key_mappings)
+                );
+
                 run(gamepad,joy_keyboard,QuickLookupWindow::new(handle));
             });
 

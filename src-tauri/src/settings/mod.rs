@@ -1,7 +1,5 @@
-use settings_data::SettingsData;
+use crate::settings_data::SettingsData;
 use thiserror::Error;
-
-mod settings_data;
 
 #[cfg(test)]
 use mockall::{automock, predicate::*};

@@ -1,7 +1,9 @@
 use stepper::StepperButtonTrait;
 use std::time::{Duration, Instant};
 
-use self::enigo_wrapper::EnigoTrait;
+use crate::{settings_data::KeyMapping, gamepad::CustomButton};
+
+use self::{enigo_wrapper::EnigoTrait, joy_keyboard_keys_config::JoyKeyboardKeysConfig};
 
 #[cfg(test)]
 mod tests;
@@ -10,6 +12,8 @@ mod tests;
 // buttons. They are called steppers because
 // they allow the user to navigate between steps
 pub mod stepper;
+
+pub mod joy_keyboard_keys_config;
 
 pub mod enigo_wrapper;
 
@@ -20,12 +24,15 @@ pub struct JoyKeyboard {
     current_step: Step,
     current_layer: Layer,
     duration_threshold_to_count_move_to_layer_as_visit: Duration,
+
+    key_mappings: JoyKeyboardKeysConfig,
 }
 
 impl JoyKeyboard {
     pub fn new(enigo: Box<dyn EnigoTrait>,
                r1_stepper_button: Box<dyn StepperButtonTrait>,
                l1_stepper_button: Box<dyn StepperButtonTrait>,
+    key_mappings: JoyKeyboardKeysConfig,
                ) -> JoyKeyboard {
         JoyKeyboard {
             enigo,
@@ -34,6 +41,7 @@ impl JoyKeyboard {
             current_step: Step::Step1,
             current_layer: Layer::First,
             duration_threshold_to_count_move_to_layer_as_visit: Duration::from_millis(500),
+            key_mappings,
         }
     }
     
@@ -45,44 +53,168 @@ impl JoyKeyboard {
         self.current_layer
     }
 
-    pub fn key_click(&mut self, gamepad_key: GamepadKeyConfig,) {
+    // fn key_click(&mut self, gamepad_key: &JoyKeyboardKeyConfig,) {
+    //     let key_to_click = match self.current_layer {
+    //         Layer::First | Layer::VisitingFirst(_)
+    //             => match self.current_step {
+    //             Step::Step1 => {
+    //                 &gamepad_key.first_layer_step_1
+    //             },
+    //             Step::Step2 => {
+    //                 &gamepad_key.first_layer_step_2
+    //             },
+    //             Step::Step3 => {
+    //                 &gamepad_key.first_layer_step_3
+    //             },
+    //             Step::Step4 => {
+    //                 &gamepad_key.first_layer_step_4
+    //             },
+    //         },
+    //         Layer::Second | Layer::VisitingSecond(_)
+    //             => match self.current_step {
+    //             Step::Step1 => {
+    //                 &gamepad_key.second_layer_step_1
+    //             },
+    //             Step::Step2 => {
+    //                 &gamepad_key.second_layer_step_2
+    //             },
+    //             Step::Step3 => {
+    //                 &gamepad_key.second_layer_step_3
+    //             },
+    //             Step::Step4 => {
+    //                 &gamepad_key.second_layer_step_4
+    //             },
+    //         },
+    //     };
+    //
+    //     if let Some(modifiers) = key_to_click.modifiers.clone() {
+    //         for modifier in modifiers {
+    //             println!("-> {:?}",modifier);
+    //             self.enigo.key_down(modifier);
+    //         }
+    //     }
+    //
+    //     if let Some(key) = key_to_click.key {
+    //         println!("-> {:?}",key);
+    //         self.enigo.key_click(key);
+    //     }
+    //     if let Some(modifiers) = key_to_click.modifiers {
+    //         for modifier in modifiers {
+    //             println!("-> {:?}",modifier);
+    //             self.enigo.key_up(modifier);
+    //         }
+    //     }
+    //
+    // }
+
+    // returns whether the button was consumed or ignored
+    pub fn button_pressed(&mut self, button: CustomButton) -> bool{
+        let gamepad_key = match button{
+            CustomButton::Base(gilrs::Button::North) => {
+                &self.key_mappings.north
+            },
+            CustomButton::Base(gilrs::Button::East) => {
+                &self.key_mappings.east
+            },
+            CustomButton::Base(gilrs::Button::South) => {
+                &self.key_mappings.south
+            },
+            CustomButton::Base(gilrs::Button::West) => {
+                &self.key_mappings.west
+            },
+            CustomButton::Base(gilrs::Button::DPadUp) => {
+                &self.key_mappings.d_pad_up
+            },
+            CustomButton::Base(gilrs::Button::DPadDown) => {
+                &self.key_mappings.d_pad_down
+            },
+            CustomButton::Base(gilrs::Button::DPadLeft) => {
+                &self.key_mappings.d_pad_left
+            },
+            CustomButton::Base(gilrs::Button::DPadRight) => {
+                &self.key_mappings.d_pad_right
+            },
+            CustomButton::LeftStickUp => {
+                &self.key_mappings.left_stick_up
+            },
+            CustomButton::LeftStickDown => {
+                &self.key_mappings.left_stick_down
+            },
+            CustomButton::LeftStickLeft => {
+                &self.key_mappings.left_stick_left
+            },
+            CustomButton::LeftStickRight => {
+                &self.key_mappings.left_stick_right
+            },
+            CustomButton::RightStickUp => {
+                &self.key_mappings.right_stick_up
+            },
+            CustomButton::RightStickDown => {
+                &self.key_mappings.right_stick_down
+            },
+            CustomButton::RightStickLeft => {
+                &self.key_mappings.right_stick_left
+            },
+            CustomButton::RightStickRight => {
+                &self.key_mappings.right_stick_right
+            },
+            _ => return false,
+
+        };
+
         let key_to_click = match self.current_layer {
             Layer::First | Layer::VisitingFirst(_)
                 => match self.current_step {
                 Step::Step1 => {
-                    gamepad_key.first_layer_step_1
+                    &gamepad_key.first_layer_step_1
                 },
                 Step::Step2 => {
-                    gamepad_key.first_layer_step_2
+                    &gamepad_key.first_layer_step_2
                 },
                 Step::Step3 => {
-                    gamepad_key.first_layer_step_3
+                    &gamepad_key.first_layer_step_3
                 },
                 Step::Step4 => {
-                    gamepad_key.first_layer_step_4
+                    &gamepad_key.first_layer_step_4
                 },
             },
             Layer::Second | Layer::VisitingSecond(_)
                 => match self.current_step {
                 Step::Step1 => {
-                    gamepad_key.second_layer_step_1
+                    &gamepad_key.second_layer_step_1
                 },
                 Step::Step2 => {
-                    gamepad_key.second_layer_step_2
+                    &gamepad_key.second_layer_step_2
                 },
                 Step::Step3 => {
-                    gamepad_key.second_layer_step_3
+                    &gamepad_key.second_layer_step_3
                 },
                 Step::Step4 => {
-                    gamepad_key.second_layer_step_4
+                    &gamepad_key.second_layer_step_4
                 },
             },
         };
 
-        if let Some(key) = key_to_click {
+        if let Some(modifiers) = &key_to_click.modifiers {
+            for modifier in modifiers {
+                println!("-> {:?}",modifier);
+                self.enigo.key_down(*modifier);
+            }
+        }
+
+        if let Some(key) = key_to_click.key {
             println!("-> {:?}",key);
             self.enigo.key_click(key);
         }
+
+        if let Some(modifiers) = &key_to_click.modifiers {
+            for modifier in modifiers {
+                println!("-> {:?}",modifier);
+                self.enigo.key_up(*modifier);
+            }
+        }
+
+        true
     }
 
     pub fn set_r1_mod_is_down(&mut self, is_down: bool) {
@@ -179,14 +311,14 @@ impl JoyKeyboard {
 }
 
 pub struct GamepadKeyConfig {
-    pub first_layer_step_1: Option<enigo::Key>,
-    pub first_layer_step_2: Option<enigo::Key>,
-    pub first_layer_step_3: Option<enigo::Key>,
-    pub first_layer_step_4: Option<enigo::Key>,
-    pub second_layer_step_1: Option<enigo::Key>,
-    pub second_layer_step_2: Option<enigo::Key>,
-    pub second_layer_step_3: Option<enigo::Key>,
-    pub second_layer_step_4: Option<enigo::Key>,
+    pub first_layer_step_1: KeyMapping,
+    pub first_layer_step_2: KeyMapping,
+    pub first_layer_step_3: KeyMapping,
+    pub first_layer_step_4: KeyMapping,
+    pub second_layer_step_1: KeyMapping,
+    pub second_layer_step_2: KeyMapping,
+    pub second_layer_step_3: KeyMapping,
+    pub second_layer_step_4: KeyMapping,
 }
 
 #[derive(Debug,PartialEq,Clone,Copy)]
@@ -224,4 +356,6 @@ pub enum Layer {
     Second,
     VisitingSecond(LayerVisitDetails),
 }
+
+
 

@@ -1,5 +1,5 @@
 [[profiles]]
-name="default"
+name="Built-in default"
 [profiles.keyboard_mode.key_mappings.south]
 first_layer_step_1= {char_key= "I"}
 first_layer_step_2= {char_key= "U"}
