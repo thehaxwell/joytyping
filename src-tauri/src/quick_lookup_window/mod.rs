@@ -5,16 +5,36 @@
 
 use tauri::Manager;
 
-use crate::joy_input::{Layer, Step};
+use crate::{joy_input::{Layer, Step}, settings::SettingsLoadError};
+
+#[cfg(test)]
+use mockall::{automock, predicate::*};
+
+const DEFAULT_QUICK_LOOKUP_INIT_SCRIPT: &str = include_str!("default_startup_script.js");
+
+#[cfg_attr(test, automock)]
+pub trait QuickLookupWindowDependencies {
+    fn read_to_string(&self, path: &str) -> Result<String, std::io::Error>;
+}
+
+pub struct QuickLookupWindowDependenciesImpl;
+impl QuickLookupWindowDependencies for QuickLookupWindowDependenciesImpl {
+    fn read_to_string(&self, path: &str) -> Result<String, std::io::Error> {
+        std::fs::read_to_string(path)
+    }
+}
 
 const WINDOW_LABEL: &str = "quick-lookup";
 pub struct QuickLookupWindow {
     tauri_app_handle: tauri::AppHandle,
+    dependencies: Box<dyn QuickLookupWindowDependencies>,
+initialization_script: String,
 }
 
 impl QuickLookupWindow {
-    pub fn new(tauri_app_handle: tauri::AppHandle) -> Self {
-        Self { tauri_app_handle,}
+    pub fn new(tauri_app_handle: tauri::AppHandle,
+               dependencies: Box<dyn QuickLookupWindowDependencies>) -> Self {
+        Self { tauri_app_handle, dependencies, initialization_script: DEFAULT_QUICK_LOOKUP_INIT_SCRIPT.to_string()}
     }
 
     pub fn show_or_open(&mut self) -> Result<(), tauri::Error> {
@@ -26,8 +46,9 @@ impl QuickLookupWindow {
             let _ = tauri::WindowBuilder::new(
                 &self.tauri_app_handle,
                 WINDOW_LABEL, /* the unique window label */
-                tauri::WindowUrl::App("#/quick-lookup".into())
+                tauri::WindowUrl::App("quick-lookup.html".into())
             )
+            .initialization_script(&self.initialization_script)
             .title("Joytyping Quick Lookup")
             .build()?;
             Ok(())
@@ -60,6 +81,46 @@ impl QuickLookupWindow {
             None => Ok(()),
         }
     }
+
+    /// Load settings from the specified file.
+    /// If reading or parsing the file fails, load the default settings.
+    pub fn load(&mut self) -> Result<(), SettingsLoadError> {
+        match self.dependencies.read_to_string(
+            "/home/haxwell/.config/joytyping/quick-lookup/build/bundle.js") {
+            Err(e) => {
+                self.initialization_script = DEFAULT_QUICK_LOOKUP_INIT_SCRIPT.to_string();
+                match e.kind() {
+                    std::io::ErrorKind::NotFound => {
+                        Err(SettingsLoadError::FileNotFound)
+                    },
+                    std::io::ErrorKind::PermissionDenied => {
+                        Err(SettingsLoadError::PermissionDenied)
+                    },
+                    _ => {
+                        Err(SettingsLoadError::FileNotReadable)
+                    },
+                }
+            },
+            Ok(rollup_script_str) => {
+                let mut init_script = String::from("window.addEventListener(\"load\", (event) => {");
+                init_script.push_str(&rollup_script_str);
+                init_script.push_str("});");
+                self.initialization_script = init_script;
+                Ok(())
+            },
+        }
+    }
+
+    // pub fn load_default(&mut self) {
+    //     match self.dependencies.from_str(JOYTYPING_DEFAULT_SETTINGS) {
+    //         Err(e) => 
+    //             panic!("Default settings file not parsable: {}", e.to_string())
+    //         ,
+    //         Ok(deserialized) => {
+    //             self.data = Some(deserialized);
+    //         }
+    //     }
+    // }
 }
 
 #[derive(Clone, serde::Serialize)]

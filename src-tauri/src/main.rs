@@ -9,7 +9,7 @@ use joytyping::run;
 use joytyping::gamepad::gilrs_wrapper::GilrsWrapper;
 use joytyping::gamepad::sticks_interpreter::SticksInterpreter;
 use joytyping::joy_input::enigo_wrapper::EnigoWrapper;
-use joytyping::quick_lookup_window::QuickLookupWindow;
+use joytyping::quick_lookup_window::{QuickLookupWindow, QuickLookupWindowDependenciesImpl};
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]
@@ -71,7 +71,28 @@ fn main() {
                         settings_data.profiles.remove(0).keyboard_mode.key_mappings)
                 );
 
-                run(gamepad,joy_keyboard,QuickLookupWindow::new(handle));
+                let mut quick_lookup_window = QuickLookupWindow::new(
+                    handle,
+                    Box::new(QuickLookupWindowDependenciesImpl)
+                );
+
+                match quick_lookup_window.load() {
+                    Err(e) => {
+                        match e {
+                            SettingsLoadError::FileNotParsable(msg) => {
+                                println!("Error: {}", msg);
+                            },
+                            _ => {
+                                println!("Error!");
+                            }
+                        }
+                    },
+                    Ok(_) => {
+                        println!("quick lookup window external script");
+                    }
+                }
+
+                run(gamepad,joy_keyboard,quick_lookup_window);
             });
 
             Ok(())
