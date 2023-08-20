@@ -1,9 +1,9 @@
 [global]
-quick_lookup_window= {inner_width= 600,inner_height= 400}
 default_profile= "Built-in default" # The name of the profile to use by default
 
 [[profiles]]
 name="Built-in default"
+quick_lookup_window= {inner_width= 600,inner_height= 400}
 [profiles.keyboard_mode.key_mappings.south]
 first_layer_step_1= {char_key= "I"}
 first_layer_step_2= {char_key= "U"}

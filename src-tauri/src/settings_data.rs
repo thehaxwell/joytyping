@@ -135,6 +135,7 @@ pub struct KeyboardModeConfig {
 pub struct Profile {
 	pub keyboard_mode: KeyboardModeConfig,
 	pub name: String,
+    pub quick_lookup_window: QuickLookupWindowSettings,
 }
 
 #[derive(Deserialize, Debug, Clone)]
@@ -146,7 +147,6 @@ pub struct QuickLookupWindowSettings {
 #[derive(Deserialize, Debug, Clone)]
 pub struct GlobalSettings {
     pub default_profile: String,
-    pub quick_lookup_window: QuickLookupWindowSettings,
 }
 
 #[derive(Deserialize, Debug, Clone)]
