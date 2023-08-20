@@ -63,25 +63,30 @@ fn main() {
                     Box::new(GilrsWrapper::new()),
                     Box::new(SticksInterpreter::new()),
                 );
+                let active_profile_index_option = settings_data.profiles.iter()
+                    .position(|profile| profile.name == settings_data.global.default_profile);
+                        
+                let active_profile = settings_data.profiles.remove(match active_profile_index_option {
+                    Some(idx) => idx,
+                    None => 0
+                });
                 let joy_keyboard = joytyping::joy_input::JoyKeyboard::new(
                     Box::new(EnigoWrapper::new()),
                     Box::new(StepperButton::new()),
                     Box::new(StepperButton::new()),
                     JoyKeyboardKeysConfig::from(
-                        settings_data.profiles.remove(0).keyboard_mode.key_mappings)
+                        active_profile.keyboard_mode.key_mappings)
                 );
 
                 let mut quick_lookup_window = QuickLookupWindow::new(
                     handle,
-                    Box::new(QuickLookupWindowDependenciesImpl)
+                    Box::new(QuickLookupWindowDependenciesImpl),
                 );
 
-                match quick_lookup_window.load() {
+                quick_lookup_window.set_window_settings(settings_data.global.quick_lookup_window);
+                match quick_lookup_window.load_startup_script() {
                     Err(e) => {
                         match e {
-                            SettingsLoadError::FileNotParsable(msg) => {
-                                println!("Error: {}", msg);
-                            },
                             _ => {
                                 println!("Error!");
                             }

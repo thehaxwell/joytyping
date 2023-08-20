@@ -1,3 +1,7 @@
+[global]
+quick_lookup_window= {inner_width= 600,inner_height= 400}
+default_profile= "Built-in default" # The name of the profile to use by default
+
 [[profiles]]
 name="Built-in default"
 [profiles.keyboard_mode.key_mappings.south]

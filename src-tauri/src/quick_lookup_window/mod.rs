@@ -5,7 +5,9 @@
 
 use tauri::Manager;
 
-use crate::{joy_input::{Layer, Step}, settings::SettingsLoadError};
+use crate::{joy_input::{Layer, Step}, settings_data::QuickLookupWindowSettings};
+
+use thiserror::Error;
 
 #[cfg(test)]
 use mockall::{automock, predicate::*};
@@ -29,12 +31,16 @@ pub struct QuickLookupWindow {
     tauri_app_handle: tauri::AppHandle,
     dependencies: Box<dyn QuickLookupWindowDependencies>,
 initialization_script: String,
+quick_lookup_window_settings: Option<QuickLookupWindowSettings>,
 }
 
 impl QuickLookupWindow {
     pub fn new(tauri_app_handle: tauri::AppHandle,
                dependencies: Box<dyn QuickLookupWindowDependencies>) -> Self {
-        Self { tauri_app_handle, dependencies, initialization_script: DEFAULT_QUICK_LOOKUP_INIT_SCRIPT.to_string()}
+        Self { tauri_app_handle,
+        dependencies,
+        initialization_script: DEFAULT_QUICK_LOOKUP_INIT_SCRIPT.to_string(),
+        quick_lookup_window_settings: None,}
     }
 
     pub fn show_or_open(&mut self) -> Result<(), tauri::Error> {
@@ -43,14 +49,23 @@ impl QuickLookupWindow {
         if let Some(win) = window {
             win.show()
         } else {
-            let _ = tauri::WindowBuilder::new(
+            let window = tauri::WindowBuilder::new(
                 &self.tauri_app_handle,
                 WINDOW_LABEL, /* the unique window label */
                 tauri::WindowUrl::App("quick-lookup.html".into())
             )
             .initialization_script(&self.initialization_script)
-            .title("Joytyping Quick Lookup")
-            .build()?;
+            .title("Joytyping Quick Lookup");
+
+            if let Some(settings) = &self.quick_lookup_window_settings {
+                window
+                .inner_size(settings.inner_width, settings.inner_height)
+                .build()?;
+            }
+            else {
+                window.build()?;
+            }
+
             Ok(())
         }
     }
@@ -64,7 +79,7 @@ impl QuickLookupWindow {
 
     pub fn update_keyboard(&self, layer: Layer, step: Step) -> Result<(), tauri::Error> {
         match self.tauri_app_handle.get_window(WINDOW_LABEL) {
-            Some(docs_window) => docs_window.emit("update-keyboard", Payload{
+            Some(docs_window) => docs_window.emit("update-keyboard", UpdateKeyboardEventPayload{
                layer: match layer {
                    Layer::First => 1,
                    Layer::Second => 2,
@@ -82,22 +97,26 @@ impl QuickLookupWindow {
         }
     }
 
-    /// Load settings from the specified file.
-    /// If reading or parsing the file fails, load the default settings.
-    pub fn load(&mut self) -> Result<(), SettingsLoadError> {
+    pub fn set_window_settings(&mut self, settings: QuickLookupWindowSettings) {
+        self.quick_lookup_window_settings = Some(settings);
+    }
+
+    /// Load startup script from the specified file.
+    /// If reading or parsing the file fails, load the default startup script.
+    pub fn load_startup_script(&mut self) -> Result<(), StartupScriptLoadError> {
         match self.dependencies.read_to_string(
             "/home/haxwell/.config/joytyping/quick-lookup/build/bundle.js") {
             Err(e) => {
                 self.initialization_script = DEFAULT_QUICK_LOOKUP_INIT_SCRIPT.to_string();
                 match e.kind() {
                     std::io::ErrorKind::NotFound => {
-                        Err(SettingsLoadError::FileNotFound)
+                        Err(StartupScriptLoadError::FileNotFound)
                     },
                     std::io::ErrorKind::PermissionDenied => {
-                        Err(SettingsLoadError::PermissionDenied)
+                        Err(StartupScriptLoadError::PermissionDenied)
                     },
                     _ => {
-                        Err(SettingsLoadError::FileNotReadable)
+                        Err(StartupScriptLoadError::FileNotReadable)
                     },
                 }
             },
@@ -110,21 +129,23 @@ impl QuickLookupWindow {
             },
         }
     }
-
-    // pub fn load_default(&mut self) {
-    //     match self.dependencies.from_str(JOYTYPING_DEFAULT_SETTINGS) {
-    //         Err(e) => 
-    //             panic!("Default settings file not parsable: {}", e.to_string())
-    //         ,
-    //         Ok(deserialized) => {
-    //             self.data = Some(deserialized);
-    //         }
-    //     }
-    // }
 }
 
 #[derive(Clone, serde::Serialize)]
-struct Payload {
+struct UpdateKeyboardEventPayload {
   layer: u8,
   step: u8,
+}
+
+
+#[derive(Error, Debug)]
+pub enum StartupScriptLoadError {
+    #[error("Startup script file not found")]
+    FileNotFound,
+
+    #[error("Startup script file not readable")]
+    FileNotReadable,
+
+    #[error("OS denied access to startup script file")]
+    PermissionDenied
 }
