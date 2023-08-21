@@ -59,7 +59,8 @@ impl QuickLookupWindow {
 
             if let Some(settings) = &self.quick_lookup_window_settings {
                 window
-                .inner_size(settings.inner_width, settings.inner_height)
+                .inner_size(settings.inner_size.width, settings.inner_size.height)
+                .center()
                 .build()?;
             }
             else {

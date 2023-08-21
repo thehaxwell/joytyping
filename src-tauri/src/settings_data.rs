@@ -139,9 +139,14 @@ pub struct Profile {
 }
 
 #[derive(Deserialize, Debug, Clone)]
+pub struct HeightAndWidth {
+    pub width: f64,
+    pub height: f64,
+}
+
+#[derive(Deserialize, Debug, Clone)]
 pub struct QuickLookupWindowSettings {
-    pub inner_width: f64,
-    pub inner_height: f64,
+    pub inner_size: HeightAndWidth,
 }
 
 #[derive(Deserialize, Debug, Clone)]

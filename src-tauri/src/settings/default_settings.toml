@@ -3,7 +3,11 @@ default_profile= "Built-in default" # The name of the profile to use by default
 
 [[profiles]]
 name="Built-in default"
-quick_lookup_window= {inner_width= 600,inner_height= 400}
+# Note that the options for quick_lookup_window
+# are to match the API's for the WindowBuilder
+# methods (https://docs.rs/tauri/latest/tauri/window/struct.WindowBuilder.html)
+[profiles.quick_lookup_window]
+inner_size = {width= 600,height= 400}
 [profiles.keyboard_mode.key_mappings.south]
 first_layer_step_1= {char_key= "I"}
 first_layer_step_2= {char_key= "U"}
