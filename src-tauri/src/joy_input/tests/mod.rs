@@ -1,23 +1,17 @@
+use crate::gamepad::CustomButton;
 use crate::joy_input::{JoyKeyboard, Step, Layer};
 
 use crate::joy_input::enigo_wrapper::MockEnigoTrait;
 use crate::joy_input::stepper::MockStepperButtonTrait;
 use crate::joy_input::StepperButtonDirection;
 
-use super::GamepadKeyConfig;
+use self::joy_keyboard_keys_config::joy_keyboard_keys_config;
+
+use gilrs::Button;
 use mockall::predicate::*;
 
-const GAMEPAD_KEY_CONFIG: GamepadKeyConfig = GamepadKeyConfig {
-    first_layer_step_1: Some(enigo::Key::Layout('I')),
-    first_layer_step_2: Some(enigo::Key::Layout('U')),
-    first_layer_step_3: Some(enigo::Key::Layout('v')),
-    first_layer_step_4: Some(enigo::Key::Layout('A')),
-    second_layer_step_1: Some(enigo::Key::Layout('&')),
-    second_layer_step_2: Some(enigo::Key::Layout('}')),
-    second_layer_step_3: Some(enigo::Key::Layout('A')),
-    second_layer_step_4: Some(enigo::Key::Layout('z')),
-};
-
+#[cfg(test)]
+mod joy_keyboard_keys_config;
 
 fn assert_just_now(time: std::time::Instant){
     assert!(time.elapsed().as_secs() < 1);
@@ -28,12 +22,20 @@ fn assert_just_now(time: std::time::Instant){
 //--------------
 
 fn setup_key_click_hard_coded_matching_test(
-    layer: Layer, step: Step, gamepad_key_config: enigo::Key){
+    layer: Layer, step: Step, gamepad_key_config: Option<enigo::Key>){
     let mut mock_enigo = MockEnigoTrait::new();
-    mock_enigo
-        .expect_key_click()
-        .with(eq(gamepad_key_config))
-        .return_const(());
+
+    if let Some(config) = gamepad_key_config {
+        mock_enigo
+            .expect_key_click()
+            .with(eq(config))
+            .return_const(());
+    }
+    else {
+        mock_enigo
+            .expect_key_click()
+            .times(0);
+    }
 
     let mock_right_stepper_button = MockStepperButtonTrait::new();
     let mock_left_stepper_button = MockStepperButtonTrait::new();
@@ -41,12 +43,13 @@ fn setup_key_click_hard_coded_matching_test(
         Box::new(mock_enigo),
         Box::new(mock_right_stepper_button),
         Box::new(mock_left_stepper_button),
+        joy_keyboard_keys_config()
     );
 
     joy_keyboard.current_step = step;
     joy_keyboard.current_layer = layer;
 
-    joy_keyboard.key_click(GAMEPAD_KEY_CONFIG);
+    joy_keyboard.button_pressed(CustomButton::Base(Button::South));
 }
 
 #[test]
@@ -54,7 +57,7 @@ fn key_click_hard_coded_layer_1_step_1() {
     setup_key_click_hard_coded_matching_test(
         Layer::First,
         Step::Step1,
-        GAMEPAD_KEY_CONFIG.first_layer_step_1.unwrap());
+        joy_keyboard_keys_config().south.first_layer_step_1.key);
 }
 
 #[test]
@@ -62,7 +65,7 @@ fn key_click_hard_coded_layer_1_step_2() {
     setup_key_click_hard_coded_matching_test(
         Layer::First,
         Step::Step2,
-        GAMEPAD_KEY_CONFIG.first_layer_step_2.unwrap());
+        joy_keyboard_keys_config().south.first_layer_step_2.key);
 }
 
 #[test]
@@ -70,7 +73,7 @@ fn key_click_hard_coded_layer_1_step_3() {
     setup_key_click_hard_coded_matching_test(
         Layer::First,
         Step::Step3,
-        GAMEPAD_KEY_CONFIG.first_layer_step_3.unwrap());
+        joy_keyboard_keys_config().south.first_layer_step_3.key);
 }
 
 #[test]
@@ -78,7 +81,7 @@ fn key_click_hard_coded_layer_2_step_1() {
     setup_key_click_hard_coded_matching_test(
         Layer::Second,
         Step::Step1,
-        GAMEPAD_KEY_CONFIG.second_layer_step_1.unwrap());
+        joy_keyboard_keys_config().south.second_layer_step_1.key);
 }
 
 #[test]
@@ -86,7 +89,7 @@ fn key_click_hard_coded_layer_2_step_2() {
     setup_key_click_hard_coded_matching_test(
         Layer::Second,
         Step::Step2,
-        GAMEPAD_KEY_CONFIG.second_layer_step_2.unwrap());
+        joy_keyboard_keys_config().south.second_layer_step_2.key);
 }
 
 #[test]
@@ -94,7 +97,7 @@ fn key_click_hard_coded_layer_2_step_3() {
     setup_key_click_hard_coded_matching_test(
         Layer::Second,
         Step::Step3,
-        GAMEPAD_KEY_CONFIG.second_layer_step_3.unwrap());
+        joy_keyboard_keys_config().south.second_layer_step_3.key);
 }
 
 //--------------
@@ -126,6 +129,7 @@ fn set_r1_mod_is_down_layer_1_step_1() {
         Box::new(mock_enigo),
         Box::new(mock_right_stepper_button),
         Box::new(mock_left_stepper_button),
+        joy_keyboard_keys_config()
     );
 
     joy_keyboard.set_r1_mod_is_down(R1_IS_DOWN);
@@ -158,6 +162,7 @@ fn set_r1_mod_is_down_layer_1_step_2() {
         Box::new(mock_enigo),
         Box::new(mock_right_stepper_button),
         Box::new(mock_left_stepper_button),
+        joy_keyboard_keys_config()
     );
 
     joy_keyboard.set_r1_mod_is_down(R1_IS_DOWN);
@@ -190,6 +195,7 @@ fn set_l1_mod_is_down_layer_1_step_3() {
         Box::new(mock_enigo),
         Box::new(mock_right_stepper_button),
         Box::new(mock_left_stepper_button),
+        joy_keyboard_keys_config()
     );
 
     joy_keyboard.set_l1_mod_is_down(L1_IS_DOWN);
@@ -226,6 +232,7 @@ fn set_r1_and_l1_mod_is_down_layer_1_step_4() {
         Box::new(mock_enigo),
         Box::new(mock_right_stepper_button),
         Box::new(mock_left_stepper_button),
+        joy_keyboard_keys_config()
     );
 
     joy_keyboard.set_r1_mod_is_down(R1_IS_DOWN);
@@ -263,6 +270,7 @@ fn set_r1_mod_is_down_layer_2_step_1() {
         Box::new(mock_enigo),
         Box::new(mock_right_stepper_button),
         Box::new(mock_left_stepper_button),
+        joy_keyboard_keys_config()
     );
 
     joy_keyboard.current_layer = Layer::Second;
@@ -297,6 +305,7 @@ fn set_r1_mod_is_down_layer_2_step_2() {
         Box::new(mock_enigo),
         Box::new(mock_right_stepper_button),
         Box::new(mock_left_stepper_button),
+        joy_keyboard_keys_config()
     );
 
     joy_keyboard.current_layer = Layer::Second;
@@ -331,6 +340,7 @@ fn set_l1_mod_is_down_layer_2_step_3() {
         Box::new(mock_enigo),
         Box::new(mock_right_stepper_button),
         Box::new(mock_left_stepper_button),
+        joy_keyboard_keys_config()
     );
 
     joy_keyboard.current_layer = Layer::Second;
@@ -369,6 +379,7 @@ fn set_r1_and_l1_mod_is_down_layer_2_step_4() {
         Box::new(mock_enigo),
         Box::new(mock_right_stepper_button),
         Box::new(mock_left_stepper_button),
+        joy_keyboard_keys_config()
     );
 
     joy_keyboard.current_layer = Layer::Second;
@@ -408,6 +419,7 @@ fn use_r1_mod_to_visit_layer_2_step_1() {
         Box::new(mock_enigo),
         Box::new(mock_right_stepper_button),
         Box::new(mock_left_stepper_button),
+        joy_keyboard_keys_config()
     );
 
     joy_keyboard.set_r1_mod_is_down(R1_IS_DOWN);
@@ -449,6 +461,7 @@ fn use_l1_mod_to_visit_layer_2_step_1() {
         Box::new(mock_enigo),
         Box::new(mock_right_stepper_button),
         Box::new(mock_left_stepper_button),
+        joy_keyboard_keys_config()
     );
 
     joy_keyboard.set_l1_mod_is_down(L1_IS_DOWN);
@@ -503,6 +516,7 @@ fn use_l1_mod_to_visit_layer_2_and_r1_to_go_to_step_2() {
         Box::new(mock_enigo),
         Box::new(mock_right_stepper_button),
         Box::new(mock_left_stepper_button),
+        joy_keyboard_keys_config()
     );
 
     joy_keyboard.set_l1_mod_is_down(L1_IS_DOWN);
@@ -569,6 +583,7 @@ fn use_r1_mod_to_visit_layer_2_and_l1_to_go_to_step_3() {
         Box::new(mock_enigo),
         Box::new(mock_right_stepper_button),
         Box::new(mock_left_stepper_button),
+        joy_keyboard_keys_config()
     );
 
     joy_keyboard.set_r1_mod_is_down(R1_IS_DOWN);
@@ -627,6 +642,7 @@ fn set_r1_mod_is_down_visit_second_layer() {
         Box::new(mock_enigo),
         Box::new(mock_right_stepper_button),
         Box::new(mock_left_stepper_button),
+        joy_keyboard_keys_config()
     );
 
     joy_keyboard.set_r1_mod_is_down(R1_IS_DOWN);
@@ -667,6 +683,7 @@ fn set_l1_mod_is_down_visit_second_layer() {
         Box::new(mock_enigo),
         Box::new(mock_right_stepper_button),
         Box::new(mock_left_stepper_button),
+        joy_keyboard_keys_config()
     );
 
     joy_keyboard.set_l1_mod_is_down(L1_IS_DOWN);
@@ -726,6 +743,7 @@ fn set_r1_mod_is_down_go_to_second_layer() {
         Box::new(mock_enigo),
         Box::new(mock_right_stepper_button),
         Box::new(mock_left_stepper_button),
+        joy_keyboard_keys_config()
     );
 
     joy_keyboard.set_r1_mod_is_down(true);
@@ -789,6 +807,7 @@ fn set_l1_mod_is_down_go_to_second_layer() {
         Box::new(mock_enigo),
         Box::new(mock_right_stepper_button),
         Box::new(mock_left_stepper_button),
+        joy_keyboard_keys_config()
     );
 
     joy_keyboard.set_l1_mod_is_down(true);
@@ -852,6 +871,7 @@ fn set_r1_mod_is_down_go_back_to_first_layer() {
         Box::new(mock_enigo),
         Box::new(mock_right_stepper_button),
         Box::new(mock_left_stepper_button),
+        joy_keyboard_keys_config()
     );
 
     joy_keyboard.current_layer = Layer::Second;
@@ -917,6 +937,7 @@ fn set_l1_mod_is_down_go_back_to_first_layer() {
         Box::new(mock_enigo),
         Box::new(mock_right_stepper_button),
         Box::new(mock_left_stepper_button),
+        joy_keyboard_keys_config()
     );
 
     joy_keyboard.current_layer = Layer::Second;
@@ -947,7 +968,7 @@ fn key_click_defaults_to_layer_1_step_1() {
     let mut mock_enigo = MockEnigoTrait::new();
     mock_enigo
         .expect_key_click()
-        .with(eq(GAMEPAD_KEY_CONFIG.first_layer_step_1.unwrap()))
+        .with(eq(joy_keyboard_keys_config().south.first_layer_step_1.key.unwrap()))
         .return_const(());
 
     let mock_right_stepper_button = MockStepperButtonTrait::new();
@@ -956,9 +977,10 @@ fn key_click_defaults_to_layer_1_step_1() {
         Box::new(mock_enigo),
         Box::new(mock_right_stepper_button),
         Box::new(mock_left_stepper_button),
+        joy_keyboard_keys_config()
     );
 
-    joy_keyboard.key_click(GAMEPAD_KEY_CONFIG);
+    joy_keyboard.button_pressed(CustomButton::Base(Button::South));
 }
 
 #[test]
@@ -969,7 +991,7 @@ fn key_click_layer_1_step_2() {
     let mut mock_enigo = MockEnigoTrait::new();
     mock_enigo
         .expect_key_click()
-        .with(eq(GAMEPAD_KEY_CONFIG.first_layer_step_2.unwrap()))
+        .with(eq(joy_keyboard_keys_config().south.first_layer_step_2.key.unwrap()))
         .return_const(());
 
     let mut mock_right_stepper_button = MockStepperButtonTrait::new();
@@ -990,10 +1012,11 @@ fn key_click_layer_1_step_2() {
         Box::new(mock_enigo),
         Box::new(mock_right_stepper_button),
         Box::new(mock_left_stepper_button),
+        joy_keyboard_keys_config()
     );
 
     joy_keyboard.set_r1_mod_is_down(R1_IS_DOWN);
-    joy_keyboard.key_click(GAMEPAD_KEY_CONFIG);
+    joy_keyboard.button_pressed(CustomButton::Base(Button::South));
     assert_eq!(joy_keyboard.current_step,Step::Step2);
     assert_eq!(joy_keyboard.current_layer,Layer::First);
 }
@@ -1006,7 +1029,7 @@ fn key_click_layer_1_step_3() {
     let mut mock_enigo = MockEnigoTrait::new();
     mock_enigo
         .expect_key_click()
-        .with(eq(GAMEPAD_KEY_CONFIG.first_layer_step_3.unwrap()))
+        .with(eq(joy_keyboard_keys_config().south.first_layer_step_3.key.unwrap()))
         .return_const(());
 
     let mut mock_right_stepper_button = MockStepperButtonTrait::new();
@@ -1027,10 +1050,11 @@ fn key_click_layer_1_step_3() {
         Box::new(mock_enigo),
         Box::new(mock_right_stepper_button),
         Box::new(mock_left_stepper_button),
+        joy_keyboard_keys_config()
     );
 
     joy_keyboard.set_l1_mod_is_down(L1_IS_DOWN);
-    joy_keyboard.key_click(GAMEPAD_KEY_CONFIG);
+    joy_keyboard.button_pressed(CustomButton::Base(Button::South));
     assert_eq!(joy_keyboard.current_step,Step::Step3);
     assert_eq!(joy_keyboard.current_layer,Layer::First);
 }
@@ -1043,8 +1067,8 @@ fn key_click_layer_1_step_4() {
     let mut mock_enigo = MockEnigoTrait::new();
     mock_enigo
         .expect_key_click()
-        .with(eq(GAMEPAD_KEY_CONFIG.first_layer_step_4.unwrap()))
-        .return_const(());
+        // .with(eq(joy_keyboard_keys_config().south.first_layer_step_4.key.unwrap()))
+        .times(0); // because south.first_layer_step_4 is None
 
     let mut mock_right_stepper_button = MockStepperButtonTrait::new();
     mock_right_stepper_button
@@ -1068,11 +1092,12 @@ fn key_click_layer_1_step_4() {
         Box::new(mock_enigo),
         Box::new(mock_right_stepper_button),
         Box::new(mock_left_stepper_button),
+        joy_keyboard_keys_config()
     );
 
     joy_keyboard.set_r1_mod_is_down(R1_IS_DOWN);
     joy_keyboard.set_l1_mod_is_down(L1_IS_DOWN);
-    joy_keyboard.key_click(GAMEPAD_KEY_CONFIG);
+    joy_keyboard.button_pressed(CustomButton::Base(Button::South));
     assert_eq!(joy_keyboard.current_step,Step::Step4);
     assert_eq!(joy_keyboard.current_layer,Layer::First);
 }
@@ -1089,7 +1114,7 @@ fn key_click_visit_layer_2_step_1_through_r1() {
     let mut mock_enigo = MockEnigoTrait::new();
     mock_enigo
         .expect_key_click()
-        .with(eq(GAMEPAD_KEY_CONFIG.second_layer_step_1.unwrap()))
+        .with(eq(joy_keyboard_keys_config().south.second_layer_step_1.key.unwrap()))
         .return_const(());
 
     let mut mock_right_stepper_button = MockStepperButtonTrait::new();
@@ -1110,10 +1135,11 @@ fn key_click_visit_layer_2_step_1_through_r1() {
         Box::new(mock_enigo),
         Box::new(mock_right_stepper_button),
         Box::new(mock_left_stepper_button),
+        joy_keyboard_keys_config()
     );
 
     joy_keyboard.set_r1_mod_is_down(R1_IS_DOWN);
-    joy_keyboard.key_click(GAMEPAD_KEY_CONFIG);
+    joy_keyboard.button_pressed(CustomButton::Base(Button::South));
     assert_eq!(joy_keyboard.current_step,Step::Step1);
 
     if let Layer::VisitingSecond(details)
@@ -1135,7 +1161,7 @@ fn key_click_visit_layer_2_step_1_through_l1() {
     let mut mock_enigo = MockEnigoTrait::new();
     mock_enigo
         .expect_key_click()
-        .with(eq(GAMEPAD_KEY_CONFIG.second_layer_step_1.unwrap()))
+        .with(eq(joy_keyboard_keys_config().south.second_layer_step_1.key.unwrap()))
         .return_const(());
 
     let mut mock_right_stepper_button = MockStepperButtonTrait::new();
@@ -1156,10 +1182,11 @@ fn key_click_visit_layer_2_step_1_through_l1() {
         Box::new(mock_enigo),
         Box::new(mock_right_stepper_button),
         Box::new(mock_left_stepper_button),
+        joy_keyboard_keys_config()
     );
 
     joy_keyboard.set_l1_mod_is_down(L1_IS_DOWN);
-    joy_keyboard.key_click(GAMEPAD_KEY_CONFIG);
+    joy_keyboard.button_pressed(CustomButton::Base(Button::South));
     assert_eq!(joy_keyboard.current_step,Step::Step1);
 
     if let Layer::VisitingSecond(details)
@@ -1171,3 +1198,5 @@ fn key_click_visit_layer_2_step_1_through_l1() {
         panic!("Expected layer to be VisitingSecond");
     }
 }
+
+
