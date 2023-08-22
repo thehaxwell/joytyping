@@ -1,6 +1,7 @@
 use crate::Alignment;
 use crate::gamepad::GamepadEvent;
 use crate::gamepad::CustomButton;
+use crate::settings_data;
 
 #[cfg(test)]
 use mockall::{automock, predicate::*};
@@ -213,4 +214,18 @@ pub struct AxisClickThresholds {
     pub down: f32,
     pub left: f32,
     pub alignment: Alignment,
+}
+
+impl AxisClickThresholds {
+    pub fn get_from_setting(
+        thresholds: settings_data::AxisClickThresholds, alignment: Alignment
+        ) -> Self {
+        Self {
+            up: thresholds.up,
+            right: thresholds.right,
+            down: thresholds.down,
+            left: thresholds.left,
+            alignment
+        }
+    }
 }

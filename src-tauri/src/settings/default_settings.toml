@@ -8,6 +8,12 @@ name="Built-in default"
 # methods (https://docs.rs/tauri/latest/tauri/window/struct.WindowBuilder.html)
 [profiles.quick_lookup_window]
 inner_size = {width= 600,height= 400}
+
+[profiles.left_axis]
+click_thresholds = { up = 0.5, down = 0.5, left = 0.5, right = 0.5 }
+[profiles.right_axis]
+click_thresholds = { up = 0.5, down = 0.5, left = 0.5, right = 0.5 }
+
 [profiles.keyboard_mode.key_mappings.south]
 first_layer_step_1= {char_key= "I"}
 first_layer_step_2= {char_key= "U"}

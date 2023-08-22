@@ -131,11 +131,26 @@ pub struct KeyboardModeConfig {
 	pub key_mappings: KeyboardModeKeyMappings,
 }
 
+#[derive(Deserialize, Debug, Clone,Copy)]
+pub struct AxisClickThresholds {
+    pub up: f32,
+    pub right: f32,
+    pub down: f32,
+    pub left: f32,
+}
+
+#[derive(Deserialize, Debug, Clone)]
+pub struct Axis {
+    pub click_thresholds: AxisClickThresholds,
+}
+
 #[derive(Deserialize, Debug, Clone)]
 pub struct Profile {
 	pub keyboard_mode: KeyboardModeConfig,
 	pub name: String,
     pub quick_lookup_window: QuickLookupWindowSettings,
+    pub left_axis: Axis,
+    pub right_axis: Axis,
 }
 
 #[derive(Deserialize, Debug, Clone)]

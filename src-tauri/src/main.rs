@@ -59,24 +59,6 @@ fn main() {
                 }
                 let mut settings_data = settings.get_data().unwrap();
 
-                let gamepad = joytyping::gamepad::Gamepad::new(
-                    Box::new(GilrsWrapper::new()),
-                    Box::new(SticksInterpreter::new(
-                    AxisClickThresholds {
-                        up: 0.5,
-                        down: 0.5,
-                        left: 0.5,
-                        right: 0.5,
-                        alignment: Alignment::Left,
-                    },
-                    AxisClickThresholds {
-                        up: 0.5,
-                        down: 0.5,
-                        left: 0.5,
-                        right: 0.5,
-                        alignment: Alignment::Right,
-                    },)),
-                );
                 let active_profile_index_option = settings_data.profiles.iter()
                     .position(|profile| profile.name == settings_data.global.default_profile);
                         
@@ -84,6 +66,19 @@ fn main() {
                     Some(idx) => idx,
                     None => 0
                 });
+
+                let gamepad = joytyping::gamepad::Gamepad::new(
+                    Box::new(GilrsWrapper::new()),
+                    Box::new(SticksInterpreter::new(
+                    AxisClickThresholds::get_from_setting(
+                        active_profile.left_axis.click_thresholds,
+                        Alignment::Left),
+                    AxisClickThresholds::get_from_setting(
+                        active_profile.right_axis.click_thresholds,
+                        Alignment::Right),
+                        
+                    )),
+                );
                 let joy_keyboard = joytyping::joy_input::JoyKeyboard::new(
                     Box::new(EnigoWrapper::new()),
                     Box::new(StepperButton::new()),
