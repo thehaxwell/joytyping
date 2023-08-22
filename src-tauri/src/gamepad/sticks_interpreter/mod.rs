@@ -1,3 +1,4 @@
+use crate::Alignment;
 use crate::gamepad::GamepadEvent;
 use crate::gamepad::CustomButton;
 
@@ -29,7 +30,23 @@ pub struct SticksInterpreter {
 
 #[cfg_attr(test, automock)]
 impl SticksInterpreter {
-    pub fn new() -> SticksInterpreter{
+    pub fn new(first_axis_click_thresholds: AxisClickThresholds,
+               second_axis_click_thresholds: AxisClickThresholds,
+               ) -> SticksInterpreter{
+        // Sorting out the parameters as the left and right
+       let (right_axis_click_thresholds, left_axis_click_thresholds)
+           = if first_axis_click_thresholds.alignment == Alignment::Left
+               && second_axis_click_thresholds.alignment == Alignment::Right {
+                (second_axis_click_thresholds, first_axis_click_thresholds)
+           }
+           else if first_axis_click_thresholds.alignment == Alignment::Right
+               && second_axis_click_thresholds.alignment == Alignment::Left {
+                (first_axis_click_thresholds, second_axis_click_thresholds)
+           }
+           else {
+                panic!("Invalid alignment combination: expected left-right or right-left")
+           };
+
         SticksInterpreter {
             right_stick_interpreter: StickInterpreter::new(
                 CardinalCustomButtons {
@@ -37,14 +54,18 @@ impl SticksInterpreter {
                     right: CustomButton::RightStickRight,
                     down: CustomButton::RightStickDown,
                     left: CustomButton::RightStickLeft
-                }),
+                },
+                right_axis_click_thresholds,
+            ),
             left_stick_interpreter: StickInterpreter::new(
                 CardinalCustomButtons {
-                up: CustomButton::LeftStickUp,
-                right: CustomButton::LeftStickRight,
-                down: CustomButton::LeftStickDown,
-                left: CustomButton::LeftStickLeft
-            }),
+                    up: CustomButton::LeftStickUp,
+                    right: CustomButton::LeftStickRight,
+                    down: CustomButton::LeftStickDown,
+                    left: CustomButton::LeftStickLeft
+                },
+                left_axis_click_thresholds,
+            ),
             latest_left_button_pressed: None,
             latest_right_button_pressed: None,
         }
@@ -152,32 +173,31 @@ struct CardinalCustomButtons {
 
 struct StickInterpreter {
     button: CardinalCustomButtons,
+    click_thresholds: AxisClickThresholds,
 }
 
 impl StickInterpreter {
-    pub fn new(button: CardinalCustomButtons) -> StickInterpreter{
+    pub fn new(button: CardinalCustomButtons, click_thresholds: AxisClickThresholds) -> StickInterpreter{
         StickInterpreter {
-            button
+            button,
+            click_thresholds,
         }
     }
 
     pub fn interpret_move(&mut self, x_axis: f32, y_axis: f32)-> Option<CustomButton> {
-        const AXIS_CLICK_THRESHOLD: f32 = 0.5;
-        const AXIS_CLICK_THRESHOLD_NEG: f32 = -0.5;
-
         if x_axis.abs() > y_axis.abs() {
-            if x_axis > AXIS_CLICK_THRESHOLD {
+            if x_axis > self.click_thresholds.right {
                 return Some(self.button.right);
             }
-            else if x_axis < AXIS_CLICK_THRESHOLD_NEG {
+            else if x_axis < self.click_thresholds.left * -1.0 {
                 return Some(self.button.left);
             }
         }
         else {
-            if y_axis > AXIS_CLICK_THRESHOLD {
+            if y_axis > self.click_thresholds.up {
                 return Some(self.button.up);
             }
-            else if y_axis < AXIS_CLICK_THRESHOLD_NEG {
+            else if y_axis < self.click_thresholds.down * -1.0 {
                 return Some(self.button.down);
             }
 
@@ -185,4 +205,12 @@ impl StickInterpreter {
 
         return None;
     }
+}
+
+pub struct AxisClickThresholds {
+    pub up: f32,
+    pub right: f32,
+    pub down: f32,
+    pub left: f32,
+    pub alignment: Alignment,
 }

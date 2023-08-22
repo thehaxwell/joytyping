@@ -57,6 +57,8 @@ impl QuickLookupWindow {
             .initialization_script(&self.initialization_script)
             .title("Joytyping Quick Lookup");
 
+            // TODO: consider using https://lib.rs/crates/tap
+            // instead of this if-let
             if let Some(settings) = &self.quick_lookup_window_settings {
                 window
                 .inner_size(settings.inner_size.width, settings.inner_size.height)

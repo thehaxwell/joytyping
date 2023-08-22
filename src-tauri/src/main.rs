@@ -5,9 +5,9 @@ use joytyping::joy_input::joy_keyboard_keys_config::JoyKeyboardKeysConfig;
 use joytyping::settings::{Settings,SettingsLoadError,SettingsDependenciesImpl};
 use tauri::Manager;
 use joytyping::joy_input::stepper::StepperButton;
-use joytyping::run;
+use joytyping::{run, Alignment};
 use joytyping::gamepad::gilrs_wrapper::GilrsWrapper;
-use joytyping::gamepad::sticks_interpreter::SticksInterpreter;
+use joytyping::gamepad::sticks_interpreter::{SticksInterpreter, AxisClickThresholds};
 use joytyping::joy_input::enigo_wrapper::EnigoWrapper;
 use joytyping::quick_lookup_window::{QuickLookupWindow, QuickLookupWindowDependenciesImpl};
 
@@ -61,7 +61,21 @@ fn main() {
 
                 let gamepad = joytyping::gamepad::Gamepad::new(
                     Box::new(GilrsWrapper::new()),
-                    Box::new(SticksInterpreter::new()),
+                    Box::new(SticksInterpreter::new(
+                    AxisClickThresholds {
+                        up: 0.5,
+                        down: 0.5,
+                        left: 0.5,
+                        right: 0.5,
+                        alignment: Alignment::Left,
+                    },
+                    AxisClickThresholds {
+                        up: 0.5,
+                        down: 0.5,
+                        left: 0.5,
+                        right: 0.5,
+                        alignment: Alignment::Right,
+                    },)),
                 );
                 let active_profile_index_option = settings_data.profiles.iter()
                     .position(|profile| profile.name == settings_data.global.default_profile);
