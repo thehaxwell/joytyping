@@ -1,6 +1,10 @@
 use crate::settings_data;
 use crate::settings_data::{EnigoKey, KeyboardModeKeyMappings, KeyboardModeSingleKeyMapping};
 
+#[cfg(test)]
+mod tests;
+
+#[derive(Debug,PartialEq)]
 pub struct KeyClickConfig {
 	pub key: Option<enigo::Key>,
 	pub modifiers: Option<Vec<enigo::Key>>,
@@ -19,7 +23,7 @@ impl KeyClickConfig {
             Some(enigo::Key::Layout(key))
         }
         else if let Some(key) = key_src {
-            KeyClickConfig::to_enigo_key(key)
+            Some(KeyClickConfig::to_enigo_key(key))
         }
         else {
             None
@@ -30,9 +34,7 @@ impl KeyClickConfig {
         if let Some(mods) = modifiers {
             let mut enigo_modifiers = Vec::new();
             for modifier in mods {
-                if let Some(enigo_modifier) = KeyClickConfig::to_enigo_key(modifier.clone()) {
-                    enigo_modifiers.push(enigo_modifier);
-                }
+               enigo_modifiers.push(KeyClickConfig::to_enigo_key(modifier.clone()));
             }
             Some(enigo_modifiers)
         }
@@ -41,95 +43,96 @@ impl KeyClickConfig {
         }
     }
 
-    fn to_enigo_key(key: EnigoKey) -> Option<enigo::Key> {
+    fn to_enigo_key(key: EnigoKey) -> enigo::Key {
         match key {
-            EnigoKey::Alt => Some(enigo::Key::Alt),
-            EnigoKey::Backspace => Some(enigo::Key::Backspace),
-            EnigoKey::Begin => Some(enigo::Key::Begin),
-            EnigoKey::Break => Some(enigo::Key::Break),
-            EnigoKey::Cancel => Some(enigo::Key::Cancel),
-            EnigoKey::CapsLock => Some(enigo::Key::CapsLock),
-            EnigoKey::Clear => Some(enigo::Key::Clear),
-            EnigoKey::Control => Some(enigo::Key::Control),
-            EnigoKey::Delete => Some(enigo::Key::Delete),
-            EnigoKey::DownArrow => Some(enigo::Key::DownArrow),
-            EnigoKey::End => Some(enigo::Key::End),
-            EnigoKey::Escape => Some(enigo::Key::Escape),
-            EnigoKey::Execute => Some(enigo::Key::Execute),
-            EnigoKey::F1 => Some(enigo::Key::F1),
-            EnigoKey::F2 => Some(enigo::Key::F2),
-            EnigoKey::F3 => Some(enigo::Key::F3),
-            EnigoKey::F4 => Some(enigo::Key::F4),
-            EnigoKey::F5 => Some(enigo::Key::F5),
-            EnigoKey::F6 => Some(enigo::Key::F6),
-            EnigoKey::F7 => Some(enigo::Key::F7),
-            EnigoKey::F8 => Some(enigo::Key::F8),
-            EnigoKey::F9 => Some(enigo::Key::F9),
-            EnigoKey::F10 => Some(enigo::Key::F10),
-            EnigoKey::F11 => Some(enigo::Key::F11),
-            EnigoKey::F12 => Some(enigo::Key::F12),
-            EnigoKey::F13 => Some(enigo::Key::F13),
-            EnigoKey::F14 => Some(enigo::Key::F14),
-            EnigoKey::F15 => Some(enigo::Key::F15),
-            EnigoKey::F16 => Some(enigo::Key::F16),
-            EnigoKey::F17 => Some(enigo::Key::F17),
-            EnigoKey::F18 => Some(enigo::Key::F18),
-            EnigoKey::F19 => Some(enigo::Key::F19),
-            EnigoKey::F20 => Some(enigo::Key::F20),
-            EnigoKey::F21 => Some(enigo::Key::F21),
-            EnigoKey::F22 => Some(enigo::Key::F22),
-            EnigoKey::F23 => Some(enigo::Key::F23),
-            EnigoKey::F24 => Some(enigo::Key::F24),
-            EnigoKey::F25 => Some(enigo::Key::F25),
-            EnigoKey::F26 => Some(enigo::Key::F26),
-            EnigoKey::F27 => Some(enigo::Key::F27),
-            EnigoKey::F28 => Some(enigo::Key::F28),
-            EnigoKey::F29 => Some(enigo::Key::F29),
-            EnigoKey::F30 => Some(enigo::Key::F30),
-            EnigoKey::F31 => Some(enigo::Key::F31),
-            EnigoKey::F32 => Some(enigo::Key::F32),
-            EnigoKey::F33 => Some(enigo::Key::F33),
-            EnigoKey::F34 => Some(enigo::Key::F34),
-            EnigoKey::F35 => Some(enigo::Key::F35),
-            EnigoKey::Find => Some(enigo::Key::Find),
-            EnigoKey::Hangul => Some(enigo::Key::Hangul),
-            EnigoKey::Hanja => Some(enigo::Key::Hanja),
-            EnigoKey::Help => Some(enigo::Key::Help),
-            EnigoKey::Home => Some(enigo::Key::Home),
-            EnigoKey::Insert => Some(enigo::Key::Insert),
-            EnigoKey::Kanji => Some(enigo::Key::Kanji),
-            EnigoKey::LControl => Some(enigo::Key::LControl),
-            EnigoKey::LeftArrow => Some(enigo::Key::LeftArrow),
-            EnigoKey::Linefeed => Some(enigo::Key::Linefeed),
-            EnigoKey::LMenu => Some(enigo::Key::LMenu),
-            EnigoKey::LShift => Some(enigo::Key::LShift),
-            EnigoKey::Meta => Some(enigo::Key::Meta),
-            EnigoKey::ModeChange => Some(enigo::Key::ModeChange),
-            EnigoKey::Numlock => Some(enigo::Key::Numlock),
-            EnigoKey::Option => Some(enigo::Key::Option),
-            EnigoKey::PageDown => Some(enigo::Key::PageDown),
-            EnigoKey::PageUp => Some(enigo::Key::PageUp),
-            EnigoKey::Pause => Some(enigo::Key::Pause),
-            EnigoKey::Print => Some(enigo::Key::Print),
-            EnigoKey::RControl => Some(enigo::Key::RControl),
-            EnigoKey::Redo => Some(enigo::Key::Redo),
-            EnigoKey::Return => Some(enigo::Key::Return),
-            EnigoKey::RightArrow => Some(enigo::Key::RightArrow),
-            EnigoKey::RShift => Some(enigo::Key::RShift),
-            EnigoKey::ScrollLock => Some(enigo::Key::ScrollLock),
-            EnigoKey::Select => Some(enigo::Key::Select),
-            EnigoKey::ScriptSwitch => Some(enigo::Key::ScriptSwitch),
-            EnigoKey::Shift => Some(enigo::Key::Shift),
-            EnigoKey::ShiftLock => Some(enigo::Key::ShiftLock),
-            EnigoKey::Space => Some(enigo::Key::Space),
-            EnigoKey::SysReq => Some(enigo::Key::SysReq),
-            EnigoKey::Tab => Some(enigo::Key::Tab),
-            EnigoKey::UpArrow => Some(enigo::Key::UpArrow),
-            EnigoKey::Undo => Some(enigo::Key::Undo),
+            EnigoKey::Alt => enigo::Key::Alt,
+            EnigoKey::Backspace => enigo::Key::Backspace,
+            EnigoKey::Begin => enigo::Key::Begin,
+            EnigoKey::Break => enigo::Key::Break,
+            EnigoKey::Cancel => enigo::Key::Cancel,
+            EnigoKey::CapsLock => enigo::Key::CapsLock,
+            EnigoKey::Clear => enigo::Key::Clear,
+            EnigoKey::Control => enigo::Key::Control,
+            EnigoKey::Delete => enigo::Key::Delete,
+            EnigoKey::DownArrow => enigo::Key::DownArrow,
+            EnigoKey::End => enigo::Key::End,
+            EnigoKey::Escape => enigo::Key::Escape,
+            EnigoKey::Execute => enigo::Key::Execute,
+            EnigoKey::F1 => enigo::Key::F1,
+            EnigoKey::F2 => enigo::Key::F2,
+            EnigoKey::F3 => enigo::Key::F3,
+            EnigoKey::F4 => enigo::Key::F4,
+            EnigoKey::F5 => enigo::Key::F5,
+            EnigoKey::F6 => enigo::Key::F6,
+            EnigoKey::F7 => enigo::Key::F7,
+            EnigoKey::F8 => enigo::Key::F8,
+            EnigoKey::F9 => enigo::Key::F9,
+            EnigoKey::F10 => enigo::Key::F10,
+            EnigoKey::F11 => enigo::Key::F11,
+            EnigoKey::F12 => enigo::Key::F12,
+            EnigoKey::F13 => enigo::Key::F13,
+            EnigoKey::F14 => enigo::Key::F14,
+            EnigoKey::F15 => enigo::Key::F15,
+            EnigoKey::F16 => enigo::Key::F16,
+            EnigoKey::F17 => enigo::Key::F17,
+            EnigoKey::F18 => enigo::Key::F18,
+            EnigoKey::F19 => enigo::Key::F19,
+            EnigoKey::F20 => enigo::Key::F20,
+            EnigoKey::F21 => enigo::Key::F21,
+            EnigoKey::F22 => enigo::Key::F22,
+            EnigoKey::F23 => enigo::Key::F23,
+            EnigoKey::F24 => enigo::Key::F24,
+            EnigoKey::F25 => enigo::Key::F25,
+            EnigoKey::F26 => enigo::Key::F26,
+            EnigoKey::F27 => enigo::Key::F27,
+            EnigoKey::F28 => enigo::Key::F28,
+            EnigoKey::F29 => enigo::Key::F29,
+            EnigoKey::F30 => enigo::Key::F30,
+            EnigoKey::F31 => enigo::Key::F31,
+            EnigoKey::F32 => enigo::Key::F32,
+            EnigoKey::F33 => enigo::Key::F33,
+            EnigoKey::F34 => enigo::Key::F34,
+            EnigoKey::F35 => enigo::Key::F35,
+            EnigoKey::Find => enigo::Key::Find,
+            EnigoKey::Hangul => enigo::Key::Hangul,
+            EnigoKey::Hanja => enigo::Key::Hanja,
+            EnigoKey::Help => enigo::Key::Help,
+            EnigoKey::Home => enigo::Key::Home,
+            EnigoKey::Insert => enigo::Key::Insert,
+            EnigoKey::Kanji => enigo::Key::Kanji,
+            EnigoKey::LControl => enigo::Key::LControl,
+            EnigoKey::LeftArrow => enigo::Key::LeftArrow,
+            EnigoKey::Linefeed => enigo::Key::Linefeed,
+            EnigoKey::LMenu => enigo::Key::LMenu,
+            EnigoKey::LShift => enigo::Key::LShift,
+            EnigoKey::Meta => enigo::Key::Meta,
+            EnigoKey::ModeChange => enigo::Key::ModeChange,
+            EnigoKey::Numlock => enigo::Key::Numlock,
+            EnigoKey::Option => enigo::Key::Option,
+            EnigoKey::PageDown => enigo::Key::PageDown,
+            EnigoKey::PageUp => enigo::Key::PageUp,
+            EnigoKey::Pause => enigo::Key::Pause,
+            EnigoKey::Print => enigo::Key::Print,
+            EnigoKey::RControl => enigo::Key::RControl,
+            EnigoKey::Redo => enigo::Key::Redo,
+            EnigoKey::Return => enigo::Key::Return,
+            EnigoKey::RightArrow => enigo::Key::RightArrow,
+            EnigoKey::RShift => enigo::Key::RShift,
+            EnigoKey::ScrollLock => enigo::Key::ScrollLock,
+            EnigoKey::Select => enigo::Key::Select,
+            EnigoKey::ScriptSwitch => enigo::Key::ScriptSwitch,
+            EnigoKey::Shift => enigo::Key::Shift,
+            EnigoKey::ShiftLock => enigo::Key::ShiftLock,
+            EnigoKey::Space => enigo::Key::Space,
+            EnigoKey::SysReq => enigo::Key::SysReq,
+            EnigoKey::Tab => enigo::Key::Tab,
+            EnigoKey::UpArrow => enigo::Key::UpArrow,
+            EnigoKey::Undo => enigo::Key::Undo,
         }
     }
 }
 
+#[derive(Debug,PartialEq)]
 pub struct SingleKeyConfig {
     pub first_layer_step_1: KeyClickConfig,
     pub first_layer_step_2: KeyClickConfig,
@@ -155,6 +158,7 @@ impl SingleKeyConfig {
     }
 }
 
+#[derive(Debug,PartialEq)]
 pub struct KeysConfig {
     pub south: SingleKeyConfig,
     pub east: SingleKeyConfig,
