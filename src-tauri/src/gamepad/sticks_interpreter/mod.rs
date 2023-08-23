@@ -73,24 +73,24 @@ impl SticksInterpreter {
     }
 
     fn interpret_stick_move_wrapper(
-        &mut self, is_left_stick: bool,
+        &mut self, stick: LeftOrRight,
         x_axis_value: Option<f32>,
         y_axis_value: Option<f32>)-> Option<GamepadEvent> {
         let x_value =
             if let Some(data) = x_axis_value {data} else {0.0};
         let y_value =
             if let Some(data) = y_axis_value {data} else {0.0};
-        self.interpret_stick_move(is_left_stick,x_value,y_value)
+        self.interpret_stick_move(stick,x_value,y_value)
     }
 
     // The difference with this one is that is
     // processes x and y coordinates together to
     // eliminate possible race conditions
     fn interpret_stick_move(
-        &mut self, is_left_stick: bool,
+        &mut self, stick: LeftOrRight,
         x_value: f32,
         y_value: f32)-> Option<GamepadEvent> {
-        if is_left_stick {
+        if stick == LeftOrRight::Left {
                 let button_pressed = 
                     self.left_stick_interpreter
                     .interpret_move(x_value,y_value);
@@ -154,14 +154,14 @@ impl SticksInterpreterTrait for SticksInterpreter {
         &mut self,
         x_axis_value: Option<f32>,
         y_axis_value: Option<f32>) -> Option<GamepadEvent>{
-        self.interpret_stick_move_wrapper(true,x_axis_value,y_axis_value)
+        self.interpret_stick_move_wrapper(LeftOrRight::Left,x_axis_value,y_axis_value)
     }
     
     fn interpret_right_stick_move (
         &mut self,
         x_axis_value: Option<f32>,
         y_axis_value: Option<f32>) -> Option<GamepadEvent>{
-        self.interpret_stick_move_wrapper(false,x_axis_value,y_axis_value)
+        self.interpret_stick_move_wrapper(LeftOrRight::Right,x_axis_value,y_axis_value)
     }
 }
 

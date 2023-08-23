@@ -16,7 +16,7 @@ fn create_axes_and_move_stick_to(
         );
     raw_events
         .iter()
-        .map(|m| axes_interpreter.interpret_stick_move(if let LeftOrRight::Left = m.0 { true } else {false},m.1,m.2))
+        .map(|m| axes_interpreter.interpret_stick_move(m.0.clone(),m.1,m.2))
         .collect()
 }
 

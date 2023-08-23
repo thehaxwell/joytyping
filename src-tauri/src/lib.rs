@@ -69,7 +69,7 @@ pub fn run(mut gamepad: gamepad::Gamepad, mut joy_keyboard: joy_input::JoyKeyboa
     }
 }
 
-#[derive(PartialEq)]
+#[derive(PartialEq,Clone)]
 pub enum LeftOrRight {
     Left,
     Right,
