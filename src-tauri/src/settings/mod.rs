@@ -98,8 +98,8 @@ impl Settings {
         -> Result<(), SettingsLoadError> {
             let error: Option<SettingsLoadError> = data.profiles.iter().find_map(|p| {
                 let thresholds_arr = [
-                    p.left_axis.click_thresholds,
-                    p.right_axis.click_thresholds];
+                    p.left_stick.click_thresholds,
+                    p.right_stick.click_thresholds];
 
                 let mut idx = -1;
                 thresholds_arr.iter().find_map(|t| {
@@ -124,7 +124,7 @@ impl Settings {
                         Some(SettingsLoadError::FileNotParsable(format!(
                             "at \"{}\" profile > {} > click_thresholds: {} is out of bounds",
                             p.name,
-                            if idx == 0 {"left_axis"} else {"right_axis"},
+                            if idx == 0 {"left_stick"} else {"right_stick"},
                             direction)))
                     }
                     else {

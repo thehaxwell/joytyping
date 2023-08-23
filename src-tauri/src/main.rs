@@ -71,10 +71,10 @@ fn main() {
                     Box::new(GilrsWrapper::new()),
                     Box::new(SticksInterpreter::new(
                     AxisClickThresholds::get_from_setting(
-                        active_profile.left_axis.click_thresholds,
+                        active_profile.left_stick.click_thresholds,
                         Alignment::Left),
                     AxisClickThresholds::get_from_setting(
-                        active_profile.right_axis.click_thresholds,
+                        active_profile.right_stick.click_thresholds,
                         Alignment::Right),
                         
                     )),

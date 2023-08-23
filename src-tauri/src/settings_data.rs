@@ -149,8 +149,8 @@ pub struct Profile {
 	pub keyboard_mode: KeyboardModeConfig,
 	pub name: String,
     pub quick_lookup_window: QuickLookupWindowSettings,
-    pub left_axis: Axis,
-    pub right_axis: Axis,
+    pub left_stick: Axis,
+    pub right_stick: Axis,
 }
 
 #[derive(Deserialize, Debug, Clone)]
