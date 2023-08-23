@@ -88,42 +88,42 @@ pub enum EnigoKey {
 }
 
 #[derive(Deserialize, Debug, Clone)]
-pub struct KeyMapping {
+pub struct KeyClickConfig {
 	pub key: Option<EnigoKey>,
 	pub modifiers: Option<Vec<EnigoKey>>,
 	pub char_key: Option<char>,
 }
 
 #[derive(Deserialize, Debug, Clone)]
-pub struct KeyboardModeKeyMappingsMappings {
-    pub first_layer_step_1: KeyMapping,
-    pub first_layer_step_2: KeyMapping,
-    pub first_layer_step_3: KeyMapping,
-    pub first_layer_step_4: KeyMapping,
-    pub second_layer_step_1: KeyMapping,
-    pub second_layer_step_2: KeyMapping,
-    pub second_layer_step_3: KeyMapping,
-    pub second_layer_step_4: KeyMapping,
+pub struct KeyboardModeSingleKeyMapping {
+    pub first_layer_step_1: KeyClickConfig,
+    pub first_layer_step_2: KeyClickConfig,
+    pub first_layer_step_3: KeyClickConfig,
+    pub first_layer_step_4: KeyClickConfig,
+    pub second_layer_step_1: KeyClickConfig,
+    pub second_layer_step_2: KeyClickConfig,
+    pub second_layer_step_3: KeyClickConfig,
+    pub second_layer_step_4: KeyClickConfig,
 }
 
 #[derive(Deserialize, Debug, Clone)]
 pub struct KeyboardModeKeyMappings {
-	pub south: KeyboardModeKeyMappingsMappings,
-	pub east: KeyboardModeKeyMappingsMappings,
-	pub north: KeyboardModeKeyMappingsMappings,
-	pub west: KeyboardModeKeyMappingsMappings,
-	pub d_pad_up: KeyboardModeKeyMappingsMappings,
-	pub d_pad_down: KeyboardModeKeyMappingsMappings,
-	pub d_pad_left: KeyboardModeKeyMappingsMappings,
-	pub d_pad_right: KeyboardModeKeyMappingsMappings,
-	pub left_stick_up: KeyboardModeKeyMappingsMappings,
-	pub left_stick_down: KeyboardModeKeyMappingsMappings,
-	pub left_stick_left: KeyboardModeKeyMappingsMappings,
-	pub left_stick_right: KeyboardModeKeyMappingsMappings,
-	pub right_stick_up: KeyboardModeKeyMappingsMappings,
-	pub right_stick_down: KeyboardModeKeyMappingsMappings,
-	pub right_stick_left: KeyboardModeKeyMappingsMappings,
-	pub right_stick_right: KeyboardModeKeyMappingsMappings,
+	pub south: KeyboardModeSingleKeyMapping,
+	pub east: KeyboardModeSingleKeyMapping,
+	pub north: KeyboardModeSingleKeyMapping,
+	pub west: KeyboardModeSingleKeyMapping,
+	pub d_pad_up: KeyboardModeSingleKeyMapping,
+	pub d_pad_down: KeyboardModeSingleKeyMapping,
+	pub d_pad_left: KeyboardModeSingleKeyMapping,
+	pub d_pad_right: KeyboardModeSingleKeyMapping,
+	pub left_stick_up: KeyboardModeSingleKeyMapping,
+	pub left_stick_down: KeyboardModeSingleKeyMapping,
+	pub left_stick_left: KeyboardModeSingleKeyMapping,
+	pub left_stick_right: KeyboardModeSingleKeyMapping,
+	pub right_stick_up: KeyboardModeSingleKeyMapping,
+	pub right_stick_down: KeyboardModeSingleKeyMapping,
+	pub right_stick_left: KeyboardModeSingleKeyMapping,
+	pub right_stick_right: KeyboardModeSingleKeyMapping,
 }
 
 #[derive(Deserialize, Debug, Clone)]
@@ -148,7 +148,7 @@ pub struct Axis {
 pub struct Profile {
 	pub keyboard_mode: KeyboardModeConfig,
 	pub name: String,
-    pub quick_lookup_window: QuickLookupWindowSettings,
+    pub quick_lookup_window: QuickLookupWindow,
     pub left_stick: Axis,
     pub right_stick: Axis,
 }
@@ -160,17 +160,17 @@ pub struct HeightAndWidth {
 }
 
 #[derive(Deserialize, Debug, Clone)]
-pub struct QuickLookupWindowSettings {
+pub struct QuickLookupWindow {
     pub inner_size: HeightAndWidth,
 }
 
 #[derive(Deserialize, Debug, Clone)]
-pub struct GlobalSettings {
+pub struct Global {
     pub default_profile: String,
 }
 
 #[derive(Deserialize, Debug, Clone)]
 pub struct SettingsData {
 	pub profiles: Vec<Profile>,
-    pub global: GlobalSettings,
+    pub global: Global,
 }

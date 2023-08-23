@@ -5,7 +5,8 @@
 
 use tauri::Manager;
 
-use crate::{joy_keyboard::{Layer, Step}, settings_data::QuickLookupWindowSettings};
+use crate::joy_keyboard::{Layer, Step};
+use crate::settings_data;
 
 use thiserror::Error;
 
@@ -31,7 +32,7 @@ pub struct QuickLookupWindow {
     tauri_app_handle: tauri::AppHandle,
     dependencies: Box<dyn QuickLookupWindowDependencies>,
 initialization_script: String,
-quick_lookup_window_settings: Option<QuickLookupWindowSettings>,
+quick_lookup_window_settings: Option<settings_data::QuickLookupWindow>,
 }
 
 impl QuickLookupWindow {
@@ -100,7 +101,7 @@ impl QuickLookupWindow {
         }
     }
 
-    pub fn set_window_settings(&mut self, settings: QuickLookupWindowSettings) {
+    pub fn set_window_settings(&mut self, settings: settings_data::QuickLookupWindow) {
         self.quick_lookup_window_settings = Some(settings);
     }
 

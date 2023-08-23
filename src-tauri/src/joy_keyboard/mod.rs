@@ -1,7 +1,7 @@
 use stepper::StepperButtonTrait;
 use std::time::{Duration, Instant};
 
-use crate::{settings_data::KeyMapping, gamepad::CustomButton};
+use crate::{settings_data::KeyClickConfig, gamepad::CustomButton};
 
 use self::{enigo_wrapper::EnigoTrait, keys_config::KeysConfig};
 
@@ -257,14 +257,14 @@ impl JoyKeyboard {
 }
 
 pub struct GamepadKeyConfig {
-    pub first_layer_step_1: KeyMapping,
-    pub first_layer_step_2: KeyMapping,
-    pub first_layer_step_3: KeyMapping,
-    pub first_layer_step_4: KeyMapping,
-    pub second_layer_step_1: KeyMapping,
-    pub second_layer_step_2: KeyMapping,
-    pub second_layer_step_3: KeyMapping,
-    pub second_layer_step_4: KeyMapping,
+    pub first_layer_step_1: KeyClickConfig,
+    pub first_layer_step_2: KeyClickConfig,
+    pub first_layer_step_3: KeyClickConfig,
+    pub first_layer_step_4: KeyClickConfig,
+    pub second_layer_step_1: KeyClickConfig,
+    pub second_layer_step_2: KeyClickConfig,
+    pub second_layer_step_3: KeyClickConfig,
+    pub second_layer_step_4: KeyClickConfig,
 }
 
 #[derive(Debug,PartialEq,Clone,Copy)]

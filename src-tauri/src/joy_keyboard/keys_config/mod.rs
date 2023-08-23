@@ -1,16 +1,16 @@
 use crate::settings_data;
-use crate::settings_data::{EnigoKey, KeyboardModeKeyMappings, KeyboardModeKeyMappingsMappings};
+use crate::settings_data::{EnigoKey, KeyboardModeKeyMappings, KeyboardModeSingleKeyMapping};
 
-pub struct KeyMapping {
+pub struct KeyClickConfig {
 	pub key: Option<enigo::Key>,
 	pub modifiers: Option<Vec<enigo::Key>>,
 }
 
-impl KeyMapping {
-    fn from(mapping: settings_data::KeyMapping) -> Self {
+impl KeyClickConfig {
+    fn from(mapping: settings_data::KeyClickConfig) -> Self {
         Self {
-            key: KeyMapping::get_key(mapping.key, mapping.char_key),
-            modifiers: KeyMapping::get_modifier_keys(mapping.modifiers),
+            key: KeyClickConfig::get_key(mapping.key, mapping.char_key),
+            modifiers: KeyClickConfig::get_modifier_keys(mapping.modifiers),
         }
     }
     // If char_key is given, it takes precedence over key
@@ -19,7 +19,7 @@ impl KeyMapping {
             Some(enigo::Key::Layout(key))
         }
         else if let Some(key) = key_src {
-            KeyMapping::to_enigo_key(key)
+            KeyClickConfig::to_enigo_key(key)
         }
         else {
             None
@@ -30,7 +30,7 @@ impl KeyMapping {
         if let Some(mods) = modifiers {
             let mut enigo_modifiers = Vec::new();
             for modifier in mods {
-                if let Some(enigo_modifier) = KeyMapping::to_enigo_key(modifier.clone()) {
+                if let Some(enigo_modifier) = KeyClickConfig::to_enigo_key(modifier.clone()) {
                     enigo_modifiers.push(enigo_modifier);
                 }
             }
@@ -131,26 +131,26 @@ impl KeyMapping {
 }
 
 pub struct SingleKeyConfig {
-    pub first_layer_step_1: KeyMapping,
-    pub first_layer_step_2: KeyMapping,
-    pub first_layer_step_3: KeyMapping,
-    pub first_layer_step_4: KeyMapping,
-    pub second_layer_step_1: KeyMapping,
-    pub second_layer_step_2: KeyMapping,
-    pub second_layer_step_3: KeyMapping,
-    pub second_layer_step_4: KeyMapping,
+    pub first_layer_step_1: KeyClickConfig,
+    pub first_layer_step_2: KeyClickConfig,
+    pub first_layer_step_3: KeyClickConfig,
+    pub first_layer_step_4: KeyClickConfig,
+    pub second_layer_step_1: KeyClickConfig,
+    pub second_layer_step_2: KeyClickConfig,
+    pub second_layer_step_3: KeyClickConfig,
+    pub second_layer_step_4: KeyClickConfig,
 }
 impl SingleKeyConfig {
-    fn from(conf: KeyboardModeKeyMappingsMappings) -> Self {
+    fn from(conf: KeyboardModeSingleKeyMapping) -> Self {
         SingleKeyConfig {
-            first_layer_step_1: KeyMapping::from(conf.first_layer_step_1),
-            first_layer_step_2: KeyMapping::from(conf.first_layer_step_2),
-            first_layer_step_3: KeyMapping::from(conf.first_layer_step_3),
-            first_layer_step_4: KeyMapping::from(conf.first_layer_step_4),
-            second_layer_step_1: KeyMapping::from(conf.second_layer_step_1),
-            second_layer_step_2: KeyMapping::from(conf.second_layer_step_2),
-            second_layer_step_3: KeyMapping::from(conf.second_layer_step_3),
-            second_layer_step_4: KeyMapping::from(conf.second_layer_step_4),
+            first_layer_step_1: KeyClickConfig::from(conf.first_layer_step_1),
+            first_layer_step_2: KeyClickConfig::from(conf.first_layer_step_2),
+            first_layer_step_3: KeyClickConfig::from(conf.first_layer_step_3),
+            first_layer_step_4: KeyClickConfig::from(conf.first_layer_step_4),
+            second_layer_step_1: KeyClickConfig::from(conf.second_layer_step_1),
+            second_layer_step_2: KeyClickConfig::from(conf.second_layer_step_2),
+            second_layer_step_3: KeyClickConfig::from(conf.second_layer_step_3),
+            second_layer_step_4: KeyClickConfig::from(conf.second_layer_step_4),
         }
     }
 }
