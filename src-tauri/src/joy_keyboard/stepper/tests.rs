@@ -1,4 +1,4 @@
-use crate::joy_input::stepper::{StepperButton, StepperButtonTrait};
+use crate::joy_keyboard::stepper::{StepperButton, StepperButtonTrait};
 
 #[test]
 fn double_click_works() {

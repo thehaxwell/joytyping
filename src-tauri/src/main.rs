@@ -1,14 +1,14 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use joytyping::joy_input::joy_keyboard_keys_config::JoyKeyboardKeysConfig;
+use joytyping::joy_keyboard::joy_keyboard_keys_config::JoyKeyboardKeysConfig;
 use joytyping::settings::{Settings,SettingsLoadError,SettingsDependenciesImpl};
 use tauri::Manager;
-use joytyping::joy_input::stepper::StepperButton;
+use joytyping::joy_keyboard::stepper::StepperButton;
 use joytyping::{run, LeftOrRight};
 use joytyping::gamepad::gilrs_wrapper::GilrsWrapper;
 use joytyping::gamepad::sticks_interpreter::{SticksInterpreter, AxisClickThresholds};
-use joytyping::joy_input::enigo_wrapper::EnigoWrapper;
+use joytyping::joy_keyboard::enigo_wrapper::EnigoWrapper;
 use joytyping::quick_lookup_window::{QuickLookupWindow, QuickLookupWindowDependenciesImpl};
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
@@ -79,7 +79,7 @@ fn main() {
                         
                     )),
                 );
-                let joy_keyboard = joytyping::joy_input::JoyKeyboard::new(
+                let joy_keyboard = joytyping::joy_keyboard::JoyKeyboard::new(
                     Box::new(EnigoWrapper::new()),
                     Box::new(StepperButton::new()),
                     Box::new(StepperButton::new()),

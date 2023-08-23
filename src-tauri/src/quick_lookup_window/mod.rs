@@ -5,7 +5,7 @@
 
 use tauri::Manager;
 
-use crate::{joy_input::{Layer, Step}, settings_data::QuickLookupWindowSettings};
+use crate::{joy_keyboard::{Layer, Step}, settings_data::QuickLookupWindowSettings};
 
 use thiserror::Error;
 

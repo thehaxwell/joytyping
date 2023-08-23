@@ -1,9 +1,9 @@
 use crate::gamepad::CustomButton;
-use crate::joy_input::{JoyKeyboard, Step, Layer};
+use crate::joy_keyboard::{JoyKeyboard, Step, Layer};
 
-use crate::joy_input::enigo_wrapper::MockEnigoTrait;
-use crate::joy_input::stepper::MockStepperButtonTrait;
-use crate::joy_input::StepperButtonDirection;
+use crate::joy_keyboard::enigo_wrapper::MockEnigoTrait;
+use crate::joy_keyboard::stepper::MockStepperButtonTrait;
+use crate::joy_keyboard::StepperButtonDirection;
 
 use self::joy_keyboard_keys_config::joy_keyboard_keys_config;
 

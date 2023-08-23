@@ -1,12 +1,12 @@
 use quick_lookup_window::QuickLookupWindow;
 
-pub mod joy_input;
+pub mod joy_keyboard;
 pub mod gamepad;
 pub mod quick_lookup_window;
 pub mod settings;
 pub mod settings_data;
 
-pub fn run(mut gamepad: gamepad::Gamepad, mut joy_keyboard: joy_input::JoyKeyboard, mut quick_lookup_window: QuickLookupWindow,
+pub fn run(mut gamepad: gamepad::Gamepad, mut joy_keyboard: joy_keyboard::JoyKeyboard, mut quick_lookup_window: QuickLookupWindow,
            ) {
     use gamepad::CustomButton;
     loop {

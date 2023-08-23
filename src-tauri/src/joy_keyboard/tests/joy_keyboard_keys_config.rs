@@ -1,4 +1,4 @@
-use crate::joy_input::joy_keyboard_keys_config::{JoyKeyboardKeysConfig, JoyKeyboardKeyConfig, JoyKeyboardKeyMapping};
+use crate::joy_keyboard::joy_keyboard_keys_config::{JoyKeyboardKeysConfig, JoyKeyboardKeyConfig, JoyKeyboardKeyMapping};
 
 pub fn joy_keyboard_keys_config() -> JoyKeyboardKeysConfig{
     JoyKeyboardKeysConfig {
