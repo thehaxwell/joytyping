@@ -1,4 +1,4 @@
-use crate::Alignment;
+use crate::LeftOrRight;
 use crate::gamepad::sticks_interpreter::SticksInterpreter;
 use crate::gamepad::GamepadEvent;
 use crate::gamepad::CustomButton;
@@ -8,7 +8,7 @@ use super::AxisClickThresholds;
 fn create_axes_and_move_stick_to(
     first_thresholds: AxisClickThresholds,
     second_thresholds: AxisClickThresholds,
-    raw_events: Vec<(Alignment,f32,f32)>
+    raw_events: Vec<(LeftOrRight,f32,f32)>
     ) -> Vec<Option<GamepadEvent>>{
     let mut axes_interpreter = SticksInterpreter::new(
         first_thresholds,
@@ -16,7 +16,7 @@ fn create_axes_and_move_stick_to(
         );
     raw_events
         .iter()
-        .map(|m| axes_interpreter.interpret_stick_move(if let Alignment::Left = m.0 { true } else {false},m.1,m.2))
+        .map(|m| axes_interpreter.interpret_stick_move(if let LeftOrRight::Left = m.0 { true } else {false},m.1,m.2))
         .collect()
 }
 
@@ -31,17 +31,17 @@ fn resting_position_fires_no_events() {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Left,0.0,0.0),
+        (LeftOrRight::Left,0.0,0.0),
     ]);
 
     assert_eq!(res[0],None);
@@ -52,17 +52,17 @@ fn resting_position_fires_no_events() {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Right,0.0,0.0),
+        (LeftOrRight::Right,0.0,0.0),
     ]);
 
     assert_eq!(res[0],None);
@@ -80,17 +80,17 @@ fn tilt_left_stick_to_the_left() {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Left,-1.0,0.0),
+        (LeftOrRight::Left,-1.0,0.0),
     ]);
 
     assert_eq!(res[0],Some(GamepadEvent::ButtonPressed(CustomButton::LeftStickLeft)));
@@ -104,17 +104,17 @@ fn tilt_right_stick_to_the_left() {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Right,-1.0,0.0),
+        (LeftOrRight::Right,-1.0,0.0),
     ]);
 
     assert_eq!(res[0],Some(GamepadEvent::ButtonPressed(CustomButton::RightStickLeft)));
@@ -128,17 +128,17 @@ fn tilt_left_stick_to_the_right() {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Left,1.0,0.0),
+        (LeftOrRight::Left,1.0,0.0),
     ]);
 
     assert_eq!(res[0],Some(GamepadEvent::ButtonPressed(CustomButton::LeftStickRight)));
@@ -153,17 +153,17 @@ fn tilt_right_stick_to_the_right() {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Right,1.0,0.0),
+        (LeftOrRight::Right,1.0,0.0),
     ]);
 
     assert_eq!(res[0],Some(GamepadEvent::ButtonPressed(CustomButton::RightStickRight)));
@@ -177,17 +177,17 @@ fn tilt_left_stick_up() {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Left,0.0,1.0),
+        (LeftOrRight::Left,0.0,1.0),
     ]);
 
     assert_eq!(res[0],Some(GamepadEvent::ButtonPressed(CustomButton::LeftStickUp)));
@@ -201,17 +201,17 @@ fn tilt_right_stick_up() {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Right,0.0,1.0),
+        (LeftOrRight::Right,0.0,1.0),
     ]);
 
     assert_eq!(res[0],Some(GamepadEvent::ButtonPressed(CustomButton::RightStickUp)));
@@ -225,17 +225,17 @@ fn tilt_left_stick_down() {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Left,0.0,-1.0),
+        (LeftOrRight::Left,0.0,-1.0),
     ]);
 
     assert_eq!(res[0],Some(GamepadEvent::ButtonPressed(CustomButton::LeftStickDown)));
@@ -249,17 +249,17 @@ fn tilt_right_stick_down() {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Right,0.0,-1.0),
+        (LeftOrRight::Right,0.0,-1.0),
     ]);
 
     assert_eq!(res[0],Some(GamepadEvent::ButtonPressed(CustomButton::RightStickDown)));
@@ -277,17 +277,17 @@ fn inadequately_tilt_left_stick_to_the_left_wont_register() {
             down: 0.2,
             left: 0.3,
             right: 0.4,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.6,
             left: 0.7,
             right: 0.8,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Left,-0.3,0.0),
+        (LeftOrRight::Left,-0.3,0.0),
     ]);
 
     assert_eq!(res[0],None);
@@ -302,17 +302,17 @@ fn inadequately_tilt_right_stick_to_the_left_wont_register() {
             down: 0.52,
             left: 0.53,
             right: 0.541,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.55,
             down: 0.56,
             left: 0.57,
             right: 0.58,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Right,-0.57,0.0),
+        (LeftOrRight::Right,-0.57,0.0),
     ]);
 
     assert_eq!(res[0],None);
@@ -326,17 +326,17 @@ fn inadequately_tilt_left_stick_to_the_right_wont_register() {
             down: 0.205,
             left: 0.305,
             right: 0.405,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.505,
             down: 0.605,
             left: 0.705,
             right: 0.805,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Left,0.305,0.0),
+        (LeftOrRight::Left,0.305,0.0),
     ]);
 
     assert_eq!(res[0],None);
@@ -350,17 +350,17 @@ fn inadequately_tilt_right_stick_to_the_right_wont_register() {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Right,0.5,0.0),
+        (LeftOrRight::Right,0.5,0.0),
     ]);
 
     assert_eq!(res[0],None);
@@ -374,17 +374,17 @@ fn inadequately_tilt_left_stick_up_wont_register() {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Left,0.0,0.5),
+        (LeftOrRight::Left,0.0,0.5),
     ]);
 
     assert_eq!(res[0],None);
@@ -398,17 +398,17 @@ fn inadequately_tilt_right_stick_up_wont_register() {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Right,0.0,0.5),
+        (LeftOrRight::Right,0.0,0.5),
     ]);
 
     assert_eq!(res[0],None);
@@ -422,17 +422,17 @@ fn inadequately_tilt_left_stick_down_wont_register() {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Left,0.0,-0.5),
+        (LeftOrRight::Left,0.0,-0.5),
     ]);
 
     assert_eq!(res[0],None);
@@ -446,17 +446,17 @@ fn inadequately_tilt_right_stick_down_wont_register() {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Right,0.0,-0.5),
+        (LeftOrRight::Right,0.0,-0.5),
     ]);
 
     assert_eq!(res[0],None);
@@ -475,17 +475,17 @@ fn minimally_tilt_left_stick_to_the_left() {
             down: 0.9835,
             left: 0.37852,
             right: 0.8329,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.8392,
             down: 0.2389,
             left: 0.82934,
             right: 0.32948,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Left,-0.3785201,0.0),
+        (LeftOrRight::Left,-0.3785201,0.0),
     ]);
 
     assert_eq!(res[0],Some(GamepadEvent::ButtonPressed(CustomButton::LeftStickLeft)));
@@ -499,17 +499,17 @@ fn minimally_tilt_right_stick_to_the_left() {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Right,-0.51,0.0),
+        (LeftOrRight::Right,-0.51,0.0),
     ]);
 
     assert_eq!(res[0],Some(GamepadEvent::ButtonPressed(CustomButton::RightStickLeft)));
@@ -523,17 +523,17 @@ fn minimally_tilt_left_stick_to_the_right() {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Left,0.51,0.0),
+        (LeftOrRight::Left,0.51,0.0),
     ]);
 
     assert_eq!(res[0],Some(GamepadEvent::ButtonPressed(CustomButton::LeftStickRight)));
@@ -547,17 +547,17 @@ fn minimally_tilt_right_stick_to_the_right() {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Right,0.51,0.0),
+        (LeftOrRight::Right,0.51,0.0),
     ]);
 
     assert_eq!(res[0],Some(GamepadEvent::ButtonPressed(CustomButton::RightStickRight)));
@@ -571,17 +571,17 @@ fn minimally_tilt_left_stick_up() {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Left,0.0,0.51),
+        (LeftOrRight::Left,0.0,0.51),
     ]);
 
     assert_eq!(res[0],Some(GamepadEvent::ButtonPressed(CustomButton::LeftStickUp)));
@@ -595,17 +595,17 @@ fn minimally_tilt_right_stick_up() {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Right,0.0,0.51),
+        (LeftOrRight::Right,0.0,0.51),
     ]);
 
     assert_eq!(res[0],Some(GamepadEvent::ButtonPressed(CustomButton::RightStickUp)));
@@ -619,17 +619,17 @@ fn minimally_tilt_left_stick_down() {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Left,0.0,-0.51),
+        (LeftOrRight::Left,0.0,-0.51),
     ]);
 
     assert_eq!(res[0],Some(GamepadEvent::ButtonPressed(CustomButton::LeftStickDown)));
@@ -643,17 +643,17 @@ fn minimally_tilt_right_stick_down() {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Right,0.0,-0.51),
+        (LeftOrRight::Right,0.0,-0.51),
     ]);
 
     assert_eq!(res[0],Some(GamepadEvent::ButtonPressed(CustomButton::RightStickDown)));
@@ -672,18 +672,18 @@ fn tilt_and_untilt_left_stick_to_the_left() {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Left,-1.0,0.0),
-        (Alignment::Left,-0.1,0.0),
+        (LeftOrRight::Left,-1.0,0.0),
+        (LeftOrRight::Left,-0.1,0.0),
     ]);
 
     assert_eq!(res[0],Some(GamepadEvent::ButtonPressed(CustomButton::LeftStickLeft)));
@@ -698,18 +698,18 @@ fn tilt_and_untilt_right_stick_to_the_left() {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Right,-1.0,0.0),
-        (Alignment::Right,-0.1,0.0),
+        (LeftOrRight::Right,-1.0,0.0),
+        (LeftOrRight::Right,-0.1,0.0),
     ]);
 
     assert_eq!(res[0],Some(GamepadEvent::ButtonPressed(CustomButton::RightStickLeft)));
@@ -724,18 +724,18 @@ fn tilt_and_untilt_left_stick_to_the_right() {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Left,1.0,0.0),
-        (Alignment::Left,0.1,0.0),
+        (LeftOrRight::Left,1.0,0.0),
+        (LeftOrRight::Left,0.1,0.0),
     ]);
 
     assert_eq!(res[0],Some(GamepadEvent::ButtonPressed(CustomButton::LeftStickRight)));
@@ -750,18 +750,18 @@ fn tilt_and_untilt_right_stick_to_the_right() {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Right,1.0,0.0),
-        (Alignment::Right,0.1,0.0),
+        (LeftOrRight::Right,1.0,0.0),
+        (LeftOrRight::Right,0.1,0.0),
     ]);
 
     assert_eq!(res[0],Some(GamepadEvent::ButtonPressed(CustomButton::RightStickRight)));
@@ -776,18 +776,18 @@ fn tilt_and_untilt_left_stick_up() {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Left,0.0,1.0),
-        (Alignment::Left,0.0,0.1),
+        (LeftOrRight::Left,0.0,1.0),
+        (LeftOrRight::Left,0.0,0.1),
     ]);
 
     assert_eq!(res[0],Some(GamepadEvent::ButtonPressed(CustomButton::LeftStickUp)));
@@ -802,18 +802,18 @@ fn tilt_and_untilt_right_stick_up() {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Right,0.0,1.0),
-        (Alignment::Right,0.0,0.1),
+        (LeftOrRight::Right,0.0,1.0),
+        (LeftOrRight::Right,0.0,0.1),
     ]);
 
     assert_eq!(res[0],Some(GamepadEvent::ButtonPressed(CustomButton::RightStickUp)));
@@ -828,18 +828,18 @@ fn tilt_and_untilt_left_stick_down() {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Left,0.0,-1.0),
-        (Alignment::Left,0.0,-0.1),
+        (LeftOrRight::Left,0.0,-1.0),
+        (LeftOrRight::Left,0.0,-0.1),
     ]);
 
     assert_eq!(res[0],Some(GamepadEvent::ButtonPressed(CustomButton::LeftStickDown)));
@@ -854,18 +854,18 @@ fn tilt_and_untilt_right_stick_down() {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Right,0.0,-1.0),
-        (Alignment::Right,0.0,-0.1),
+        (LeftOrRight::Right,0.0,-1.0),
+        (LeftOrRight::Right,0.0,-0.1),
     ]);
 
     assert_eq!(res[0],Some(GamepadEvent::ButtonPressed(CustomButton::RightStickDown)));
@@ -884,17 +884,17 @@ fn tilt_left_stick_to_the_leftish () {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Left,-1.0,0.1),
+        (LeftOrRight::Left,-1.0,0.1),
     ]);
 
     assert_eq!(res[0],Some(GamepadEvent::ButtonPressed(CustomButton::LeftStickLeft)));
@@ -905,17 +905,17 @@ fn tilt_left_stick_to_the_leftish () {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Left,-0.8,0.7),
+        (LeftOrRight::Left,-0.8,0.7),
     ]);
 
     assert_eq!(res[0],Some(GamepadEvent::ButtonPressed(CustomButton::LeftStickLeft)));
@@ -926,17 +926,17 @@ fn tilt_left_stick_to_the_leftish () {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Left,-0.7,-0.6),
+        (LeftOrRight::Left,-0.7,-0.6),
     ]);
 
     assert_eq!(res[0],Some(GamepadEvent::ButtonPressed(CustomButton::LeftStickLeft)));
@@ -950,17 +950,17 @@ fn tilt_right_stick_to_the_leftish () {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Right,-1.0,0.1),
+        (LeftOrRight::Right,-1.0,0.1),
     ]);
 
     assert_eq!(res[0],Some(GamepadEvent::ButtonPressed(CustomButton::RightStickLeft)));
@@ -971,17 +971,17 @@ fn tilt_right_stick_to_the_leftish () {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Right,-0.8,0.7),
+        (LeftOrRight::Right,-0.8,0.7),
     ]);
 
     assert_eq!(res[0],Some(GamepadEvent::ButtonPressed(CustomButton::RightStickLeft)));
@@ -992,17 +992,17 @@ fn tilt_right_stick_to_the_leftish () {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Right,-0.7,-0.6),
+        (LeftOrRight::Right,-0.7,-0.6),
     ]);
 
     assert_eq!(res[0],Some(GamepadEvent::ButtonPressed(CustomButton::RightStickLeft)));
@@ -1016,17 +1016,17 @@ fn tilt_left_stick_to_the_rightish () {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Left,1.0,0.1),
+        (LeftOrRight::Left,1.0,0.1),
     ]);
 
     assert_eq!(res[0],Some(GamepadEvent::ButtonPressed(CustomButton::LeftStickRight)));
@@ -1037,17 +1037,17 @@ fn tilt_left_stick_to_the_rightish () {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Left,0.8,0.7),
+        (LeftOrRight::Left,0.8,0.7),
     ]);
 
     assert_eq!(res[0],Some(GamepadEvent::ButtonPressed(CustomButton::LeftStickRight)));
@@ -1058,17 +1058,17 @@ fn tilt_left_stick_to_the_rightish () {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Left,0.7,-0.6),
+        (LeftOrRight::Left,0.7,-0.6),
     ]);
 
     assert_eq!(res[0],Some(GamepadEvent::ButtonPressed(CustomButton::LeftStickRight)));
@@ -1082,17 +1082,17 @@ fn tilt_right_stick_to_the_rightish () {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Right,1.0,0.1),
+        (LeftOrRight::Right,1.0,0.1),
     ]);
 
     assert_eq!(res[0],Some(GamepadEvent::ButtonPressed(CustomButton::RightStickRight)));
@@ -1103,17 +1103,17 @@ fn tilt_right_stick_to_the_rightish () {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Right,0.8,0.7),
+        (LeftOrRight::Right,0.8,0.7),
     ]);
 
     assert_eq!(res[0],Some(GamepadEvent::ButtonPressed(CustomButton::RightStickRight)));
@@ -1124,17 +1124,17 @@ fn tilt_right_stick_to_the_rightish () {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Right,0.7,-0.6),
+        (LeftOrRight::Right,0.7,-0.6),
     ]);
 
     assert_eq!(res[0],Some(GamepadEvent::ButtonPressed(CustomButton::RightStickRight)));
@@ -1148,17 +1148,17 @@ fn tilt_left_stick_upish () {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Left,0.1,1.0),
+        (LeftOrRight::Left,0.1,1.0),
     ]);
 
     assert_eq!(res[0],Some(GamepadEvent::ButtonPressed(CustomButton::LeftStickUp)));
@@ -1169,17 +1169,17 @@ fn tilt_left_stick_upish () {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Left,0.7,0.8),
+        (LeftOrRight::Left,0.7,0.8),
     ]);
 
     assert_eq!(res[0],Some(GamepadEvent::ButtonPressed(CustomButton::LeftStickUp)));
@@ -1190,17 +1190,17 @@ fn tilt_left_stick_upish () {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Left,-0.6,0.7),
+        (LeftOrRight::Left,-0.6,0.7),
     ]);
 
     assert_eq!(res[0],Some(GamepadEvent::ButtonPressed(CustomButton::LeftStickUp)));
@@ -1214,17 +1214,17 @@ fn tilt_right_stick_upish () {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Right,0.1,1.0),
+        (LeftOrRight::Right,0.1,1.0),
     ]);
 
     assert_eq!(res[0],Some(GamepadEvent::ButtonPressed(CustomButton::RightStickUp)));
@@ -1235,17 +1235,17 @@ fn tilt_right_stick_upish () {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Right,0.7,0.8),
+        (LeftOrRight::Right,0.7,0.8),
     ]);
 
     assert_eq!(res[0],Some(GamepadEvent::ButtonPressed(CustomButton::RightStickUp)));
@@ -1256,17 +1256,17 @@ fn tilt_right_stick_upish () {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Right,-0.6,0.7),
+        (LeftOrRight::Right,-0.6,0.7),
     ]);
 
     assert_eq!(res[0],Some(GamepadEvent::ButtonPressed(CustomButton::RightStickUp)));
@@ -1280,17 +1280,17 @@ fn tilt_left_stick_downish () {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Left,0.1,-1.0),
+        (LeftOrRight::Left,0.1,-1.0),
     ]);
 
     assert_eq!(res[0],Some(GamepadEvent::ButtonPressed(CustomButton::LeftStickDown)));
@@ -1301,17 +1301,17 @@ fn tilt_left_stick_downish () {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Left,0.7,-0.8),
+        (LeftOrRight::Left,0.7,-0.8),
     ]);
 
     assert_eq!(res[0],Some(GamepadEvent::ButtonPressed(CustomButton::LeftStickDown)));
@@ -1322,17 +1322,17 @@ fn tilt_left_stick_downish () {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Left,-0.6,-0.7),
+        (LeftOrRight::Left,-0.6,-0.7),
     ]);
 
     assert_eq!(res[0],Some(GamepadEvent::ButtonPressed(CustomButton::LeftStickDown)));
@@ -1346,17 +1346,17 @@ fn tilt_right_stick_downish () {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Right,0.1,-1.0),
+        (LeftOrRight::Right,0.1,-1.0),
     ]);
 
     assert_eq!(res[0],Some(GamepadEvent::ButtonPressed(CustomButton::RightStickDown)));
@@ -1367,17 +1367,17 @@ fn tilt_right_stick_downish () {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Right,0.7,-0.8),
+        (LeftOrRight::Right,0.7,-0.8),
     ]);
 
     assert_eq!(res[0],Some(GamepadEvent::ButtonPressed(CustomButton::RightStickDown)));
@@ -1388,17 +1388,17 @@ fn tilt_right_stick_downish () {
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Left,
+            alignment: LeftOrRight::Left,
         },
         AxisClickThresholds {
             up: 0.5,
             down: 0.5,
             left: 0.5,
             right: 0.5,
-            alignment: Alignment::Right,
+            alignment: LeftOrRight::Right,
         },
         vec![
-        (Alignment::Right,-0.6,-0.7),
+        (LeftOrRight::Right,-0.6,-0.7),
     ]);
 
     assert_eq!(res[0],Some(GamepadEvent::ButtonPressed(CustomButton::RightStickDown)));

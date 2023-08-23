@@ -5,7 +5,7 @@ use joytyping::joy_input::joy_keyboard_keys_config::JoyKeyboardKeysConfig;
 use joytyping::settings::{Settings,SettingsLoadError,SettingsDependenciesImpl};
 use tauri::Manager;
 use joytyping::joy_input::stepper::StepperButton;
-use joytyping::{run, Alignment};
+use joytyping::{run, LeftOrRight};
 use joytyping::gamepad::gilrs_wrapper::GilrsWrapper;
 use joytyping::gamepad::sticks_interpreter::{SticksInterpreter, AxisClickThresholds};
 use joytyping::joy_input::enigo_wrapper::EnigoWrapper;
@@ -72,10 +72,10 @@ fn main() {
                     Box::new(SticksInterpreter::new(
                     AxisClickThresholds::get_from_setting(
                         active_profile.left_stick.click_thresholds,
-                        Alignment::Left),
+                        LeftOrRight::Left),
                     AxisClickThresholds::get_from_setting(
                         active_profile.right_stick.click_thresholds,
-                        Alignment::Right),
+                        LeftOrRight::Right),
                         
                     )),
                 );

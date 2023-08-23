@@ -1,4 +1,4 @@
-use crate::Alignment;
+use crate::LeftOrRight;
 use crate::gamepad::GamepadEvent;
 use crate::gamepad::CustomButton;
 use crate::settings_data;
@@ -36,12 +36,12 @@ impl SticksInterpreter {
                ) -> SticksInterpreter{
         // Sorting out the parameters as the left and right
        let (right_axis_click_thresholds, left_axis_click_thresholds)
-           = if first_axis_click_thresholds.alignment == Alignment::Left
-               && second_axis_click_thresholds.alignment == Alignment::Right {
+           = if first_axis_click_thresholds.alignment == LeftOrRight::Left
+               && second_axis_click_thresholds.alignment == LeftOrRight::Right {
                 (second_axis_click_thresholds, first_axis_click_thresholds)
            }
-           else if first_axis_click_thresholds.alignment == Alignment::Right
-               && second_axis_click_thresholds.alignment == Alignment::Left {
+           else if first_axis_click_thresholds.alignment == LeftOrRight::Right
+               && second_axis_click_thresholds.alignment == LeftOrRight::Left {
                 (first_axis_click_thresholds, second_axis_click_thresholds)
            }
            else {
@@ -213,12 +213,12 @@ pub struct AxisClickThresholds {
     pub right: f32,
     pub down: f32,
     pub left: f32,
-    pub alignment: Alignment,
+    pub alignment: LeftOrRight,
 }
 
 impl AxisClickThresholds {
     pub fn get_from_setting(
-        thresholds: settings_data::AxisClickThresholds, alignment: Alignment
+        thresholds: settings_data::AxisClickThresholds, alignment: LeftOrRight
         ) -> Self {
         Self {
             up: thresholds.up,
