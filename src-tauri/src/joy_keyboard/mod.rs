@@ -3,7 +3,7 @@ use std::time::{Duration, Instant};
 
 use crate::{settings_data::KeyMapping, gamepad::CustomButton};
 
-use self::{enigo_wrapper::EnigoTrait, joy_keyboard_keys_config::JoyKeyboardKeysConfig};
+use self::{enigo_wrapper::EnigoTrait, keys_config::KeysConfig};
 
 #[cfg(test)]
 mod tests;
@@ -13,7 +13,7 @@ mod tests;
 // they allow the user to navigate between steps
 pub mod stepper;
 
-pub mod joy_keyboard_keys_config;
+pub mod keys_config;
 
 pub mod enigo_wrapper;
 
@@ -25,14 +25,14 @@ pub struct JoyKeyboard {
     current_layer: Layer,
     duration_threshold_to_count_move_to_layer_as_visit: Duration,
 
-    key_mappings: JoyKeyboardKeysConfig,
+    key_mappings: KeysConfig,
 }
 
 impl JoyKeyboard {
     pub fn new(enigo: Box<dyn EnigoTrait>,
                r1_stepper_button: Box<dyn StepperButtonTrait>,
                l1_stepper_button: Box<dyn StepperButtonTrait>,
-    key_mappings: JoyKeyboardKeysConfig,
+    key_mappings: KeysConfig,
                ) -> JoyKeyboard {
         JoyKeyboard {
             enigo,
@@ -52,60 +52,6 @@ impl JoyKeyboard {
     pub fn get_current_layer(&self)-> Layer {
         self.current_layer
     }
-
-    // fn key_click(&mut self, gamepad_key: &JoyKeyboardKeyConfig,) {
-    //     let key_to_click = match self.current_layer {
-    //         Layer::First | Layer::VisitingFirst(_)
-    //             => match self.current_step {
-    //             Step::Step1 => {
-    //                 &gamepad_key.first_layer_step_1
-    //             },
-    //             Step::Step2 => {
-    //                 &gamepad_key.first_layer_step_2
-    //             },
-    //             Step::Step3 => {
-    //                 &gamepad_key.first_layer_step_3
-    //             },
-    //             Step::Step4 => {
-    //                 &gamepad_key.first_layer_step_4
-    //             },
-    //         },
-    //         Layer::Second | Layer::VisitingSecond(_)
-    //             => match self.current_step {
-    //             Step::Step1 => {
-    //                 &gamepad_key.second_layer_step_1
-    //             },
-    //             Step::Step2 => {
-    //                 &gamepad_key.second_layer_step_2
-    //             },
-    //             Step::Step3 => {
-    //                 &gamepad_key.second_layer_step_3
-    //             },
-    //             Step::Step4 => {
-    //                 &gamepad_key.second_layer_step_4
-    //             },
-    //         },
-    //     };
-    //
-    //     if let Some(modifiers) = key_to_click.modifiers.clone() {
-    //         for modifier in modifiers {
-    //             println!("-> {:?}",modifier);
-    //             self.enigo.key_down(modifier);
-    //         }
-    //     }
-    //
-    //     if let Some(key) = key_to_click.key {
-    //         println!("-> {:?}",key);
-    //         self.enigo.key_click(key);
-    //     }
-    //     if let Some(modifiers) = key_to_click.modifiers {
-    //         for modifier in modifiers {
-    //             println!("-> {:?}",modifier);
-    //             self.enigo.key_up(modifier);
-    //         }
-    //     }
-    //
-    // }
 
     // returns whether the button was consumed or ignored
     pub fn button_pressed(&mut self, button: CustomButton) -> bool{

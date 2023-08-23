@@ -1,15 +1,16 @@
-use crate::settings_data::{KeyMapping, EnigoKey, KeyboardModeKeyMappings, KeyboardModeKeyMappingsMappings};
+use crate::settings_data;
+use crate::settings_data::{EnigoKey, KeyboardModeKeyMappings, KeyboardModeKeyMappingsMappings};
 
-pub struct JoyKeyboardKeyMapping {
+pub struct KeyMapping {
 	pub key: Option<enigo::Key>,
 	pub modifiers: Option<Vec<enigo::Key>>,
 }
 
-impl JoyKeyboardKeyMapping {
-    fn from(mapping: KeyMapping) -> Self {
+impl KeyMapping {
+    fn from(mapping: settings_data::KeyMapping) -> Self {
         Self {
-            key: JoyKeyboardKeyMapping::get_key(mapping.key, mapping.char_key),
-            modifiers: JoyKeyboardKeyMapping::get_modifier_keys(mapping.modifiers),
+            key: KeyMapping::get_key(mapping.key, mapping.char_key),
+            modifiers: KeyMapping::get_modifier_keys(mapping.modifiers),
         }
     }
     // If char_key is given, it takes precedence over key
@@ -18,7 +19,7 @@ impl JoyKeyboardKeyMapping {
             Some(enigo::Key::Layout(key))
         }
         else if let Some(key) = key_src {
-            JoyKeyboardKeyMapping::to_enigo_key(key)
+            KeyMapping::to_enigo_key(key)
         }
         else {
             None
@@ -29,7 +30,7 @@ impl JoyKeyboardKeyMapping {
         if let Some(mods) = modifiers {
             let mut enigo_modifiers = Vec::new();
             for modifier in mods {
-                if let Some(enigo_modifier) = JoyKeyboardKeyMapping::to_enigo_key(modifier.clone()) {
+                if let Some(enigo_modifier) = KeyMapping::to_enigo_key(modifier.clone()) {
                     enigo_modifiers.push(enigo_modifier);
                 }
             }
@@ -129,68 +130,68 @@ impl JoyKeyboardKeyMapping {
     }
 }
 
-pub struct JoyKeyboardKeyConfig {
-    pub first_layer_step_1: JoyKeyboardKeyMapping,
-    pub first_layer_step_2: JoyKeyboardKeyMapping,
-    pub first_layer_step_3: JoyKeyboardKeyMapping,
-    pub first_layer_step_4: JoyKeyboardKeyMapping,
-    pub second_layer_step_1: JoyKeyboardKeyMapping,
-    pub second_layer_step_2: JoyKeyboardKeyMapping,
-    pub second_layer_step_3: JoyKeyboardKeyMapping,
-    pub second_layer_step_4: JoyKeyboardKeyMapping,
+pub struct SingleKeyConfig {
+    pub first_layer_step_1: KeyMapping,
+    pub first_layer_step_2: KeyMapping,
+    pub first_layer_step_3: KeyMapping,
+    pub first_layer_step_4: KeyMapping,
+    pub second_layer_step_1: KeyMapping,
+    pub second_layer_step_2: KeyMapping,
+    pub second_layer_step_3: KeyMapping,
+    pub second_layer_step_4: KeyMapping,
 }
-impl JoyKeyboardKeyConfig {
+impl SingleKeyConfig {
     fn from(conf: KeyboardModeKeyMappingsMappings) -> Self {
-        JoyKeyboardKeyConfig {
-            first_layer_step_1: JoyKeyboardKeyMapping::from(conf.first_layer_step_1),
-            first_layer_step_2: JoyKeyboardKeyMapping::from(conf.first_layer_step_2),
-            first_layer_step_3: JoyKeyboardKeyMapping::from(conf.first_layer_step_3),
-            first_layer_step_4: JoyKeyboardKeyMapping::from(conf.first_layer_step_4),
-            second_layer_step_1: JoyKeyboardKeyMapping::from(conf.second_layer_step_1),
-            second_layer_step_2: JoyKeyboardKeyMapping::from(conf.second_layer_step_2),
-            second_layer_step_3: JoyKeyboardKeyMapping::from(conf.second_layer_step_3),
-            second_layer_step_4: JoyKeyboardKeyMapping::from(conf.second_layer_step_4),
+        SingleKeyConfig {
+            first_layer_step_1: KeyMapping::from(conf.first_layer_step_1),
+            first_layer_step_2: KeyMapping::from(conf.first_layer_step_2),
+            first_layer_step_3: KeyMapping::from(conf.first_layer_step_3),
+            first_layer_step_4: KeyMapping::from(conf.first_layer_step_4),
+            second_layer_step_1: KeyMapping::from(conf.second_layer_step_1),
+            second_layer_step_2: KeyMapping::from(conf.second_layer_step_2),
+            second_layer_step_3: KeyMapping::from(conf.second_layer_step_3),
+            second_layer_step_4: KeyMapping::from(conf.second_layer_step_4),
         }
     }
 }
 
-pub struct JoyKeyboardKeysConfig {
-    pub south: JoyKeyboardKeyConfig,
-    pub east: JoyKeyboardKeyConfig,
-    pub north: JoyKeyboardKeyConfig,
-    pub west: JoyKeyboardKeyConfig,
-    pub d_pad_up: JoyKeyboardKeyConfig,
-    pub d_pad_down: JoyKeyboardKeyConfig,
-    pub d_pad_left: JoyKeyboardKeyConfig,
-    pub d_pad_right: JoyKeyboardKeyConfig,
-    pub left_stick_up: JoyKeyboardKeyConfig,
-    pub left_stick_down: JoyKeyboardKeyConfig,
-    pub left_stick_left: JoyKeyboardKeyConfig,
-    pub left_stick_right: JoyKeyboardKeyConfig,
-    pub right_stick_up: JoyKeyboardKeyConfig,
-    pub right_stick_down: JoyKeyboardKeyConfig,
-    pub right_stick_left: JoyKeyboardKeyConfig,
-    pub right_stick_right: JoyKeyboardKeyConfig,
+pub struct KeysConfig {
+    pub south: SingleKeyConfig,
+    pub east: SingleKeyConfig,
+    pub north: SingleKeyConfig,
+    pub west: SingleKeyConfig,
+    pub d_pad_up: SingleKeyConfig,
+    pub d_pad_down: SingleKeyConfig,
+    pub d_pad_left: SingleKeyConfig,
+    pub d_pad_right: SingleKeyConfig,
+    pub left_stick_up: SingleKeyConfig,
+    pub left_stick_down: SingleKeyConfig,
+    pub left_stick_left: SingleKeyConfig,
+    pub left_stick_right: SingleKeyConfig,
+    pub right_stick_up: SingleKeyConfig,
+    pub right_stick_down: SingleKeyConfig,
+    pub right_stick_left: SingleKeyConfig,
+    pub right_stick_right: SingleKeyConfig,
 }
-impl JoyKeyboardKeysConfig {
+impl KeysConfig {
     pub fn from(mappings: KeyboardModeKeyMappings) -> Self {
-        JoyKeyboardKeysConfig {
-            south: JoyKeyboardKeyConfig::from(mappings.south),
-            east: JoyKeyboardKeyConfig::from(mappings.east),
-            north: JoyKeyboardKeyConfig::from(mappings.north),
-            west: JoyKeyboardKeyConfig::from(mappings.west),
-            d_pad_up: JoyKeyboardKeyConfig::from(mappings.d_pad_up),
-            d_pad_down: JoyKeyboardKeyConfig::from(mappings.d_pad_down),
-            d_pad_left: JoyKeyboardKeyConfig::from(mappings.d_pad_left),
-            d_pad_right: JoyKeyboardKeyConfig::from(mappings.d_pad_right),
-            left_stick_up: JoyKeyboardKeyConfig::from(mappings.left_stick_up),
-            left_stick_down: JoyKeyboardKeyConfig::from(mappings.left_stick_down),
-            left_stick_left: JoyKeyboardKeyConfig::from(mappings.left_stick_left),
-            left_stick_right: JoyKeyboardKeyConfig::from(mappings.left_stick_right),
-            right_stick_up: JoyKeyboardKeyConfig::from(mappings.right_stick_up),
-            right_stick_down: JoyKeyboardKeyConfig::from(mappings.right_stick_down),
-            right_stick_left: JoyKeyboardKeyConfig::from(mappings.right_stick_left),
-            right_stick_right: JoyKeyboardKeyConfig::from(mappings.right_stick_right),
+        KeysConfig {
+            south: SingleKeyConfig::from(mappings.south),
+            east: SingleKeyConfig::from(mappings.east),
+            north: SingleKeyConfig::from(mappings.north),
+            west: SingleKeyConfig::from(mappings.west),
+            d_pad_up: SingleKeyConfig::from(mappings.d_pad_up),
+            d_pad_down: SingleKeyConfig::from(mappings.d_pad_down),
+            d_pad_left: SingleKeyConfig::from(mappings.d_pad_left),
+            d_pad_right: SingleKeyConfig::from(mappings.d_pad_right),
+            left_stick_up: SingleKeyConfig::from(mappings.left_stick_up),
+            left_stick_down: SingleKeyConfig::from(mappings.left_stick_down),
+            left_stick_left: SingleKeyConfig::from(mappings.left_stick_left),
+            left_stick_right: SingleKeyConfig::from(mappings.left_stick_right),
+            right_stick_up: SingleKeyConfig::from(mappings.right_stick_up),
+            right_stick_down: SingleKeyConfig::from(mappings.right_stick_down),
+            right_stick_left: SingleKeyConfig::from(mappings.right_stick_left),
+            right_stick_right: SingleKeyConfig::from(mappings.right_stick_right),
         }
     }
 

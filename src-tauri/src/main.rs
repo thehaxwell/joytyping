@@ -1,7 +1,7 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use joytyping::joy_keyboard::joy_keyboard_keys_config::JoyKeyboardKeysConfig;
+use joytyping::joy_keyboard::keys_config::KeysConfig;
 use joytyping::settings::{Settings,SettingsLoadError,SettingsDependenciesImpl};
 use tauri::Manager;
 use joytyping::joy_keyboard::stepper::StepperButton;
@@ -83,7 +83,7 @@ fn main() {
                     Box::new(EnigoWrapper::new()),
                     Box::new(StepperButton::new()),
                     Box::new(StepperButton::new()),
-                    JoyKeyboardKeysConfig::from(
+                    KeysConfig::from(
                         active_profile.keyboard_mode.key_mappings)
                 );
 
