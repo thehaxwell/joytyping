@@ -29,18 +29,18 @@ impl SettingsDependencies for SettingsDependenciesImpl {
 pub struct Settings {
     data: Option<SettingsData>,
     dependencies: Box<dyn SettingsDependencies>,
+    file_path: String,
 }
 
 impl Settings {
-    pub fn new(deps: Box<dyn SettingsDependencies>,) -> Self{
-        Self{data: None,dependencies:deps}
+    pub fn new(deps: Box<dyn SettingsDependencies>, file_path: String) -> Self{
+        Self{data: None,dependencies:deps,file_path}
     }
 
     /// Load settings from the specified file.
     /// If reading or parsing the file fails, load the default settings.
     pub fn load(&mut self) -> Result<(), SettingsLoadError> {
-        match self.dependencies.read_to_string(
-            "/home/haxwell/.config/joytyping/joytyping.toml") {
+        match self.dependencies.read_to_string(&self.file_path) {
             Err(e) => {
                 self.load_default();
                 match e.kind() {
@@ -141,7 +141,7 @@ impl Settings {
     }
 }
 
-#[derive(Error, Debug)]
+#[derive(Error, Debug, PartialEq)]
 pub enum SettingsLoadError {
     #[error("Settings file not found")]
     FileNotFound,

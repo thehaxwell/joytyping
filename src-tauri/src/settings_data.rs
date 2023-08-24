@@ -1,6 +1,6 @@
 use serde::Deserialize;
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 pub enum EnigoKey {
     Alt,
     Backspace,
@@ -87,14 +87,14 @@ pub enum EnigoKey {
     UpArrow,
 }
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct KeyClickConfig {
 	pub key: Option<EnigoKey>,
 	pub modifiers: Option<Vec<EnigoKey>>,
 	pub char_key: Option<char>,
 }
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct KeyboardModeSingleKeyMapping {
     pub first_layer_step_1: KeyClickConfig,
     pub first_layer_step_2: KeyClickConfig,
@@ -106,7 +106,7 @@ pub struct KeyboardModeSingleKeyMapping {
     pub second_layer_step_4: KeyClickConfig,
 }
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct KeyboardModeKeyMappings {
 	pub south: KeyboardModeSingleKeyMapping,
 	pub east: KeyboardModeSingleKeyMapping,
@@ -126,12 +126,12 @@ pub struct KeyboardModeKeyMappings {
 	pub right_stick_right: KeyboardModeSingleKeyMapping,
 }
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct KeyboardModeConfig {
 	pub key_mappings: KeyboardModeKeyMappings,
 }
 
-#[derive(Deserialize, Debug, Clone,Copy)]
+#[derive(Deserialize, Debug, Clone, PartialEq,Copy)]
 pub struct AxisClickThresholds {
     pub up: f32,
     pub right: f32,
@@ -139,12 +139,12 @@ pub struct AxisClickThresholds {
     pub left: f32,
 }
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct Axis {
     pub click_thresholds: AxisClickThresholds,
 }
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct Profile {
 	pub keyboard_mode: KeyboardModeConfig,
 	pub name: String,
@@ -153,23 +153,23 @@ pub struct Profile {
     pub right_stick: Axis,
 }
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct HeightAndWidth {
     pub width: f64,
     pub height: f64,
 }
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct QuickLookupWindow {
     pub inner_size: HeightAndWidth,
 }
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct Global {
     pub default_profile: String,
 }
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct SettingsData {
 	pub profiles: Vec<Profile>,
     pub global: Global,

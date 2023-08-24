@@ -41,7 +41,8 @@ fn main() {
             let handle = app.app_handle();
 
             std::thread::spawn( move || {
-                let mut settings = Settings::new(Box::new(SettingsDependenciesImpl));
+                let mut settings = Settings::new(Box::new(SettingsDependenciesImpl),
+                    "/home/haxwell/.config/joytyping/joytyping.toml".to_string());
                 match settings.load() {
                     Err(e) => {
                         match e {
