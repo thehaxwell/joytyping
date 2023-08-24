@@ -4,7 +4,7 @@ use crate::settings_data::{EnigoKey, KeyboardModeKeyMappings, KeyboardModeSingle
 #[cfg(test)]
 mod tests;
 
-#[derive(Debug,PartialEq)]
+#[derive(Debug,PartialEq,Clone, Copy)]
 pub struct KeyClickConfig {
 	pub key: Option<enigo::Key>,
 	pub modifiers: [Option<enigo::Key>;5],
@@ -136,7 +136,7 @@ impl KeyClickConfig {
     }
 }
 
-#[derive(Debug,PartialEq)]
+#[derive(Debug,PartialEq,Clone, Copy)]
 pub struct SingleKeyConfig {
     pub first_layer_step_1: KeyClickConfig,
     pub first_layer_step_2: KeyClickConfig,

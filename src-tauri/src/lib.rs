@@ -9,13 +9,15 @@ pub mod settings_data;
 pub fn run(mut gamepad: gamepad::Gamepad, mut joy_keyboard: joy_keyboard::JoyKeyboard, mut quick_lookup_window: QuickLookupWindow,
            ) {
     use gamepad::CustomButton;
+    //TODO: check if this actually eases the load on the CPU
+    let loop_sleep_duration = std::time::Duration::from_millis(10);
     loop {
+        std::thread::sleep(loop_sleep_duration);
+        joy_keyboard.trigger_input();
         while let Some(event) = gamepad.next_event() {
             match event {
                 gamepad::GamepadEvent::ButtonPressed(button)=> {
                 print!("ButtonPressed: {:?}\n",button);
-                let press_consumed = joy_keyboard.button_pressed(button);
-                if !press_consumed {
                     match button{
                         CustomButton::Base(gilrs::Button::LeftTrigger) => {
                             joy_keyboard.set_l1_mod_is_down(true);
@@ -35,9 +37,10 @@ pub fn run(mut gamepad: gamepad::Gamepad, mut joy_keyboard: joy_keyboard::JoyKey
                                 joy_keyboard.get_current_step()
                             );
                         },
-                        _ => (),
+                        _ => {
+                            joy_keyboard.button_pressed(button);
+                        },
                     };
-                }
 
                 },
                 gamepad::GamepadEvent::ButtonReleased(button) => {
@@ -60,7 +63,9 @@ pub fn run(mut gamepad: gamepad::Gamepad, mut joy_keyboard: joy_keyboard::JoyKey
                         CustomButton::Base(gilrs::Button::LeftTrigger2) => {
                           let _ = quick_lookup_window.hide();
                         },
-                        _other => ()
+                        _ => {
+                            joy_keyboard.button_released();
+                        },
                     }
                 },
             };
