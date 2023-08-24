@@ -7,14 +7,31 @@ mod tests;
 #[derive(Debug,PartialEq)]
 pub struct KeyClickConfig {
 	pub key: Option<enigo::Key>,
-	pub modifiers: Option<Vec<enigo::Key>>,
+	pub modifiers: [Option<enigo::Key>;5],
 }
 
 impl KeyClickConfig {
     fn from(mapping: settings_data::KeyClickConfig) -> Self {
         Self {
             key: KeyClickConfig::get_key(mapping.key, mapping.char_key),
-            modifiers: KeyClickConfig::get_modifier_keys(mapping.modifiers),
+            // modifiers: KeyClickConfig::get_modifier_keys(mapping.modifiers),
+            modifiers: [
+                if mapping.modifier_1.is_some() {
+                    Some(KeyClickConfig::to_enigo_key(mapping.modifier_1.unwrap().clone()))
+                } else {None},
+                if mapping.modifier_2.is_some() {
+                    Some(KeyClickConfig::to_enigo_key(mapping.modifier_2.unwrap().clone()))
+                } else {None},
+                if mapping.modifier_3.is_some() {
+                    Some(KeyClickConfig::to_enigo_key(mapping.modifier_3.unwrap().clone()))
+                } else {None},
+                if mapping.modifier_4.is_some() {
+                    Some(KeyClickConfig::to_enigo_key(mapping.modifier_4.unwrap().clone()))
+                } else {None},
+                if mapping.modifier_5.is_some() {
+                    Some(KeyClickConfig::to_enigo_key(mapping.modifier_5.unwrap().clone()))
+                } else {None},
+            ]
         }
     }
     // If char_key is given, it takes precedence over key
@@ -24,19 +41,6 @@ impl KeyClickConfig {
         }
         else if let Some(key) = key_src {
             Some(KeyClickConfig::to_enigo_key(key))
-        }
-        else {
-            None
-        }
-    }
-
-    fn get_modifier_keys(modifiers: Option<Vec<EnigoKey>>) -> Option<Vec<enigo::Key>> {
-        if let Some(mods) = modifiers {
-            let mut enigo_modifiers = Vec::new();
-            for modifier in mods {
-               enigo_modifiers.push(KeyClickConfig::to_enigo_key(modifier.clone()));
-            }
-            Some(enigo_modifiers)
         }
         else {
             None

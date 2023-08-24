@@ -141,8 +141,8 @@ impl JoyKeyboard {
             },
         };
 
-        if let Some(modifiers) = &key_to_click.modifiers {
-            for modifier in modifiers {
+        for key_to_click_modifier in &key_to_click.modifiers {
+            if let Some(modifier) = key_to_click_modifier {
                 println!("-> {:?}",modifier);
                 self.enigo.key_down(*modifier);
             }
@@ -153,8 +153,8 @@ impl JoyKeyboard {
             self.enigo.key_click(key);
         }
 
-        if let Some(modifiers) = &key_to_click.modifiers {
-            for modifier in modifiers {
+        for key_to_click_modifier in &key_to_click.modifiers {
+            if let Some(modifier) = key_to_click_modifier {
                 println!("-> {:?}",modifier);
                 self.enigo.key_up(*modifier);
             }

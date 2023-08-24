@@ -39,7 +39,7 @@ first_layer_step_3= {char_key= "G"}
 first_layer_step_4= {char_key= "Q"}
 second_layer_step_1= {char_key= "%"}
 second_layer_step_2= {char_key= "\""}
-second_layer_step_3= {key= "Tab",modifiers=["Shift"]}
+second_layer_step_3= {key= "Tab",modifier_1="Shift"}
 second_layer_step_4= {}
 [profiles.keyboard_mode.key_mappings.west]
 first_layer_step_1= {char_key= "A"}

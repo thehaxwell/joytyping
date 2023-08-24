@@ -90,7 +90,11 @@ pub enum EnigoKey {
 #[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct KeyClickConfig {
 	pub key: Option<EnigoKey>,
-	pub modifiers: Option<Vec<EnigoKey>>,
+	pub modifier_1: Option<EnigoKey>,
+	pub modifier_2: Option<EnigoKey>,
+	pub modifier_3: Option<EnigoKey>,
+	pub modifier_4: Option<EnigoKey>,
+	pub modifier_5: Option<EnigoKey>,
 	pub char_key: Option<char>,
 }
 

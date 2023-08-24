@@ -16,12 +16,16 @@ fn key_click_config_is_correctly_initialized_key() {
     assert_key_click_configs_translate_to_equal(
         settings_data::KeyClickConfig{
             key: Some(EnigoKey::Tab),
-            modifiers: None,
+            modifier_1: None,
+            modifier_2: None,
+            modifier_3: None,
+            modifier_4: None,
+            modifier_5: None,
             char_key: None,
         },
         KeyClickConfig {
             key: Some(enigo::Key::Tab),
-            modifiers: None,
+            modifiers: [None,None,None,None,None],
         });
 }
 
@@ -29,12 +33,16 @@ fn setup_key_click_config_is_correctly_initialized_char_key(char: char){
     assert_key_click_configs_translate_to_equal(
         settings_data::KeyClickConfig{
             key: None,
-            modifiers: None,
+            modifier_1: None,
+            modifier_2: None,
+            modifier_3: None,
+            modifier_4: None,
+            modifier_5: None,
             char_key: Some(char),
         },
         KeyClickConfig {
             key: Some(enigo::Key::Layout(char)),
-            modifiers: None,
+            modifiers: [None,None,None,None,None],
         });
 }
 #[test]
@@ -53,23 +61,31 @@ fn key_click_config_is_correctly_initialized_key_with_modifiers() {
     assert_key_click_configs_translate_to_equal(
         settings_data::KeyClickConfig{
             key: Some(EnigoKey::Tab),
-            modifiers: Some(vec![EnigoKey::Shift]),
+            modifier_1: Some(EnigoKey::Shift),
+            modifier_2: None,
+            modifier_3: None,
+            modifier_4: None,
+            modifier_5: None,
             char_key: None,
         },
         KeyClickConfig {
             key: Some(enigo::Key::Tab),
-            modifiers: Some(vec![enigo::Key::Shift]),
+            modifiers: [Some(enigo::Key::Shift),None,None,None,None],
         });
 
     assert_key_click_configs_translate_to_equal(
         settings_data::KeyClickConfig{
             key: Some(EnigoKey::RightArrow),
-            modifiers: Some(vec![EnigoKey::Shift, EnigoKey::Control]),
+            modifier_1: Some(EnigoKey::Shift),
+            modifier_2: Some(EnigoKey::Control),
+            modifier_3: None,
+            modifier_4: None,
+            modifier_5: None,
             char_key: None,
         },
         KeyClickConfig {
             key: Some(enigo::Key::RightArrow),
-            modifiers: Some(vec![enigo::Key::Shift, enigo::Key::Control]),
+            modifiers: [Some(enigo::Key::Shift), Some(enigo::Key::Control), None, None, None],
         });
 }
 
@@ -85,21 +101,6 @@ fn key_click_config_get_key_works_char_key() {
     assert_eq!(
         KeyClickConfig::get_key(None,Some('`')),
         Some(enigo::Key::Layout('`'))); 
-}
-
-#[test]
-fn key_click_config_get_modifier_keys_works() {
-    let res = KeyClickConfig::get_modifier_keys(Some(vec![
-        EnigoKey::Shift,
-        EnigoKey::Control,
-        EnigoKey::Select,
-    ]));
-
-    assert_eq!(res,Some(vec![
-        enigo::Key::Shift,
-        enigo::Key::Control,
-        enigo::Key::Select,
-    ]));
 }
 
 #[test]
