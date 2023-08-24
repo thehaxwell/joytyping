@@ -1,12 +1,21 @@
 use std::time::Duration;
-
 use self::enigo_wrapper::EnigoTrait;
-
 use super::keys_config::KeyClickConfig;
 
 pub mod enigo_wrapper;
 
+#[cfg(test)]
+use mockall::{automock, predicate::*};
+
 const DELAY_DURATION: Duration = Duration::from_millis(500);
+
+#[cfg_attr(test, automock)]
+pub trait InputControllerTrait {
+    fn key_down(&mut self, key_to_click: KeyClickConfig);
+    fn key_up(&mut self);
+    fn trigger_input(&mut self);
+}
+
 pub struct InputController {
     enigo: Box<dyn EnigoTrait>,
     active_key: Option<KeyClickConfig>,
@@ -24,18 +33,6 @@ impl InputController {
         }
     }
 
-    pub fn key_down(&mut self, key_to_click: KeyClickConfig) {
-        self.active_key = Some(key_to_click);
-        self.delay_from_this_instant = None;
-        self.trigger_input();
-        self.delay_from_this_instant = Some(std::time::Instant::now());
-    }
-
-    pub fn key_up(&mut self) {
-        self.active_key = None;
-        self.delay_from_this_instant = None;
-    }
-
     fn allow_input(&self) -> bool {
         if let Some(instant) = self.delay_from_this_instant {
             if instant.elapsed() <= DELAY_DURATION {
@@ -45,7 +42,22 @@ impl InputController {
         true
     }
 
-    pub fn trigger_input(&mut self) {
+}
+
+impl InputControllerTrait for InputController {
+    fn key_down(&mut self, key_to_click: KeyClickConfig) {
+        self.active_key = Some(key_to_click);
+        self.delay_from_this_instant = None;
+        self.trigger_input();
+        self.delay_from_this_instant = Some(std::time::Instant::now());
+    }
+
+    fn key_up(&mut self) {
+        self.active_key = None;
+        self.delay_from_this_instant = None;
+    }
+
+    fn trigger_input(&mut self) {
         if let Some(key_to_click) = &self.active_key {
             if !self.allow_input() {
                 return;

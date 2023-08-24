@@ -3,7 +3,7 @@ use std::time::{Duration, Instant};
 
 use crate::{settings_data::KeyClickConfig, gamepad::CustomButton};
 
-use self::{keys_config::KeysConfig, input_controller::InputController};
+use self::{keys_config::KeysConfig, input_controller::{InputController, InputControllerTrait}};
 
 #[cfg(test)]
 mod tests;
@@ -18,7 +18,7 @@ pub mod keys_config;
 pub mod input_controller;
 
 pub struct JoyKeyboard {
-    input_controller: InputController,
+    input_controller: Box<dyn InputControllerTrait>,
     r1_stepper_button: Box<dyn StepperButtonTrait>,
     l1_stepper_button: Box<dyn StepperButtonTrait>,
     current_step: Step,
@@ -29,7 +29,7 @@ pub struct JoyKeyboard {
 }
 
 impl JoyKeyboard {
-    pub fn new(input_controller: InputController,
+    pub fn new(input_controller: Box<dyn InputControllerTrait>,
                r1_stepper_button: Box<dyn StepperButtonTrait>,
                l1_stepper_button: Box<dyn StepperButtonTrait>,
     key_mappings: KeysConfig,
