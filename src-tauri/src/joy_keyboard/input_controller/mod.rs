@@ -6,6 +6,8 @@ pub mod enigo_wrapper;
 
 #[cfg(test)]
 use mockall::{automock, predicate::*};
+#[cfg(test)]
+mod tests;
 
 const DELAY_DURATION: Duration = Duration::from_millis(500);
 
@@ -19,7 +21,7 @@ pub trait InputControllerTrait {
 pub struct InputController {
     enigo: Box<dyn EnigoTrait>,
     active_key: Option<KeyClickConfig>,
-    delay_from_this_instant: Option<std::time::Instant>,
+    instant_to_start_delay_from: Option<std::time::Instant>,
 }
 
 impl InputController {
@@ -29,12 +31,12 @@ impl InputController {
         Self{
             enigo,
             active_key: None,
-            delay_from_this_instant: None,
+            instant_to_start_delay_from: None,
         }
     }
 
     fn allow_input(&self) -> bool {
-        if let Some(instant) = self.delay_from_this_instant {
+        if let Some(instant) = self.instant_to_start_delay_from {
             if instant.elapsed() <= DELAY_DURATION {
                 return false;
             }
@@ -45,16 +47,19 @@ impl InputController {
 }
 
 impl InputControllerTrait for InputController {
+    // The key is immediately triggered and then after DELAY_DURATION
+    // it will be allowed to be triggered many times by calling trigger_input()
+    // until key_up() is called (or key_down() is called again).
     fn key_down(&mut self, key_to_click: KeyClickConfig) {
         self.active_key = Some(key_to_click);
-        self.delay_from_this_instant = None;
+        self.instant_to_start_delay_from = None;
         self.trigger_input();
-        self.delay_from_this_instant = Some(std::time::Instant::now());
+        self.instant_to_start_delay_from = Some(std::time::Instant::now());
     }
 
     fn key_up(&mut self) {
         self.active_key = None;
-        self.delay_from_this_instant = None;
+        self.instant_to_start_delay_from = None;
     }
 
     fn trigger_input(&mut self) {
@@ -80,7 +85,7 @@ impl InputControllerTrait for InputController {
                     self.enigo.key_up(modifier);
                 }
             }
-            self.delay_from_this_instant = None;
+            self.instant_to_start_delay_from = None;
         }
     }
 }
