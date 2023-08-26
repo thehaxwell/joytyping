@@ -9,9 +9,9 @@ name="Built-in default"
 [profiles.quick_lookup_window]
 inner_size = {width= 600,height= 400}
 
-[profiles.left_axis]
+[profiles.left_stick]
 click_thresholds = { up = 0.5, down = 0.5, left = 0.5, right = 0.5 }
-[profiles.right_axis]
+[profiles.right_stick]
 click_thresholds = { up = 0.5, down = 0.5, left = 0.5, right = 0.5 }
 
 [profiles.keyboard_mode.key_mappings.south]
