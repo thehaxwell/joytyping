@@ -7,6 +7,8 @@ use mockall::{automock, predicate::*};
 #[cfg(test)]
 mod tests;
 
+pub mod error_display_window;
+
 const JOYTYPING_DEFAULT_SETTINGS: &str = include_str!("default_settings.toml");
 
 #[cfg_attr(test, automock)]

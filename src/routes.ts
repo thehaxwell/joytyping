@@ -1,12 +1,14 @@
 // Components
 import Welcome from './routes/Welcome.svelte'
 import QuickLookup from './routes/QuickLookup.svelte'
+import SettingsErrorDisplay from './routes/SettingsErrorDisplay.svelte'
 
 // Export the route definition object
 export default {
     // Exact path
     '/': Welcome,
     '/quick-lookup': QuickLookup,
+    '/settings-load-error': SettingsErrorDisplay,
 
     // // Using named parameters, with last being optional
     // '/hello/:first/:last?': Name,

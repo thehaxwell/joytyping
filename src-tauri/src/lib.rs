@@ -2,7 +2,8 @@ use std::sync::mpsc;
 
 use joy_keyboard::input_controller::InputController;
 use joy_keyboard::keys_config::KeysConfig;
-use settings::{Settings,SettingsLoadError,SettingsDependenciesImpl};
+use settings::error_display_window::ErrorDisplayWindow;
+use settings::{Settings,SettingsDependenciesImpl};
 use joy_keyboard::stepper::StepperButton;
 use gamepad::gilrs_wrapper::GilrsWrapper;
 use gamepad::sticks_interpreter::{SticksInterpreter, AxisClickThresholds};
@@ -16,30 +17,28 @@ pub mod quick_lookup_window;
 pub mod settings;
 pub mod settings_data;
 
-pub fn start_main_loop(end_signal_mpsc_receiver: mpsc::Receiver<MainLoopInterruption>, handle: tauri::AppHandle){
+pub fn start_main_loop(
+    end_signal_mpsc_receiver: mpsc::Receiver<MainLoopInterruption>,
+    handle: tauri::AppHandle
+    ){
     let mut quick_lookup_window = QuickLookupWindow::new(
-        handle,
+        handle.clone(),
         Box::new(QuickLookupWindowDependenciesImpl),
     );
+    let mut settings_error_display_window = ErrorDisplayWindow::new(handle);
 
     'main_loop_initializer_loop: loop {
-        let mut settings = Settings::new(Box::new(SettingsDependenciesImpl),
+        // close any open window first while there's time
+        let _ = settings_error_display_window.close();
+
+        let mut settings = Settings::new(
+            Box::new(SettingsDependenciesImpl),
             "/home/haxwell/.config/joytyping/joytyping.toml".to_string());
-        match settings.load() {
-            Err(e) => {
-                match e {
-                    SettingsLoadError::FileNotParsable(msg) => {
-                        println!("Error: {}", msg);
-                    },
-                    _ => {
-                        println!("Error!");
-                    }
-                }
-            },
-            Ok(_) => {
-                println!("Settings loaded");
-            }
+
+        if let Err(e) = settings.load() {
+           let _ = settings_error_display_window.open_and_show(e);
         }
+
         let mut settings_data = settings.get_data().unwrap();
 
         let active_profile_index_option = settings_data.profiles.iter()
