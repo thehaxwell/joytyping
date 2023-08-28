@@ -240,7 +240,7 @@ pub fn start_main_loop(
 //     }
 // }
 
-#[derive(PartialEq,Clone)]
+#[derive(Debug,PartialEq,Clone)]
 pub enum LeftOrRight {
     Left,
     Right,

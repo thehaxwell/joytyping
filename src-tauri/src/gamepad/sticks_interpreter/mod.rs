@@ -165,6 +165,7 @@ impl SticksInterpreterTrait for SticksInterpreter {
     }
 }
 
+#[derive(Debug,PartialEq)]
 struct CardinalCustomButtons {
     up: CustomButton,
     right: CustomButton,
@@ -172,6 +173,7 @@ struct CardinalCustomButtons {
     left: CustomButton
 }
 
+#[derive(Debug,PartialEq)]
 struct StickInterpreter {
     button: CardinalCustomButtons,
     click_thresholds: AxisClickThresholds,
@@ -195,11 +197,11 @@ impl StickInterpreter {
             }
         }
         else {
-            if y_axis > self.click_thresholds.up {
-                return Some(self.button.up);
-            }
-            else if y_axis < self.click_thresholds.down * -1.0 {
+            if y_axis > self.click_thresholds.down {
                 return Some(self.button.down);
+            }
+            else if y_axis < self.click_thresholds.up * -1.0 {
+                return Some(self.button.up);
             }
 
         }
@@ -208,6 +210,7 @@ impl StickInterpreter {
     }
 }
 
+#[derive(Debug,PartialEq)]
 pub struct AxisClickThresholds {
     pub up: f32,
     pub right: f32,
