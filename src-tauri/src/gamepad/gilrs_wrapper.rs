@@ -58,9 +58,6 @@ impl Gilrs for GilrsWrapper {
     }
 }
 
-// TODO: remove the "Wrapper" from this name
-//
-
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct GilrsEvent {
     pub event: GilrsEventType,
