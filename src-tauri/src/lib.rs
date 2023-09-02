@@ -1,10 +1,15 @@
 use std::sync::mpsc;
 
+use gamepad::CustomButton;
+use gamepad::gilrs_wrapper::GilrsWrapper;
+use gamepad::stick_switch_interpreter::{CardinalCustomButtons, StickSwitchInterpreter, AxisClickThresholds};
+// use gamepad::sticks_interpreter::{AxisClickThresholds, SticksInterpreter};
 use settings::error_display_window::ErrorDisplayWindow;
 use settings::{Settings,SettingsDependenciesImpl};
 
 pub mod settings;
 pub mod settings_data;
+pub mod gamepad;
 
 pub fn start_main_loop(
     end_signal_mpsc_receiver: mpsc::Receiver<MainLoopInterruption>,
@@ -34,6 +39,33 @@ pub fn start_main_loop(
             None => 0
         });
 
+        let mut gamepad = gamepad::Gamepad::new(
+            Box::new(GilrsWrapper::new()),
+            Box::new(StickSwitchInterpreter::new(
+                AxisClickThresholds::get_from_setting(
+                    active_profile.stick_switches_click_thresholds,
+                    LeftOrRight::Left),
+                CardinalCustomButtons {
+                    up: CustomButton::LeftStickUp,
+                    down: CustomButton::LeftStickDown,
+                    left: CustomButton::LeftStickLeft,
+                    right: CustomButton::LeftStickRight,
+                }
+            )),
+            Box::new(StickSwitchInterpreter::new(
+                AxisClickThresholds::get_from_setting(
+                    active_profile.stick_switches_click_thresholds,
+                    LeftOrRight::Right),
+                CardinalCustomButtons {
+                    up: CustomButton::RightStickUp,
+                    down: CustomButton::RightStickDown,
+                    left: CustomButton::RightStickLeft,
+                    right: CustomButton::RightStickRight,
+                }
+            )),
+            true // should_interpret_stick_change
+        );
+
         'main_loop: loop {
             //TODO: check if this actually eases the load on the CPU
             std::thread::sleep(std::time::Duration::from_millis(10));
@@ -49,6 +81,19 @@ pub fn start_main_loop(
                 Err(mpsc::TryRecvError::Empty) => {}
             }
 
+            while let Some(event) = gamepad.next_event() {
+                match event {
+                    gamepad::GamepadEvent::ButtonPressed(button)=> {
+                        print!(">> ButtonPressed: {:?}\n",button);
+                    },
+                    gamepad::GamepadEvent::ButtonReleased(button) => {
+                        print!(">> ButtonReleased: {:?}\n",button);
+                    },
+                    gamepad::GamepadEvent::AxisChanged(axis,value) => {
+                        println!(">> AxisChanged: {:?}, {:?}",axis,value);
+                    }
+                };
+            }
         }
     }
 }

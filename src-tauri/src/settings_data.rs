@@ -32,7 +32,7 @@ pub struct HeightAndWidth {
     pub width: f64,
     pub height: f64,
 }
-#[derive(Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, Copy, PartialEq)]
 pub struct StickSwitchesClickThresholds {
     pub left_stick_up: f32,
     pub left_stick_down: f32,
