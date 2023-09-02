@@ -82,24 +82,28 @@ fn validate_settings_data_works_with_valid_data() {
 #[test]
 fn validate_settings_data_finds_stick_threshold_errors() {
     let mut settings_data = setup_settings_data_example();
-    settings_data.profiles[0].left_stick.click_thresholds.up = 1.1;
+    settings_data.profiles[0].stick_switches_click_thresholds.left_stick_up = 1.1;
     assert!(Settings::validate_settings_data(&settings_data)
         .is_err_and(|e| e == SettingsLoadError::FileNotParsable(
-            "at \"My PS3 Controller\" profile > left_stick > click_thresholds: Up is out of bounds".to_string()),
+            "at \"My PS3 Controller\" profile > stick_switches_click_thresholds: left_stick_up is out of bounds"
+            .to_string()),
+
     ));
 
 
     let mut settings_data = setup_settings_data_example();
-    settings_data.profiles[0].left_stick.click_thresholds.left = -0.1;
+    settings_data.profiles[0].stick_switches_click_thresholds.left_stick_left = -0.1;
     assert!(Settings::validate_settings_data(&settings_data)
         .is_err_and(|e| e == SettingsLoadError::FileNotParsable(
-            "at \"My PS3 Controller\" profile > left_stick > click_thresholds: Left is out of bounds".to_string()),
+            "at \"My PS3 Controller\" profile > stick_switches_click_thresholds: left_stick_left is out of bounds"
+            .to_string()),
     ));
 
     let mut settings_data = setup_settings_data_example();
-    settings_data.profiles[0].right_stick.click_thresholds.down = -1.1;
+    settings_data.profiles[0].stick_switches_click_thresholds.right_stick_down = -1.1;
     assert!(Settings::validate_settings_data(&settings_data)
         .is_err_and(|e| e == SettingsLoadError::FileNotParsable(
-            "at \"My PS3 Controller\" profile > right_stick > click_thresholds: Down is out of bounds".to_string()),
+            "at \"My PS3 Controller\" profile > stick_switches_click_thresholds: right_stick_down is out of bounds"
+            .to_string()),
     ));
 }

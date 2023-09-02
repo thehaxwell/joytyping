@@ -100,38 +100,30 @@ impl Settings {
         -> Result<(), SettingsLoadError> {
             let error: Option<SettingsLoadError> = data.profiles.iter().find_map(|p| {
                 let thresholds_arr = [
-                    p.left_stick.click_thresholds,
-                    p.right_stick.click_thresholds];
+                    (p.stick_switches_click_thresholds.left_stick_up, "left_stick_up"),
+                    (p.stick_switches_click_thresholds.left_stick_down, "left_stick_down"),
+                    (p.stick_switches_click_thresholds.left_stick_left, "left_stick_left"),
+                    (p.stick_switches_click_thresholds.left_stick_right, "left_stick_right"),
+                    (p.stick_switches_click_thresholds.right_stick_up, "right_stick_up"),
+                    (p.stick_switches_click_thresholds.right_stick_down, "right_stick_down"),
+                    (p.stick_switches_click_thresholds.right_stick_left, "right_stick_left"),
+                    (p.stick_switches_click_thresholds.right_stick_right, "right_stick_right"),
+                ];
+
 
                 let mut idx = -1;
                 thresholds_arr.iter().find_map(|t| {
                     idx += 1;
-                    let err_at_direction = if t.up > 1.0 || t.up < 0.0 {
-                            Some(String::from("Up"))
-                    }
-                    else if t.down > 1.0 || t.down < 0.0 {
-                            Some(String::from("Down"))
-                    }
-                    else if t.left > 1.0 || t.left < 0.0 {
-                            Some(String::from("Left"))
-                    }
-                    else if t.right > 1.0 || t.right < 0.0 {
-                            Some(String::from("Right"))
-                    }
-                    else {
-                        None
-                    };
-
-                    if let Some(direction) = err_at_direction {
+                    if t.0 > 1.0 || t.0 < 0.0 {
                         Some(SettingsLoadError::FileNotParsable(format!(
-                            "at \"{}\" profile > {} > click_thresholds: {} is out of bounds",
+                            "at \"{}\" profile > stick_switches_click_thresholds: {} is out of bounds",
                             p.name,
-                            if idx == 0 {"left_stick"} else {"right_stick"},
-                            direction)))
+                            t.1)))
                     }
                     else {
                         None
                     }
+
                 })
             });
             if let Some(e) = error {

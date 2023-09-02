@@ -1,161 +1,179 @@
 [global]
-default_profile= "Built-in default" # The name of the profile to use by default
+default_profile= "default" # The name of the profile to use by default
 
 [[profiles]]
-name="Built-in default"
-# Note that the options for quick_lookup_window
-# are to match the API's for the WindowBuilder
-# methods (https://docs.rs/tauri/latest/tauri/window/struct.WindowBuilder.html)
+name="default"
 [profiles.quick_lookup_window]
 inner_size = {width= 600,height= 400}
+[profiles.stick_switches_click_thresholds]
+left_stick_up = 0.5
+left_stick_down = 0.5
+left_stick_left = 0.5
+left_stick_right = 0.5
+right_stick_up = 0.5
+right_stick_down = 0.5
+right_stick_left = 0.5
+right_stick_right = 0.5
 
-[profiles.left_stick]
-click_thresholds = { up = 0.5, down = 0.5, left = 0.5, right = 0.5 }
-[profiles.right_stick]
-click_thresholds = { up = 0.5, down = 0.5, left = 0.5, right = 0.5 }
+[[profiles.layers]]
+id = "first-layer-step-1"
+[profiles.layers.switches]
+south = {on_click= {char_key = "I"}}
+east = {on_click= {key = "Return"}}
+north = {on_click= {char_key = "E"}}
+west = {on_click= {char_key = "A"}}
+d_pad_up = {on_click= {char_key = "T"}}
+d_pad_down = {on_click= {char_key = "N"}}
+# d_pad_left = {}`
+d_pad_right = {on_click= {char_key = "O"}}
+left_stick_up = {on_click= {char_key = "t"}}
+left_stick_down = {on_click= {char_key = "n"}}
+left_stick_left = {on_click= {key = "Backspace"}}
+left_stick_right = {on_click= {char_key = "o"}}
+right_stick_up = {on_click= {char_key = "e"}}
+right_stick_down = {on_click= {char_key = "i"}}
+right_stick_left = {on_click= {char_key = "a"}}
+right_stick_right = {on_click= {key = "Space"}}
+[profiles.layers.switches.left_trigger]
+on_click_and_hold = {visit_layer="first-layer-step-3"}
+on_double_click = {move_to_layer="second-layer-step-1"}
+on_double_click_and_hold = {visit_layer="second-layer-step-1"}
+[profiles.layers.switches.right_trigger]
+on_click_and_hold = {visit_layer="first-layer-step-2"}
+on_double_click = {move_to_layer="second-layer-step-1"}
+on_double_click_and_hold = {visit_layer="second-layer-step-1"}
 
-[profiles.keyboard_mode.key_mappings.south]
-first_layer_step_1= {char_key= "I"}
-first_layer_step_2= {char_key= "U"}
-first_layer_step_3= {char_key= "V"}
-first_layer_step_4= {}
-second_layer_step_1= {char_key= "&"}
-second_layer_step_2= {char_key= "}"}
-second_layer_step_3= {}
-second_layer_step_4= {}
-[profiles.keyboard_mode.key_mappings.east]
-first_layer_step_1= {key= "Return"}
-first_layer_step_2= {char_key= "S"}
-first_layer_step_3= {char_key= "F"}
-first_layer_step_4= {char_key= "X"}
-second_layer_step_1= {char_key= "^"}
-second_layer_step_2= {char_key= ":"}
-second_layer_step_3= {char_key= "|"}
-second_layer_step_4= {}
-[profiles.keyboard_mode.key_mappings.north]
-first_layer_step_1= {char_key= "E"}
-first_layer_step_2= {char_key= "H"}
-first_layer_step_3= {char_key= "G"}
-first_layer_step_4= {char_key= "Q"}
-second_layer_step_1= {char_key= "%"}
-second_layer_step_2= {char_key= "\""}
-second_layer_step_3= {key= "Tab",modifier_1="Shift"}
-second_layer_step_4= {}
-[profiles.keyboard_mode.key_mappings.west]
-first_layer_step_1= {char_key= "A"}
-first_layer_step_2= {char_key= "D"}
-first_layer_step_3= {char_key= "Y"}
-first_layer_step_4= {}
-second_layer_step_1= {char_key= "*"}
-second_layer_step_2= {char_key= "{"}
-second_layer_step_3= {}
-second_layer_step_4= {}
-[profiles.keyboard_mode.key_mappings.d_pad_up]
-first_layer_step_1= {char_key= "T"}
-first_layer_step_2= {char_key= "L"}
-first_layer_step_3= {char_key= "W"}
-first_layer_step_4= {char_key= "Z"}
-second_layer_step_1= {char_key= "!"}
-second_layer_step_2= {char_key= "("}
-second_layer_step_3= {char_key= "_"}
-second_layer_step_4= {}
-[profiles.keyboard_mode.key_mappings.d_pad_down]
-first_layer_step_1= {char_key= "N"}
-first_layer_step_2= {char_key= "M"}
-first_layer_step_3= {char_key= "K"}
-first_layer_step_4= {}
-second_layer_step_1= {char_key= "#"}
-second_layer_step_2= {char_key= ">"}
-second_layer_step_3= {char_key= "+"}
-second_layer_step_4= {}
-[profiles.keyboard_mode.key_mappings.d_pad_left]
-first_layer_step_1= {}
-first_layer_step_2= {char_key= "R"}
-first_layer_step_3= {char_key= "P"}
-first_layer_step_4= {char_key= "J"}
-second_layer_step_1= {char_key= "$"}
-second_layer_step_2= {char_key= "<"}
-second_layer_step_3= {char_key= "~"}
-second_layer_step_4= {}
-[profiles.keyboard_mode.key_mappings.d_pad_right]
-first_layer_step_1= {char_key= "O"}
-first_layer_step_2= {char_key= "C"}
-first_layer_step_3= {char_key= "B"}
-first_layer_step_4= {}
-second_layer_step_1= {char_key= "@"}
-second_layer_step_2= {char_key= ")"}
-second_layer_step_3= {char_key= "?"}
-second_layer_step_4= {}
-[profiles.keyboard_mode.key_mappings.left_stick_up]
-first_layer_step_1= {char_key= "t"}
-first_layer_step_2= {char_key= "l"}
-first_layer_step_3= {char_key= "w"}
-first_layer_step_4= {char_key= "z"}
-second_layer_step_1= {char_key= "1"}
-second_layer_step_2= {char_key= "9"}
-second_layer_step_3= {char_key= "_"}
-second_layer_step_4= {}
-[profiles.keyboard_mode.key_mappings.left_stick_down]
-first_layer_step_1= {char_key= "n"}
-first_layer_step_2= {char_key= "m"}
-first_layer_step_3= {char_key= "k"}
-first_layer_step_4= {}
-second_layer_step_1= {char_key= "3"}
-second_layer_step_2= {char_key= "."}
-second_layer_step_3= {char_key= "="}
-second_layer_step_4= {}
-[profiles.keyboard_mode.key_mappings.left_stick_left]
-first_layer_step_1= {key= "Backspace"}
-first_layer_step_2= {char_key= "r"}
-first_layer_step_3= {char_key= "p"}
-first_layer_step_4= {char_key= "j"}
-second_layer_step_1= {char_key= "4"}
-second_layer_step_2= {char_key= ","}
-second_layer_step_3= {char_key= "`"}
-second_layer_step_4= {}
-[profiles.keyboard_mode.key_mappings.left_stick_right]
-first_layer_step_1= {char_key= "o"}
-first_layer_step_2= {char_key= "c"}
-first_layer_step_3= {char_key= "b"}
-first_layer_step_4= {}
-second_layer_step_1= {char_key= "2"}
-second_layer_step_2= {char_key= "0"}
-second_layer_step_3= {char_key= "/"}
-second_layer_step_4= {}
-[profiles.keyboard_mode.key_mappings.right_stick_up]
-first_layer_step_1= {char_key= "e"}
-first_layer_step_2= {char_key= "h"}
-first_layer_step_3= {char_key= "g"}
-first_layer_step_4= {char_key= "q"}
-second_layer_step_1= {char_key= "5"}
-second_layer_step_2= {char_key= "'"}
-second_layer_step_3= {key= "Tab"}
-second_layer_step_4= {}
-[profiles.keyboard_mode.key_mappings.right_stick_down]
-first_layer_step_1= {char_key= "i"}
-first_layer_step_2= {char_key= "u"}
-first_layer_step_3= {char_key= "v"}
-first_layer_step_4= {}
-second_layer_step_1= {char_key= "7"}
-second_layer_step_2= {char_key= "]"}
-second_layer_step_3= {}
-second_layer_step_4= {}
-[profiles.keyboard_mode.key_mappings.right_stick_left]
-first_layer_step_1= {char_key= "a"}
-first_layer_step_2= {char_key= "d"}
-first_layer_step_3= {char_key= "y"}
-first_layer_step_4= {}
-second_layer_step_1= {char_key= "8"}
-second_layer_step_2= {char_key= "["}
-second_layer_step_3= {}
-second_layer_step_4= {}
-[profiles.keyboard_mode.key_mappings.right_stick_right]
-first_layer_step_1= {key= "Space"}
-first_layer_step_2= {char_key= "s"}
-first_layer_step_3= {char_key= "f"}
-first_layer_step_4= {char_key= "x"}
-second_layer_step_1= {char_key= "6"}
-second_layer_step_2= {char_key= ";"}
-second_layer_step_3= {char_key= "\\"}
-second_layer_step_4= {}
+[[profiles.layers]]
+id = "first-layer-step-2"
+[profiles.layers.switches]
+south = {on_click= {char_key = "U"}}
+east = {on_click= {char_key = "S"}}
+north = {on_click= {char_key = "H"}}
+west = {on_click= {char_key = "D"}}
+d_pad_up = {on_click= {char_key = "L"}}
+d_pad_down = {on_click= {char_key = "M"}}
+d_pad_left = {on_click= {char_key = "R"}}
+d_pad_right = {on_click= {char_key = "C"}}
+left_stick_up = {on_click= {char_key = "l"}}
+left_stick_down = {on_click= {char_key = "m"}}
+left_stick_left = {on_click= {char_key = "r"}}
+left_stick_right = {on_click= {char_key = "c"}}
+right_stick_up = {on_click= {char_key = "h"}}
+right_stick_down = {on_click= {char_key = "u"}}
+right_stick_left = {on_click= {char_key = "d"}}
+right_stick_right = {on_click= {char_key = "s"}}
+[profiles.layers.switches.left_trigger]
+on_click_and_hold = {visit_layer="first-layer-step-4"}
+
+[[profiles.layers]]
+id = "first-layer-step-3"
+[profiles.layers.switches]
+south = {on_click= {char_key = "V"}}
+east = {on_click= {char_key = "F"}}
+north = {on_click= {char_key = "G"}}
+west = {on_click= {char_key = "Y"}}
+d_pad_up = {on_click= {char_key = "W"}}
+d_pad_down = {on_click= {char_key = "K"}}
+d_pad_left = {on_click= {char_key = "P"}}
+d_pad_right = {on_click= {char_key = "B"}}
+left_stick_up = {on_click= {char_key = "w"}}
+left_stick_down = {on_click= {char_key = "k"}}
+left_stick_left = {on_click= {char_key = "p"}}
+left_stick_right = {on_click= {char_key = "b"}}
+right_stick_up = {on_click= {char_key = "g"}}
+right_stick_down = {on_click= {char_key = "v"}}
+right_stick_left = {on_click= {char_key = "y"}}
+right_stick_right = {on_click= {char_key = "f"}}
+[profiles.layers.switches.right_trigger]
+on_click_and_hold = {visit_layer="first-layer-step-4"}
+
+[[profiles.layers]]
+id = "first-layer-step-4"
+[profiles.layers.switches]
+east = {on_click= {char_key = "X"}}
+north = {on_click= {char_key = "Q"}}
+d_pad_up = {on_click= {char_key = "Z"}}
+d_pad_left = {on_click= {char_key = "J"}}
+left_stick_up = {on_click= {char_key = "z"}}
+left_stick_left = {on_click= {char_key = "j"}}
+right_stick_up = {on_click= {char_key = "q"}}
+right_stick_right = {on_click= {char_key = "x"}}
+
+[[profiles.layers]]
+id = "second-layer-step-1"
+[profiles.layers.switches]
+south = {on_click= {char_key = "&"}}
+east = {on_click= {char_key = "^"}}
+north = {on_click= {char_key = "%"}}
+west = {on_click= {char_key = "*"}}
+d_pad_up = {on_click= {char_key = "!"}}
+d_pad_down = {on_click= {char_key = "#"}}
+d_pad_left = {on_click= {char_key = "$"}}
+d_pad_right = {on_click= {char_key = "@"}}
+left_stick_up = {on_click= {char_key = "1"}}
+left_stick_down = {on_click= {char_key = "3"}}
+left_stick_left = {on_click= {char_key = "4"}}
+left_stick_right = {on_click= {char_key = "2"}}
+right_stick_up = {on_click= {char_key = "5"}}
+right_stick_down = {on_click= {char_key = "7"}}
+right_stick_left = {on_click= {char_key = "8"}}
+right_stick_right = {on_click= {char_key = "6"}}
+[profiles.layers.switches.left_trigger]
+on_click_and_hold = {visit_layer="second-layer-step-3"}
+on_double_click = {move_to_layer="first-layer-step-1"}
+on_double_click_and_hold = {visit_layer="first-layer-step-1"}
+[profiles.layers.switches.right_trigger]
+on_click_and_hold = {visit_layer="second-layer-step-2"}
+on_double_click = {move_to_layer="first-layer-step-1"}
+on_double_click_and_hold = {visit_layer="first-layer-step-1"}
+
+
+[[profiles.layers]]
+id = "second-layer-step-2"
+[profiles.layers.switches]
+south = {on_click= {char_key = "}"}}
+east = {on_click= {char_key = ":"}}
+north = {on_click= {char_key = "\""}}
+west = {on_click= {char_key = "{"}}
+d_pad_up = {on_click= {char_key = "("}}
+d_pad_down = {on_click= {char_key = ">"}}
+d_pad_left = {on_click= {char_key = "<"}}
+d_pad_right = {on_click= {char_key = "("}}
+left_stick_up = {on_click= {char_key = "9"}}
+left_stick_down = {on_click= {char_key = "."}}
+left_stick_left = {on_click= {char_key = ","}}
+left_stick_right = {on_click= {char_key = "0"}}
+right_stick_up = {on_click= {char_key = "'"}}
+right_stick_down = {on_click= {char_key = "]"}}
+right_stick_left = {on_click= {char_key = "["}}
+right_stick_right = {on_click= {char_key = ";"}}
+[profiles.layers.switches.left_trigger]
+on_click_and_hold = {visit_layer="second-layer-step-4"}
+
+[[profiles.layers]]
+id = "second-layer-step-3"
+[profiles.layers.switches]
+east = {on_click= {char_key = "|"}}
+north = {on_click= {key = "Tab", modifiers=["Shift"]}}
+d_pad_up = {on_click= {char_key = "_"}}
+d_pad_down = {on_click= {char_key = "+"}}
+d_pad_left = {on_click= {char_key = "~"}}
+d_pad_right = {on_click= {char_key = "?"}}
+left_stick_up = {on_click= {char_key = "_"}}
+left_stick_down = {on_click= {char_key = "="}}
+left_stick_left = {on_click= {char_key = "`"}}
+left_stick_right = {on_click= {char_key = "/"}}
+right_stick_up = {on_click= {key = "Tab"}}
+right_stick_right = {on_click= {char_key = "\\"}}
+[profiles.layers.switches.right_trigger]
+on_click_and_hold = {visit_layer="second-layer-step-4"}
+
+[[profiles.layers]]
+id = "second-layer-step-4"
+[profiles.layers.switches]
+south = {mouse_button= "Left"}
+west = {mouse_button= "Right"}
+[profiles.layers.cardinal_levers]
+left_stick = {control_mouse_cursor={center_at={x=0.0, y=0.0}}}
+right_stick = {control_mouse_scrollwheel={center_at_y=0.0}}
 
