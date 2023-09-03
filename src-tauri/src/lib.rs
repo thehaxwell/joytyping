@@ -3,13 +3,18 @@ use std::sync::mpsc;
 use gamepad::CustomButton;
 use gamepad::gilrs_wrapper::GilrsWrapper;
 use gamepad::stick_switch_interpreter::{CardinalCustomButtons, StickSwitchInterpreter, AxisClickThresholds};
+use input_controller::{InputController,InputControllerTrait};
+use input_controller::enigo_wrapper::EnigoWrapper;
 // use gamepad::sticks_interpreter::{AxisClickThresholds, SticksInterpreter};
 use settings::error_display_window::ErrorDisplayWindow;
 use settings::{Settings,SettingsDependenciesImpl};
 
+use crate::input_controller::{InputShape, KeyInputShape};
+
 pub mod settings;
 pub mod settings_data;
 pub mod gamepad;
+pub mod input_controller;
 
 pub fn start_main_loop(
     end_signal_mpsc_receiver: mpsc::Receiver<MainLoopInterruption>,
@@ -66,6 +71,8 @@ pub fn start_main_loop(
             true // should_interpret_stick_change
         );
 
+        let mut input_controller = InputController::new(Box::new(EnigoWrapper::new()));
+
         'main_loop: loop {
             //TODO: check if this actually eases the load on the CPU
             std::thread::sleep(std::time::Duration::from_millis(10));
@@ -81,13 +88,21 @@ pub fn start_main_loop(
                 Err(mpsc::TryRecvError::Empty) => {}
             }
 
+            input_controller.trigger_input();
             while let Some(event) = gamepad.next_event() {
                 match event {
                     gamepad::GamepadEvent::ButtonPressed(button)=> {
                         print!(">> ButtonPressed: {:?}\n",button);
+                        input_controller.key_down(
+                            InputShape::Key(KeyInputShape {
+                                key: enigo::Key::Layout('a'),
+                                modifiers: vec![],
+                            })
+                        );
                     },
                     gamepad::GamepadEvent::ButtonReleased(button) => {
                         print!(">> ButtonReleased: {:?}\n",button);
+                        input_controller.key_up();
                     },
                     gamepad::GamepadEvent::AxisChanged(axis,value) => {
                         println!(">> AxisChanged: {:?}, {:?}",axis,value);
