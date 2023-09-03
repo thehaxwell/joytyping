@@ -1,10 +1,11 @@
 use crate::LeftOrRight;
-use crate::gamepad::GamepadEvent;
-use crate::gamepad::CustomButton;
 use crate::settings_data;
 
 #[cfg(test)]
 use mockall::{automock, predicate::*};
+
+use super::StickSwitchButton;
+use super::StickSwitchEvent;
 
 #[cfg(test)]
 mod tests;
@@ -14,11 +15,11 @@ pub trait StickSwitchInterpreterTrait {
     fn interpret_stick_move (
         &mut self,
         x_axis_value: Option<f32>,
-        y_axis_value: Option<f32>) -> Option<GamepadEvent>;
+        y_axis_value: Option<f32>) -> Option<StickSwitchEvent>;
 }
 
 pub struct StickSwitchInterpreter {
-    latest_button_pressed: Option<CustomButton>,
+    latest_button_pressed: Option<StickSwitchButton>,
     cardinal_custom_buttons: CardinalCustomButtons,
     axis_click_thresholds: AxisClickThresholds,
 }
@@ -37,7 +38,7 @@ impl StickSwitchInterpreter {
         }
     }
 
-    pub fn interpret_move(&mut self, x_axis: f32, y_axis: f32)-> Option<CustomButton> {
+    pub fn interpret_move(&mut self, x_axis: f32, y_axis: f32)-> Option<StickSwitchButton> {
         if x_axis.abs() > y_axis.abs() {
             if x_axis > self.axis_click_thresholds.right {
                 return Some(self.cardinal_custom_buttons.right);
@@ -64,7 +65,7 @@ impl StickSwitchInterpreterTrait for StickSwitchInterpreter {
     fn interpret_stick_move (
         &mut self,
         x_axis_value: Option<f32>,
-        y_axis_value: Option<f32>) -> Option<GamepadEvent>{
+        y_axis_value: Option<f32>) -> Option<StickSwitchEvent>{
         let x_value =
             if let Some(data) = x_axis_value {data} else {0.0};
         let y_value =
@@ -83,13 +84,13 @@ impl StickSwitchInterpreterTrait for StickSwitchInterpreter {
                 }
             }
             self.latest_button_pressed = Some(key);
-            Some(GamepadEvent::ButtonPressed(key))
+            Some(StickSwitchEvent::ButtonPressed(key))
         }
         else if let Some(latest) = self.latest_button_pressed {
             // If no key is down now, but there was
             // a key down before, then register its release
             self.latest_button_pressed = None;
-            Some(GamepadEvent::ButtonReleased(latest))
+            Some(StickSwitchEvent::ButtonReleased(latest))
         }
         else {
             None
@@ -99,10 +100,10 @@ impl StickSwitchInterpreterTrait for StickSwitchInterpreter {
 
 #[derive(Debug,PartialEq)]
 pub struct CardinalCustomButtons {
-    pub up: CustomButton,
-    pub right: CustomButton,
-    pub down: CustomButton,
-    pub left: CustomButton
+    pub up: StickSwitchButton,
+    pub right: StickSwitchButton,
+    pub down: StickSwitchButton,
+    pub left: StickSwitchButton
 }
 
 #[derive(Debug,PartialEq)]

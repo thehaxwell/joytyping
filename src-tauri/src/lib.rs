@@ -51,10 +51,10 @@ pub fn start_main_loop(
                     active_profile.stick_switches_click_thresholds,
                     LeftOrRight::Left),
                 CardinalCustomButtons {
-                    up: CustomButton::LeftStickUp,
-                    down: CustomButton::LeftStickDown,
-                    left: CustomButton::LeftStickLeft,
-                    right: CustomButton::LeftStickRight,
+                    up: gamepad::StickSwitchButton::LeftStickUp,
+                    down: gamepad::StickSwitchButton::LeftStickDown,
+                    left: gamepad::StickSwitchButton::LeftStickLeft,
+                    right: gamepad::StickSwitchButton::LeftStickRight,
                 }
             )),
             Box::new(StickSwitchInterpreter::new(
@@ -62,13 +62,12 @@ pub fn start_main_loop(
                     active_profile.stick_switches_click_thresholds,
                     LeftOrRight::Right),
                 CardinalCustomButtons {
-                    up: CustomButton::RightStickUp,
-                    down: CustomButton::RightStickDown,
-                    left: CustomButton::RightStickLeft,
-                    right: CustomButton::RightStickRight,
+                    up: gamepad::StickSwitchButton::RightStickUp,
+                    down: gamepad::StickSwitchButton::RightStickDown,
+                    left: gamepad::StickSwitchButton::RightStickLeft,
+                    right: gamepad::StickSwitchButton::RightStickRight,
                 }
             )),
-            true // should_interpret_stick_change
         );
 
         let mut input_controller = InputController::new(Box::new(EnigoWrapper::new()));
@@ -91,22 +90,10 @@ pub fn start_main_loop(
             input_controller.trigger_input();
             while let Some(event) = gamepad.next_event() {
                 match event {
-                    gamepad::GamepadEvent::ButtonPressed(button)=> {
-                        print!(">> ButtonPressed: {:?}\n",button);
-                        input_controller.key_down(
-                            InputShape::Key(KeyInputShape {
-                                key: enigo::Key::Layout('a'),
-                                modifiers: vec![],
-                            })
-                        );
-                    },
-                    gamepad::GamepadEvent::ButtonReleased(button) => {
-                        print!(">> ButtonReleased: {:?}\n",button);
-                        input_controller.key_up();
-                    },
-                    gamepad::GamepadEvent::AxisChanged(axis,value) => {
-                        println!(">> AxisChanged: {:?}, {:?}",axis,value);
-                    }
+                    gamepad::InputEvent::KeyDown(key)
+                        => input_controller.key_down(input_controller::InputShape::Key(key)),
+                    gamepad::InputEvent::KeyUp
+                        => input_controller.key_up(),
                 };
             }
         }
