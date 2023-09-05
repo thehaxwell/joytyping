@@ -4,9 +4,6 @@ use crate::settings_data;
 #[cfg(test)]
 use mockall::{automock, predicate::*};
 
-use super::StickSwitchButton;
-use super::StickSwitchEvent;
-
 #[cfg(test)]
 mod tests;
 
@@ -138,4 +135,23 @@ impl AxisClickThresholds {
             }
         }
     }
+}
+
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum StickSwitchButton {
+    LeftStickUp,
+    LeftStickDown,
+    LeftStickLeft,
+    LeftStickRight,
+    RightStickUp,
+    RightStickDown,
+    RightStickLeft,
+    RightStickRight,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum StickSwitchEvent {
+    ButtonPressed(StickSwitchButton),
+    ButtonReleased(StickSwitchButton),
 }

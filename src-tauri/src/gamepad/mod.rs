@@ -1,4 +1,4 @@
-use crate::{gamepad::gilrs_wrapper::Gilrs, input_controller::KeyInputShape};
+use crate::{gamepad::{gilrs_wrapper::Gilrs, stick_switch_interpreter::StickSwitchEvent}, input_controller::KeyInputShape};
 
 use self::{gilrs_wrapper::{GilrsEvent, GilrsEventType}, stick_switch_interpreter::StickSwitchInterpreterTrait};
 
@@ -107,47 +107,6 @@ impl Gamepad {
             _other => None
         }
     }
-}
-
-
-// TODO: delete
-#[derive(Clone, Copy, Debug, PartialEq)]
-pub enum CustomButton {
-    Base(gilrs::Button),
-    LeftStickUp,
-    LeftStickDown,
-    LeftStickLeft,
-    LeftStickRight,
-    RightStickUp,
-    RightStickDown,
-    RightStickLeft,
-    RightStickRight,
-}
-
-#[derive(Clone, Copy, Debug, PartialEq)]
-pub enum StickSwitchButton {
-    LeftStickUp,
-    LeftStickDown,
-    LeftStickLeft,
-    LeftStickRight,
-    RightStickUp,
-    RightStickDown,
-    RightStickLeft,
-    RightStickRight,
-}
-
-// TODO: delete
-#[derive(Clone, Copy, Debug, PartialEq)]
-pub enum GamepadEvent {
-    ButtonPressed(CustomButton),
-    ButtonReleased(CustomButton),
-    AxisChanged(gilrs::Axis,f32),
-}
-
-#[derive(Clone, Copy, Debug, PartialEq)]
-pub enum StickSwitchEvent {
-    ButtonPressed(StickSwitchButton),
-    ButtonReleased(StickSwitchButton),
 }
 
 #[derive(Debug, PartialEq)]

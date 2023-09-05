@@ -1,8 +1,6 @@
 use crate::LeftOrRight;
-use crate::gamepad::CustomButton;
-use crate::gamepad::StickSwitchEvent;
-use crate::gamepad::StickSwitchButton;
-
+use super::StickSwitchEvent;
+use super::StickSwitchButton;
 use super::AxisClickThresholds;
 use super::CardinalCustomButtons;
 use super::StickSwitchInterpreter;

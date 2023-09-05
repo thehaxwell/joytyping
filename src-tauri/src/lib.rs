@@ -1,15 +1,11 @@
 use std::sync::mpsc;
 
-use gamepad::CustomButton;
 use gamepad::gilrs_wrapper::GilrsWrapper;
-use gamepad::stick_switch_interpreter::{CardinalCustomButtons, StickSwitchInterpreter, AxisClickThresholds};
+use gamepad::stick_switch_interpreter::{CardinalCustomButtons, StickSwitchInterpreter, AxisClickThresholds, self};
 use input_controller::{InputController,InputControllerTrait};
 use input_controller::enigo_wrapper::EnigoWrapper;
-// use gamepad::sticks_interpreter::{AxisClickThresholds, SticksInterpreter};
 use settings::error_display_window::ErrorDisplayWindow;
 use settings::{Settings,SettingsDependenciesImpl};
-
-use crate::input_controller::{InputShape, KeyInputShape};
 
 pub mod settings;
 pub mod settings_data;
@@ -51,10 +47,10 @@ pub fn start_main_loop(
                     active_profile.stick_switches_click_thresholds,
                     LeftOrRight::Left),
                 CardinalCustomButtons {
-                    up: gamepad::StickSwitchButton::LeftStickUp,
-                    down: gamepad::StickSwitchButton::LeftStickDown,
-                    left: gamepad::StickSwitchButton::LeftStickLeft,
-                    right: gamepad::StickSwitchButton::LeftStickRight,
+                    up: stick_switch_interpreter::StickSwitchButton::LeftStickUp,
+                    down: stick_switch_interpreter::StickSwitchButton::LeftStickDown,
+                    left: stick_switch_interpreter::StickSwitchButton::LeftStickLeft,
+                    right: stick_switch_interpreter::StickSwitchButton::LeftStickRight,
                 }
             )),
             Box::new(StickSwitchInterpreter::new(
@@ -62,10 +58,10 @@ pub fn start_main_loop(
                     active_profile.stick_switches_click_thresholds,
                     LeftOrRight::Right),
                 CardinalCustomButtons {
-                    up: gamepad::StickSwitchButton::RightStickUp,
-                    down: gamepad::StickSwitchButton::RightStickDown,
-                    left: gamepad::StickSwitchButton::RightStickLeft,
-                    right: gamepad::StickSwitchButton::RightStickRight,
+                    up: stick_switch_interpreter::StickSwitchButton::RightStickUp,
+                    down: stick_switch_interpreter::StickSwitchButton::RightStickDown,
+                    left: stick_switch_interpreter::StickSwitchButton::RightStickLeft,
+                    right: stick_switch_interpreter::StickSwitchButton::RightStickRight,
                 }
             )),
         );
