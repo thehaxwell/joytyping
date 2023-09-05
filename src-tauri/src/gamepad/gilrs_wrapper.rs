@@ -1,5 +1,9 @@
+use gilrs::ev::{Button,Axis};
+use super::stick_switch_interpreter::StickSwitchEvent;
+
 #[cfg(test)]
 use mockall::{automock, predicate::*};
+
 
 // TODO: change Gilrs to GilrsTrait
 #[cfg_attr(test, automock)]
@@ -33,7 +37,7 @@ impl Gilrs for GilrsWrapper {
                 gilrs::ev::EventType::ButtonRepeated(button, _code) => GilrsEventType::ButtonRepeated(button),              
                 gilrs::ev::EventType::ButtonReleased(button, _code) => GilrsEventType::ButtonReleased(button),              
                 gilrs::ev::EventType::ButtonChanged(button, value, _code) => GilrsEventType::ButtonChanged(button,value),
-                gilrs::ev::EventType::AxisChanged(axis, value, _code) => GilrsEventType::AxisChanged(axis, value),
+                gilrs::ev::EventType::AxisChanged(axis, value, _code) => GilrsEventType::AxisChanged(axis, value, None),
                 gilrs::ev::EventType::Connected => GilrsEventType::Connected,
                 gilrs::ev::EventType::Disconnected => GilrsEventType::Disconnected,
                 gilrs::ev::EventType::Dropped => GilrsEventType::Dropped,
@@ -64,8 +68,6 @@ pub struct GilrsEvent {
     pub time: std::time::SystemTime
 }
 
-use gilrs::ev::{Button,Axis};
-
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum GilrsEventType {
@@ -73,7 +75,7 @@ pub enum GilrsEventType {
     ButtonRepeated(Button),
     ButtonReleased(Button),
     ButtonChanged(Button, f32),
-    AxisChanged(Axis, f32),
+    AxisChanged(Axis, f32, Option<StickSwitchEvent>),
     Connected,
     Disconnected,
     Dropped,

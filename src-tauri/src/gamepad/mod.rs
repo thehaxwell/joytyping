@@ -27,8 +27,9 @@ impl Gamepad {
         }
     }
 
+
     pub fn next_event(&mut self) -> Option<InputEvent> {
-        match self.gilrs.next_event() {
+        match self.next_gilrs_event() {
             Some(GilrsEvent { event, time: _}) => {
             match event {
                 GilrsEventType::ButtonPressed(button, )
@@ -46,46 +47,20 @@ impl Gamepad {
                     print!("ButtonChanged: {:?}\n",button);
                     None
                 },
-                GilrsEventType::AxisChanged(axis, value, ) => {
+                GilrsEventType::AxisChanged(axis, value, switch_stick_event) => {
                     print!("AxisChanged: {:?}: {:?}\n",axis,value);
-                    if true {
-                        match axis {
-                            gilrs::ev::Axis::LeftStickX | gilrs::ev::Axis::LeftStickY=> {
-                                match self.left_stick_switch_interpreter.interpret_stick_move(
-                                    self.gilrs.get_gamepad_axis_data_value(gilrs::Axis::LeftStickX),
-                                    self.gilrs.get_gamepad_axis_data_value(gilrs::Axis::LeftStickY),
-                                ){
-                                    Some(StickSwitchEvent::ButtonPressed(_))
-                                        => Some(InputEvent::KeyDown(KeyInputShape {
-                                            key: enigo::Key::Layout('a'),
-                                            modifiers: vec![],
-                                        })),
-                                    Some(StickSwitchEvent::ButtonReleased(_))
-                                        => Some(InputEvent::KeyUp),
-                                    None => None
-                                }
-
-                            },
-                            gilrs::ev::Axis::RightStickX | gilrs::ev::Axis::RightStickY=> {
-                                match self.right_stick_switch_interpreter.interpret_stick_move(
-                                    self.gilrs.get_gamepad_axis_data_value(gilrs::Axis::RightStickX),
-                                    self.gilrs.get_gamepad_axis_data_value(gilrs::Axis::RightStickY),
-                                ){
-                                    Some(StickSwitchEvent::ButtonPressed(_))
-                                        => Some(InputEvent::KeyDown(KeyInputShape {
-                                            key: enigo::Key::Layout('a'),
-                                            modifiers: vec![],
-                                        })),
-                                    Some(StickSwitchEvent::ButtonReleased(_))
-                                        => Some(InputEvent::KeyUp),
-                                    None => None
-                                }
-                            }
-                            _other => return None // return with no event
+                    if let Some(event) = switch_stick_event {
+                        match event {
+                            StickSwitchEvent::ButtonPressed(_)
+                                => Some(InputEvent::KeyDown(KeyInputShape {
+                                    key: enigo::Key::Layout('a'),
+                                    modifiers: vec![],
+                                })),
+                            StickSwitchEvent::ButtonReleased(_)
+                                => Some(InputEvent::KeyUp),
                         }
                     }
                     else {
-                        // Some(GamepadEvent::AxisChanged(axis,value))
                         None
                     }
 
@@ -103,6 +78,39 @@ impl Gamepad {
                     None
                 }
             }
+            },
+            _other => None
+        }
+    }
+
+    fn next_gilrs_event(&mut self) -> Option<GilrsEvent> {
+        match self.gilrs.next_event() {
+            Some(gilrs_event) => {
+                match gilrs_event.event {
+                    GilrsEventType::AxisChanged(axis, value, _) => {
+                         let stick_switch_event_option = match axis {
+                            gilrs::ev::Axis::LeftStickX | gilrs::ev::Axis::LeftStickY=> {
+                                self.left_stick_switch_interpreter.interpret_stick_move(
+                                    self.gilrs.get_gamepad_axis_data_value(gilrs::Axis::LeftStickX),
+                                    self.gilrs.get_gamepad_axis_data_value(gilrs::Axis::LeftStickY),
+                                )
+                            },
+                            gilrs::ev::Axis::RightStickX | gilrs::ev::Axis::RightStickY=> {
+                                self.right_stick_switch_interpreter.interpret_stick_move(
+                                    self.gilrs.get_gamepad_axis_data_value(gilrs::Axis::RightStickX),
+                                    self.gilrs.get_gamepad_axis_data_value(gilrs::Axis::RightStickY),
+                                ) 
+                            }
+                            _other => None
+                        };
+
+                        Some(GilrsEvent{
+                            time: gilrs_event.time,
+                            event: GilrsEventType::AxisChanged(axis, value, stick_switch_event_option), 
+                        })
+                    },
+                    _other => Some(gilrs_event),
+                }
             },
             _other => None
         }
