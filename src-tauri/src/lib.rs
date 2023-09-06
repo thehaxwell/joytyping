@@ -35,7 +35,7 @@ pub fn start_main_loop(
         let active_profile_index_option = settings_data.profiles.iter()
             .position(|profile| profile.name == settings_data.global.default_profile);
                 
-        let active_profile = settings_data.profiles.remove(match active_profile_index_option {
+        let mut active_profile = settings_data.profiles.remove(match active_profile_index_option {
             Some(idx) => idx,
             None => 0
         });
@@ -43,6 +43,9 @@ pub fn start_main_loop(
         // assert_eq!(
         //     active_profile.layers.remove(0).switches.unwrap().east.unwrap().on_click.unwrap().keyboard.unwrap().key,
         //     enigo::Key::Return);
+        assert_eq!(
+            active_profile.layers.remove(7).switches.unwrap().south.unwrap().on_click.unwrap().mouse.unwrap().button,
+            enigo::MouseButton::Left);
         let mut gamepad = gamepad::Gamepad::new(
             Box::new(GilrsWrapper::new()),
             Box::new(StickSwitchInterpreter::new(

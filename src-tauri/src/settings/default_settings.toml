@@ -170,8 +170,8 @@ on_click_and_hold = {visit_layer="second-layer-step-4"}
 [[profiles.layers]]
 id = "second-layer-step-4"
 [profiles.layers.switches]
-south = {mouse_button= "Left"}
-west = {mouse_button= "Right"}
+south = {mouse= {button= "Left"}}
+west = {mouse= {button= "Right"}}
 [profiles.layers.cardinal_levers]
 left_stick = {control_mouse_cursor={center_at={x=0.0, y=0.0}}}
 right_stick = {control_mouse_scrollwheel={center_at_y=0.0}}

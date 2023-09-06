@@ -10,6 +10,7 @@ pub trait EnigoTrait {
     fn key_up(&mut self, key: Key);
     fn mouse_move_relative(&mut self, x: i32, y: i32);
     fn mouse_down(&mut self, button: MouseButton);
+    fn mouse_up(&mut self, button: MouseButton);
 }
 
 pub struct EnigoWrapper {
@@ -43,5 +44,9 @@ impl EnigoTrait for EnigoWrapper {
 
     fn mouse_down(&mut self, button: MouseButton){
         self.enigo.mouse_down(button);
+    }
+
+    fn mouse_up(&mut self, button: MouseButton){
+        self.enigo.mouse_up(button);
     }
 }

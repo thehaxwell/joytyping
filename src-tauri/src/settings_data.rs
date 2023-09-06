@@ -1,3 +1,4 @@
+use enigo::MouseButton;
 use serde::Deserialize;
 use std::fmt;
 use serde::de::{self, Deserializer, Visitor, MapAccess};
@@ -15,11 +16,8 @@ pub struct Global {
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct Profile {
-	// pub keyboard_mode: KeyboardModeConfig,
 	pub name: String,
     pub quick_lookup_window: QuickLookupWindow,
-    // pub left_stick: Axis,
-    // pub right_stick: Axis,
     pub layers: Vec<Layer>,
     pub stick_switches_click_thresholds: StickSwitchesClickThresholds,
 }
@@ -117,102 +115,21 @@ pub struct SwitchEventAndReaction {
 pub struct SwitchOnClickReaction {
     pub keyboard: Option<KeyboardInput>,
 
-    pub mouse_button: Option<EnigoMouseButton>,
+    pub mouse: Option<MouseInput>,
 
     pub visit_layer: Option<String>,
     pub move_to_layer: Option<String>,
 }
 
-
 #[derive(Deserialize, Debug, Copy, Clone, PartialEq)]
-pub enum EnigoKey {
-    Alt,
-    Backspace,
-    Begin,
-    Break,
-    Cancel,
-    CapsLock,
-    Clear,
-    Control,
-    Delete,
-    DownArrow,
-    End,
-    Escape,
-    Execute,
-    F1,
-    F2,
-    F3,
-    F4,
-    F5,
-    F6,
-    F7,
-    F8,
-    F9,
-    F10,
-    F11,
-    F12,
-    F13,
-    F14,
-    F15,
-    F16,
-    F17,
-    F18,
-    F19,
-    F20,
-    F21,
-    F22,
-    F23,
-    F24,
-    F25,
-    F26,
-    F27,
-    F28,
-    F29,
-    F30,
-    F31,
-    F32,
-    F33,
-    F34,
-    F35,
-    Find,
-    Hangul,
-    Hanja,
-    Help,
-    Home,
-    Insert,
-    Kanji,
-    LControl,
-    LeftArrow,
-    Linefeed,
-    LMenu,
-    LShift,
-    Meta,
-    ModeChange,
-    Numlock,
-    Option,
-    PageDown,
-    PageUp,
-    Pause,
-    Print,
-    RControl,
-    Redo,
-    Return,
-    RightArrow,
-    RShift,
-    ScrollLock,
-    Select,
-    ScriptSwitch,
-    Shift,
-    ShiftLock,
-    Space,
-    SysReq,
-    Tab,
-    Undo,
-    UpArrow,
+pub struct MouseInput {
+    #[serde(with = "EnigoMouseButtonDef")]
+    pub button: enigo::MouseButton,
 }
 
 #[derive(Deserialize, Debug, Copy, Clone, PartialEq)]
-pub enum EnigoMouseButton {
+#[serde(remote = "MouseButton")]
+pub enum EnigoMouseButtonDef {
     Left,
     Middle,
     Right,
@@ -223,7 +140,6 @@ pub enum EnigoMouseButton {
     ScrollLeft,
     ScrollRight,
 }
-
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct KeyboardInput {
