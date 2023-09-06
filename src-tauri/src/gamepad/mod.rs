@@ -1,4 +1,4 @@
-use crate::{gamepad::{gilrs_wrapper::Gilrs, stick_switch_interpreter::StickSwitchEvent}, input_controller::KeyInputShape};
+use crate::{gamepad::{gilrs_wrapper::Gilrs, stick_switch_interpreter::StickSwitchEvent}, settings_data::KeyboardInput};
 
 use self::{gilrs_wrapper::{GilrsEvent, GilrsEventType}, stick_switch_interpreter::StickSwitchInterpreterTrait};
 
@@ -33,7 +33,7 @@ impl Gamepad {
             Some(GilrsEvent { event, time: _}) => {
             match event {
                 GilrsEventType::ButtonPressed(button, )
-                    => Some(InputEvent::KeyDown(KeyInputShape {
+                    => Some(InputEvent::KeyDown(KeyboardInput {
                             key: enigo::Key::Layout('a'),
                             modifiers: vec![],
                         })),
@@ -52,7 +52,7 @@ impl Gamepad {
                     if let Some(event) = switch_stick_event {
                         match event {
                             StickSwitchEvent::ButtonPressed(_)
-                                => Some(InputEvent::KeyDown(KeyInputShape {
+                                => Some(InputEvent::KeyDown(KeyboardInput {
                                     key: enigo::Key::Layout('a'),
                                     modifiers: vec![],
                                 })),
@@ -119,6 +119,6 @@ impl Gamepad {
 
 #[derive(Debug, PartialEq)]
 pub enum InputEvent {
-    KeyDown(KeyInputShape),
+    KeyDown(KeyboardInput),
     KeyUp,
 }

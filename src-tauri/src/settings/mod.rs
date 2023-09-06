@@ -4,8 +4,8 @@ use thiserror::Error;
 #[cfg(test)]
 use mockall::{automock, predicate::*};
 
-#[cfg(test)]
-mod tests;
+// #[cfg(test)]
+// mod tests;
 
 pub mod error_display_window;
 

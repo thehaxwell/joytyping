@@ -2,7 +2,7 @@ use std::sync::mpsc;
 
 use gamepad::gilrs_wrapper::GilrsWrapper;
 use gamepad::stick_switch_interpreter::{CardinalCustomButtons, StickSwitchInterpreter, AxisClickThresholds, self};
-use input_controller::{InputController,InputControllerTrait};
+use input_controller::{KeyboardInputController,KeyboardInputControllerTrait};
 use input_controller::enigo_wrapper::EnigoWrapper;
 use settings::error_display_window::ErrorDisplayWindow;
 use settings::{Settings,SettingsDependenciesImpl};
@@ -69,7 +69,7 @@ pub fn start_main_loop(
             )),
         );
 
-        let mut input_controller = InputController::new(Box::new(EnigoWrapper::new()));
+        let mut keyboard_input_controller = KeyboardInputController::new(Box::new(EnigoWrapper::new()));
 
         'main_loop: loop {
             //TODO: check if this actually eases the load on the CPU
@@ -86,13 +86,13 @@ pub fn start_main_loop(
                 Err(mpsc::TryRecvError::Empty) => {}
             }
 
-            input_controller.trigger_input();
+            keyboard_input_controller.trigger_input();
             while let Some(event) = gamepad.next_event() {
                 match event {
                     gamepad::InputEvent::KeyDown(key)
-                        => input_controller.key_down(input_controller::InputShape::Key(key)),
+                        => keyboard_input_controller.key_down(key),
                     gamepad::InputEvent::KeyUp
-                        => input_controller.key_up(),
+                        => keyboard_input_controller.key_up(),
                 };
             }
         }

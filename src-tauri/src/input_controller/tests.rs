@@ -1,8 +1,8 @@
 use mockall::{predicate::eq, Sequence};
 
-use crate::input_controller::{enigo_wrapper::MockEnigoTrait, InputController, DELAY_DURATION};
+use crate::{input_controller::{enigo_wrapper::MockEnigoTrait, KeyboardInputController, DELAY_DURATION}, settings_data::KeyboardInput};
 
-use super::{InputControllerTrait, InputShape};
+use super::KeyboardInputControllerTrait;
 
 fn assert_just_now(time: std::time::Instant){
     assert!(time.elapsed().as_secs() < 1);
@@ -12,10 +12,10 @@ fn assert_just_now(time: std::time::Instant){
 
 // Here is how this class is intended to be used:
 //
-// InputController exists to enable the user to hold a key,
+// KeyboardInputController exists to enable the user to hold a key,
 // and have it fired many times so long as the key is held "down".
 // To match the way the system keyboard tends to do it,
-// InputController (and its caller) will fire the input
+// KeyboardInputController (and its caller) will fire the input
 // event once, take a break, and then many times consistantly
 // until key_up() is called (or key_down() is called again).
 // Here's a visualisation of the calls:
@@ -28,7 +28,7 @@ fn assert_just_now(time: std::time::Instant){
 //  Here's a more technical explanation of this process
 // 1. key_down() is called and given an active_key.
 //    The key is immediately triggered, meaning the input-event is fired.
-// 2. InputController::trigger_input() is constantly being called by
+// 2. KeyboardInputController::trigger_input() is constantly being called by
 //    by the main loop by the main app controller.
 //    But from the moment key_down() is called until DELAY_DURATION has
 //    elapsed, trigger_input() will not trigger any input events.
@@ -39,7 +39,7 @@ fn assert_just_now(time: std::time::Instant){
 //    input events triggered by trigger_input() anymore - that is until
 //    key_down() is called again, which will take us back to 1.
 // 4.2. If key_down() is called again before key_up() is called
-//     the active_key will be updated, and InputController will be reset
+//     the active_key will be updated, and KeyboardInputController will be reset
 //     to step 1.
 //
 //     *the following 2 tests generally test that this process works*
@@ -67,23 +67,22 @@ fn input_controller_works_as_intended_1() {
         .in_sequence(&mut seq);
 
     // 1. key_down() is called and given an active_key.
-    let mut input_controller = InputController::new(Box::new(mock_enigo));
+    let mut input_controller = KeyboardInputController::new(Box::new(mock_enigo));
     assert!(input_controller.active_key.is_none());
     assert!(input_controller.instant_to_start_delay_from.is_none());
-
     input_controller.key_down(
-        InputShape::Key(super::KeyInputShape {
+        KeyboardInput {
             key: enigo::Key::Layout('*'),
             modifiers: [].to_vec(),
-        }));
+        });
     assert_just_now(input_controller.instant_to_start_delay_from.unwrap());
     assert_eq!(input_controller.active_key.as_ref().unwrap(),
-        &InputShape::Key(super::KeyInputShape {
+        &KeyboardInput {
             key: enigo::Key::Layout('*'),
             modifiers: [].to_vec(),
-        }));
+        });
 
-    // 2. InputController::trigger_input() will not fire
+    // 2. KeyboardInputController::trigger_input() will not fire
     input_controller.trigger_input();
     // this is to prove that the no events were fired
     assert!(!input_controller.allow_input());
@@ -143,23 +142,23 @@ fn input_controller_works_as_intended_2() {
         .in_sequence(&mut seq);
 
     // 1. key_down() is called and given an active_key.
-    let mut input_controller = InputController::new(Box::new(mock_enigo));
+    let mut input_controller = KeyboardInputController::new(Box::new(mock_enigo));
     assert!(input_controller.active_key.is_none());
     assert!(input_controller.instant_to_start_delay_from.is_none());
 
     input_controller.key_down(
-        InputShape::Key(super::KeyInputShape {
+        KeyboardInput {
             key: enigo::Key::Layout('*'),
             modifiers: [].to_vec(),
-        }));
+        });
     assert_just_now(input_controller.instant_to_start_delay_from.unwrap());
     assert_eq!(input_controller.active_key.as_ref().unwrap(),
-        &InputShape::Key(super::KeyInputShape {
+        &KeyboardInput {
             key: enigo::Key::Layout('*'),
             modifiers: [].to_vec(),
-        }));
+        });
 
-    // 2. InputController::trigger_input() will not fire
+    // 2. KeyboardInputController::trigger_input() will not fire
     input_controller.trigger_input();
     // this is to prove that the no events were fired
     assert!(!input_controller.allow_input());
@@ -177,16 +176,16 @@ fn input_controller_works_as_intended_2() {
     // 4.2. If key_down() is called again before key_up() is called
     //      then the active_key will be updated
     input_controller.key_down(
-        InputShape::Key(super::KeyInputShape {
+        KeyboardInput {
             key: enigo::Key::Space,
             modifiers: [].to_vec(),
-        }));
+        });
     assert_just_now(input_controller.instant_to_start_delay_from.unwrap());
     assert_eq!(input_controller.active_key.unwrap(),
-        InputShape::Key(super::KeyInputShape {
+        KeyboardInput {
             key: enigo::Key::Space,
             modifiers: [].to_vec(),
-        }));
+        });
 
 }
 
@@ -197,10 +196,10 @@ fn input_controller_works_as_intended_2() {
 fn allow_input_works() {
     assert!(true);
     let mock_enigo = MockEnigoTrait::new();
-    assert!(InputController::new(Box::new(mock_enigo)).allow_input());
+    assert!(KeyboardInputController::new(Box::new(mock_enigo)).allow_input());
 
     let mock_enigo = MockEnigoTrait::new();
-    let mut input_controller = InputController::new(Box::new(mock_enigo));
+    let mut input_controller = KeyboardInputController::new(Box::new(mock_enigo));
     input_controller.instant_to_start_delay_from = Some(std::time::Instant::now());
     assert!(!input_controller.allow_input());
 
@@ -216,12 +215,12 @@ fn key_down_works() {
         .with(eq(enigo::Key::Layout('a')))
         .return_const(());
 
-    let mut input_controller = InputController::new(Box::new(mock_enigo));
+    let mut input_controller = KeyboardInputController::new(Box::new(mock_enigo));
     input_controller.key_down(
-        InputShape::Key(super::KeyInputShape {
+        KeyboardInput {
             key: enigo::Key::Layout('a'),
             modifiers: [].to_vec(),
-        }));
+        });
     assert_just_now(input_controller.instant_to_start_delay_from.unwrap());
 }
 
@@ -242,12 +241,12 @@ fn key_down_for_key_with_modifiers_works() {
         .times(2)
         .return_const(());
 
-    let mut input_controller = InputController::new(Box::new(mock_enigo));
+    let mut input_controller = KeyboardInputController::new(Box::new(mock_enigo));
     input_controller.key_down(
-        InputShape::Key(super::KeyInputShape {
+        KeyboardInput {
             key: enigo::Key::Layout('1'),
             modifiers: [enigo::Key::Shift,enigo::Key::Alt].to_vec(),
-        }));
+        });
     assert_just_now(input_controller.instant_to_start_delay_from.unwrap());
 }
 
@@ -258,12 +257,12 @@ fn trigger_input_works() {
         .expect_key_click()
         .with(eq(enigo::Key::Tab))
         .return_const(());
-    let mut input_controller = InputController::new(Box::new(mock_enigo));
+    let mut input_controller = KeyboardInputController::new(Box::new(mock_enigo));
     input_controller.active_key = Some(
-        InputShape::Key(super::KeyInputShape {
+        KeyboardInput {
             key: enigo::Key::Tab,
             modifiers: [].to_vec(),
-        }));
+        });
     input_controller.trigger_input();
 }
 
@@ -304,12 +303,12 @@ fn trigger_input_calls_enigo_function_in_the_right_order() {
         .return_const(())
         .in_sequence(&mut seq);
 
-    let mut input_controller = InputController::new(Box::new(mock_enigo));
+    let mut input_controller = KeyboardInputController::new(Box::new(mock_enigo));
     input_controller.active_key =
-        Some(InputShape::Key(super::KeyInputShape {
+        Some(KeyboardInput {
             key: enigo::Key::Layout('1'),
             modifiers: [enigo::Key::Shift,enigo::Key::Alt].to_vec(),
-        }));
+        });
     input_controller.trigger_input();
     assert!(input_controller.instant_to_start_delay_from.is_none());
 }
