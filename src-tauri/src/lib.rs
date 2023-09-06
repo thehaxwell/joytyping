@@ -7,6 +7,8 @@ use input_controller::enigo_wrapper::EnigoWrapper;
 use settings::error_display_window::ErrorDisplayWindow;
 use settings::{Settings,SettingsDependenciesImpl};
 
+use crate::input_controller::{MouseInputController, MouseInputControllerTrait};
+
 pub mod settings;
 pub mod settings_data;
 pub mod gamepad;
@@ -73,6 +75,7 @@ pub fn start_main_loop(
         );
 
         let mut keyboard_input_controller = KeyboardInputController::new(Box::new(EnigoWrapper::new()));
+        let mut mouse_input_controller = MouseInputController::new(Box::new(EnigoWrapper::new()));
 
         'main_loop: loop {
             //TODO: check if this actually eases the load on the CPU
@@ -90,6 +93,7 @@ pub fn start_main_loop(
             }
 
             keyboard_input_controller.trigger_input();
+            mouse_input_controller.trigger_input();
             while let Some(event) = gamepad.next_event() {
                 match event {
                     gamepad::InputEvent::KeyDown(key)

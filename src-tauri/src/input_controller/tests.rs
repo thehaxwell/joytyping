@@ -2,13 +2,11 @@ use mockall::{predicate::eq, Sequence};
 
 use crate::{input_controller::{enigo_wrapper::MockEnigoTrait, KeyboardInputController, DELAY_DURATION}, settings_data::KeyboardInput};
 
-use super::KeyboardInputControllerTrait;
+use super::{KeyboardInputControllerTrait,MouseInputControllerTrait, MouseInputController};
 
 fn assert_just_now(time: std::time::Instant){
     assert!(time.elapsed().as_secs() < 1);
 }
-
-//TODO: write unit tests to test mouse input functionality
 
 // Here is how this class is intended to be used:
 //
@@ -45,7 +43,7 @@ fn assert_just_now(time: std::time::Instant){
 //     *the following 2 tests generally test that this process works*
     
 #[test]
-fn input_controller_works_as_intended_1() {
+fn keyboard_input_controller_works_as_intended_1() {
     let mut mock_enigo = MockEnigoTrait::new();
 
     let mut seq = Sequence::new();
@@ -111,7 +109,7 @@ fn input_controller_works_as_intended_1() {
 }
 
 #[test]
-fn input_controller_works_as_intended_2() {
+fn keyboard_input_controller_works_as_intended_2() {
     let mut mock_enigo = MockEnigoTrait::new();
 
     let mut seq = Sequence::new();
@@ -193,7 +191,7 @@ fn input_controller_works_as_intended_2() {
 // the rest is non-exhaustive tests of the different parts
 // ----------------
 #[test]
-fn allow_input_works() {
+fn keyboard_input_allow_input_works() {
     assert!(true);
     let mock_enigo = MockEnigoTrait::new();
     assert!(KeyboardInputController::new(Box::new(mock_enigo)).allow_input());
@@ -208,7 +206,7 @@ fn allow_input_works() {
 }
 
 #[test]
-fn key_down_works() {
+fn keyboard_input_key_down_works() {
     let mut mock_enigo = MockEnigoTrait::new();
     mock_enigo
         .expect_key_click()
@@ -225,7 +223,7 @@ fn key_down_works() {
 }
 
 #[test]
-fn key_down_for_key_with_modifiers_works() {
+fn keyboard_input_key_down_for_key_with_modifiers_works() {
     let mut mock_enigo = MockEnigoTrait::new();
     mock_enigo
         .expect_key_click()
@@ -251,7 +249,7 @@ fn key_down_for_key_with_modifiers_works() {
 }
 
 #[test]
-fn trigger_input_works() {
+fn keyboard_input_trigger_input_works() {
     let mut mock_enigo = MockEnigoTrait::new();
     mock_enigo
         .expect_key_click()
@@ -267,7 +265,7 @@ fn trigger_input_works() {
 }
 
 #[test]
-fn trigger_input_calls_enigo_function_in_the_right_order() {
+fn keyboard_input_trigger_input_calls_enigo_function_in_the_right_order() {
     let mut mock_enigo = MockEnigoTrait::new();
     let mut seq = Sequence::new();
     mock_enigo
@@ -311,4 +309,137 @@ fn trigger_input_calls_enigo_function_in_the_right_order() {
         });
     input_controller.trigger_input();
     assert!(input_controller.instant_to_start_delay_from.is_none());
+}
+
+// ----------------
+// MouseInput tests
+// ----------------
+
+#[test]
+fn mouse_input_key_down_works() {
+    let mut mock_enigo = MockEnigoTrait::new();
+    mock_enigo
+        .expect_mouse_down()
+        .with(eq(enigo::MouseButton::Left))
+        .return_const(());
+    let mut input_controller = MouseInputController{
+            enigo: Box::new(mock_enigo),
+            active_key: None,
+            mouse_cursor_x_move: None,
+            mouse_cursor_y_move: None,
+        };
+    input_controller.key_down(enigo::MouseButton::Left);
+}
+
+#[test]
+fn mouse_input_key_up_works() {
+    let mut mock_enigo = MockEnigoTrait::new();
+    mock_enigo
+        .expect_mouse_up()
+        .times(0);
+    let mut input_controller = MouseInputController{
+            enigo: Box::new(mock_enigo),
+            active_key: None,
+            mouse_cursor_x_move: None,
+            mouse_cursor_y_move: None,
+        };
+    input_controller.key_up();
+
+
+    let mut mock_enigo = MockEnigoTrait::new();
+    mock_enigo
+        .expect_mouse_up()
+        .with(eq(enigo::MouseButton::Right))
+        .return_const(());
+    let mut input_controller = MouseInputController{
+            enigo: Box::new(mock_enigo),
+            active_key: Some(enigo::MouseButton::Right),
+            mouse_cursor_x_move: None,
+            mouse_cursor_y_move: None,
+        };
+    input_controller.key_up();
+}
+
+#[test]
+fn mouse_input_trigger_input_works() {
+    let mut mock_enigo = MockEnigoTrait::new();
+    mock_enigo
+        .expect_mouse_move_relative()
+        .times(0);
+    let mut input_controller = MouseInputController{
+        enigo: Box::new(mock_enigo),
+        active_key: None,
+        mouse_cursor_x_move: None,
+        mouse_cursor_y_move: None,
+    };
+    input_controller.trigger_input();
+
+
+    let mut mock_enigo = MockEnigoTrait::new();
+    mock_enigo
+        .expect_mouse_move_relative()
+        .with(eq(50),eq(0))
+        .return_const(());
+
+    let mut input_controller = MouseInputController{
+        enigo: Box::new(mock_enigo),
+        active_key: None,
+        mouse_cursor_x_move: Some(50),
+        mouse_cursor_y_move: None,
+    };
+    input_controller.trigger_input();
+
+
+    let mut mock_enigo = MockEnigoTrait::new();
+    mock_enigo
+        .expect_mouse_move_relative()
+        .with(eq(0),eq(982))
+        .return_const(());
+
+    let mut input_controller = MouseInputController{
+        enigo: Box::new(mock_enigo),
+        active_key: None,
+        mouse_cursor_x_move: None,
+        mouse_cursor_y_move: Some(982),
+    };
+    input_controller.trigger_input();
+
+
+    let mut mock_enigo = MockEnigoTrait::new();
+    mock_enigo
+        .expect_mouse_move_relative()
+        .with(eq(250),eq(11))
+        .return_const(());
+
+    let mut input_controller = MouseInputController{
+        enigo: Box::new(mock_enigo),
+        active_key: None,
+        mouse_cursor_x_move: Some(250),
+        mouse_cursor_y_move: Some(11),
+    };
+    input_controller.trigger_input();
+
+}
+
+#[test]
+fn mouse_input_setters_work() {
+    let mock_enigo = MockEnigoTrait::new();
+    let mut input_controller = MouseInputController{
+        enigo: Box::new(mock_enigo),
+        active_key: None,
+        mouse_cursor_x_move: None,
+        mouse_cursor_y_move: Some(781),
+    };
+    input_controller.set_mouse_cursor_x_axis(Some(8217));
+    assert_eq!(input_controller.mouse_cursor_x_move,Some(8217));
+    input_controller.set_mouse_cursor_y_axis(None);
+    assert!(input_controller.mouse_cursor_y_move.is_none());
+    input_controller.set_mouse_cursor_x_axis(Some(817));
+    input_controller.set_mouse_cursor_y_axis(Some(32894));
+    assert_eq!(input_controller.mouse_cursor_x_move,Some(817));
+    input_controller.set_mouse_cursor_x_axis(None);
+    assert_eq!(input_controller.mouse_cursor_y_move,Some(32894));
+    assert!(input_controller.mouse_cursor_x_move.is_none());
+    input_controller.set_mouse_cursor_y_axis(Some(1));
+    assert_eq!(input_controller.mouse_cursor_y_move,Some(1));
 }

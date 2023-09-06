@@ -92,8 +92,8 @@ pub trait MouseInputControllerTrait {
     fn key_down(&mut self, key_to_click: enigo::MouseButton);
     fn key_up(&mut self);
     fn trigger_input(&mut self);
-    fn update_mouse_cursor_x_axis(&mut self, value: Option<i32>);
-    fn update_mouse_cursor_y_axis(&mut self, value: Option<i32>);
+    fn set_mouse_cursor_x_axis(&mut self, value: Option<i32>);
+    fn set_mouse_cursor_y_axis(&mut self, value: Option<i32>);
 }
 
 pub struct MouseInputController {
@@ -139,11 +139,11 @@ impl MouseInputControllerTrait for MouseInputController {
         }
     }
 
-    fn update_mouse_cursor_x_axis(&mut self, value: Option<i32>){
+    fn set_mouse_cursor_x_axis(&mut self, value: Option<i32>){
         self.mouse_cursor_x_move = value;
     }
    
-    fn update_mouse_cursor_y_axis(&mut self, value: Option<i32>){
+    fn set_mouse_cursor_y_axis(&mut self, value: Option<i32>){
         self.mouse_cursor_y_move = value;
     }
 }
