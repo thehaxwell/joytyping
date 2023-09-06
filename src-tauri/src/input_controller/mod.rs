@@ -127,14 +127,20 @@ pub struct KeyInputShape {
 
 impl KeyInputShape {
     pub fn from_switch_event_reaction(config: SwitchOnClickReaction) -> Option<Self> {
-        let key_option = KeyInputShape::get_enigo_key(config.char_key, config.key);
-        if let Some(key) = key_option {
-            if let Some(mods) = config.modifiers {
-                return Some(Self {
-                    key,
-                    modifiers: KeyInputShape::get_enigo_modifiers(mods)
-                });
-            }
+        // let key_option = KeyInputShape::get_enigo_key(config.char_key, config.key);
+        // if let Some(key) = key_option {
+        //     if let Some(mods) = config.modifiers {
+        //         return Some(Self {
+        //             key,
+        //             modifiers: KeyInputShape::get_enigo_modifiers(mods)
+        //         });
+        //     }
+        // }
+        if let Some(conf) = config.keyboard {
+            return Some(Self {
+                key: conf.key,
+                modifiers: conf.modifiers
+            })
         }
         None
     }

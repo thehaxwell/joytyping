@@ -18,22 +18,21 @@ right_stick_right = 0.5
 [[profiles.layers]]
 id = "first-layer-step-1"
 [profiles.layers.switches]
-south = {on_click= {char_key = "I"}}
-east = {on_click= {key = "Return"}}
-north = {on_click= {char_key = "E"}}
-west = {on_click= {char_key = "A"}}
-d_pad_up = {on_click= {char_key = "T"}}
-d_pad_down = {on_click= {char_key = "N"}}
-# d_pad_left = {}`
-d_pad_right = {on_click= {char_key = "O"}}
-left_stick_up = {on_click= {char_key = "t"}}
-left_stick_down = {on_click= {char_key = "n"}}
-left_stick_left = {on_click= {key = "Backspace"}}
-left_stick_right = {on_click= {char_key = "o"}}
-right_stick_up = {on_click= {char_key = "e"}}
-right_stick_down = {on_click= {char_key = "i"}}
-right_stick_left = {on_click= {char_key = "a"}}
-right_stick_right = {on_click= {key = "Space"}}
+south = {on_click = {keyboard = {key = "I"}}}
+east = {on_click = {keyboard = {key = "Return"}}}
+north = {on_click = {keyboard = {key = "E"}}}
+west = {on_click = {keyboard = {key = "A"}}}
+d_pad_up = {on_click = {keyboard = {key = "T"}}}
+d_pad_down = {on_click = {keyboard = {key = "N"}}}
+d_pad_right = {on_click = {keyboard = {key = "O"}}}
+left_stick_up = {on_click = {keyboard = {key = "t"}}}
+left_stick_down = {on_click = {keyboard = {key = "n"}}}
+left_stick_left = {on_click = {keyboard = {key = "Backspace"}}}
+left_stick_right = {on_click = {keyboard = {key = "o"}}}
+right_stick_up = {on_click = {keyboard = {key = "e"}}}
+right_stick_down = {on_click = {keyboard = {key = "i"}}}
+right_stick_left = {on_click = {keyboard = {key = "a"}}}
+right_stick_right = {on_click = {keyboard = {key = "Space"}}}
 [profiles.layers.switches.left_trigger]
 on_click_and_hold = {visit_layer="first-layer-step-3"}
 on_double_click = {move_to_layer="second-layer-step-1"}
@@ -46,78 +45,78 @@ on_double_click_and_hold = {visit_layer="second-layer-step-1"}
 [[profiles.layers]]
 id = "first-layer-step-2"
 [profiles.layers.switches]
-south = {on_click= {char_key = "U"}}
-east = {on_click= {char_key = "S"}}
-north = {on_click= {char_key = "H"}}
-west = {on_click= {char_key = "D"}}
-d_pad_up = {on_click= {char_key = "L"}}
-d_pad_down = {on_click= {char_key = "M"}}
-d_pad_left = {on_click= {char_key = "R"}}
-d_pad_right = {on_click= {char_key = "C"}}
-left_stick_up = {on_click= {char_key = "l"}}
-left_stick_down = {on_click= {char_key = "m"}}
-left_stick_left = {on_click= {char_key = "r"}}
-left_stick_right = {on_click= {char_key = "c"}}
-right_stick_up = {on_click= {char_key = "h"}}
-right_stick_down = {on_click= {char_key = "u"}}
-right_stick_left = {on_click= {char_key = "d"}}
-right_stick_right = {on_click= {char_key = "s"}}
+south = {on_click = {keyboard = {key = "U"}}}
+east = {on_click = {keyboard = {key = "S"}}}
+north = {on_click = {keyboard = {key = "H"}}}
+west = {on_click = {keyboard = {key = "D"}}}
+d_pad_up = {on_click = {keyboard = {key = "L"}}}
+d_pad_down = {on_click = {keyboard = {key = "M"}}}
+d_pad_left = {on_click = {keyboard = {key = "R"}}}
+d_pad_right = {on_click = {keyboard = {key = "C"}}}
+left_stick_up = {on_click = {keyboard = {key = "l"}}}
+left_stick_down = {on_click = {keyboard = {key = "m"}}}
+left_stick_left = {on_click = {keyboard = {key = "r"}}}
+left_stick_right = {on_click = {keyboard = {key = "c"}}}
+right_stick_up = {on_click = {keyboard = {key = "h"}}}
+right_stick_down = {on_click = {keyboard = {key = "u"}}}
+right_stick_left = {on_click = {keyboard = {key = "d"}}}
+right_stick_right = {on_click = {keyboard = {key = "s"}}}
 [profiles.layers.switches.left_trigger]
 on_click_and_hold = {visit_layer="first-layer-step-4"}
 
 [[profiles.layers]]
 id = "first-layer-step-3"
 [profiles.layers.switches]
-south = {on_click= {char_key = "V"}}
-east = {on_click= {char_key = "F"}}
-north = {on_click= {char_key = "G"}}
-west = {on_click= {char_key = "Y"}}
-d_pad_up = {on_click= {char_key = "W"}}
-d_pad_down = {on_click= {char_key = "K"}}
-d_pad_left = {on_click= {char_key = "P"}}
-d_pad_right = {on_click= {char_key = "B"}}
-left_stick_up = {on_click= {char_key = "w"}}
-left_stick_down = {on_click= {char_key = "k"}}
-left_stick_left = {on_click= {char_key = "p"}}
-left_stick_right = {on_click= {char_key = "b"}}
-right_stick_up = {on_click= {char_key = "g"}}
-right_stick_down = {on_click= {char_key = "v"}}
-right_stick_left = {on_click= {char_key = "y"}}
-right_stick_right = {on_click= {char_key = "f"}}
+south = {on_click = {keyboard = {key = "V"}}}
+east = {on_click = {keyboard = {key = "F"}}}
+north = {on_click = {keyboard = {key = "G"}}}
+west = {on_click = {keyboard = {key = "Y"}}}
+d_pad_up = {on_click = {keyboard = {key = "W"}}}
+d_pad_down = {on_click = {keyboard = {key = "K"}}}
+d_pad_left = {on_click = {keyboard = {key = "P"}}}
+d_pad_right = {on_click = {keyboard = {key = "B"}}}
+left_stick_up = {on_click = {keyboard = {key = "w"}}}
+left_stick_down = {on_click = {keyboard = {key = "k"}}}
+left_stick_left = {on_click = {keyboard = {key = "p"}}}
+left_stick_right = {on_click = {keyboard = {key = "b"}}}
+right_stick_up = {on_click = {keyboard = {key = "g"}}}
+right_stick_down = {on_click = {keyboard = {key = "v"}}}
+right_stick_left = {on_click = {keyboard = {key = "y"}}}
+right_stick_right = {on_click = {keyboard = {key = "f"}}}
 [profiles.layers.switches.right_trigger]
 on_click_and_hold = {visit_layer="first-layer-step-4"}
 
 [[profiles.layers]]
 id = "first-layer-step-4"
 [profiles.layers.switches]
-east = {on_click= {char_key = "X"}}
-north = {on_click= {char_key = "Q"}}
-d_pad_up = {on_click= {char_key = "Z"}}
-d_pad_left = {on_click= {char_key = "J"}}
-left_stick_up = {on_click= {char_key = "z"}}
-left_stick_left = {on_click= {char_key = "j"}}
-right_stick_up = {on_click= {char_key = "q"}}
-right_stick_right = {on_click= {char_key = "x"}}
+east = {on_click = {keyboard = {key = "X"}}}
+north = {on_click = {keyboard = {key = "Q"}}}
+d_pad_up = {on_click = {keyboard = {key = "Z"}}}
+d_pad_left = {on_click = {keyboard = {key = "J"}}}
+left_stick_up = {on_click = {keyboard = {key = "z"}}}
+left_stick_left = {on_click = {keyboard = {key = "j"}}}
+right_stick_up = {on_click = {keyboard = {key = "q"}}}
+right_stick_right = {on_click = {keyboard = {key = "x"}}}
 
 [[profiles.layers]]
 id = "second-layer-step-1"
 [profiles.layers.switches]
-south = {on_click= {char_key = "&"}}
-east = {on_click= {char_key = "^"}}
-north = {on_click= {char_key = "%"}}
-west = {on_click= {char_key = "*"}}
-d_pad_up = {on_click= {char_key = "!"}}
-d_pad_down = {on_click= {char_key = "#"}}
-d_pad_left = {on_click= {char_key = "$"}}
-d_pad_right = {on_click= {char_key = "@"}}
-left_stick_up = {on_click= {char_key = "1"}}
-left_stick_down = {on_click= {char_key = "3"}}
-left_stick_left = {on_click= {char_key = "4"}}
-left_stick_right = {on_click= {char_key = "2"}}
-right_stick_up = {on_click= {char_key = "5"}}
-right_stick_down = {on_click= {char_key = "7"}}
-right_stick_left = {on_click= {char_key = "8"}}
-right_stick_right = {on_click= {char_key = "6"}}
+south = {on_click = {keyboard = {key = "&"}}}
+east = {on_click = {keyboard = {key = "^"}}}
+north = {on_click = {keyboard = {key = "%"}}}
+west = {on_click = {keyboard = {key = "*"}}}
+d_pad_up = {on_click = {keyboard = {key = "!"}}}
+d_pad_down = {on_click = {keyboard = {key = "#"}}}
+d_pad_left = {on_click = {keyboard = {key = "$"}}}
+d_pad_right = {on_click = {keyboard = {key = "@"}}}
+left_stick_up = {on_click = {keyboard = {key = "1"}}}
+left_stick_down = {on_click = {keyboard = {key = "3"}}}
+left_stick_left = {on_click = {keyboard = {key = "4"}}}
+left_stick_right = {on_click = {keyboard = {key = "2"}}}
+right_stick_up = {on_click = {keyboard = {key = "5"}}}
+right_stick_down = {on_click = {keyboard = {key = "7"}}}
+right_stick_left = {on_click = {keyboard = {key = "8"}}}
+right_stick_right = {on_click = {keyboard = {key = "6"}}}
 [profiles.layers.switches.left_trigger]
 on_click_and_hold = {visit_layer="second-layer-step-3"}
 on_double_click = {move_to_layer="first-layer-step-1"}
@@ -131,40 +130,40 @@ on_double_click_and_hold = {visit_layer="first-layer-step-1"}
 [[profiles.layers]]
 id = "second-layer-step-2"
 [profiles.layers.switches]
-south = {on_click= {char_key = "}"}}
-east = {on_click= {char_key = ":"}}
-north = {on_click= {char_key = "\""}}
-west = {on_click= {char_key = "{"}}
-d_pad_up = {on_click= {char_key = "("}}
-d_pad_down = {on_click= {char_key = ">"}}
-d_pad_left = {on_click= {char_key = "<"}}
-d_pad_right = {on_click= {char_key = "("}}
-left_stick_up = {on_click= {char_key = "9"}}
-left_stick_down = {on_click= {char_key = "."}}
-left_stick_left = {on_click= {char_key = ","}}
-left_stick_right = {on_click= {char_key = "0"}}
-right_stick_up = {on_click= {char_key = "'"}}
-right_stick_down = {on_click= {char_key = "]"}}
-right_stick_left = {on_click= {char_key = "["}}
-right_stick_right = {on_click= {char_key = ";"}}
+south = {on_click = {keyboard = {key = "}"}}}
+east = {on_click = {keyboard = {key = ":"}}}
+north = {on_click = {keyboard = {key = "\""}}}
+west = {on_click = {keyboard = {key = "{"}}}
+d_pad_up = {on_click = {keyboard = {key = "("}}}
+d_pad_down = {on_click = {keyboard = {key = ">"}}}
+d_pad_left = {on_click = {keyboard = {key = "<"}}}
+d_pad_right = {on_click = {keyboard = {key = "("}}}
+left_stick_up = {on_click = {keyboard = {key = "9"}}}
+left_stick_down = {on_click = {keyboard = {key = "."}}}
+left_stick_left = {on_click = {keyboard = {key = ","}}}
+left_stick_right = {on_click = {keyboard = {key = "0"}}}
+right_stick_up = {on_click = {keyboard = {key = "'"}}}
+right_stick_down = {on_click = {keyboard = {key = "]"}}}
+right_stick_left = {on_click = {keyboard = {key = "["}}}
+right_stick_right = {on_click = {keyboard = {key = ";"}}}
 [profiles.layers.switches.left_trigger]
 on_click_and_hold = {visit_layer="second-layer-step-4"}
 
 [[profiles.layers]]
 id = "second-layer-step-3"
 [profiles.layers.switches]
-east = {on_click= {char_key = "|"}}
-north = {on_click= {key = "Tab", modifiers=["Shift"]}}
-d_pad_up = {on_click= {char_key = "_"}}
-d_pad_down = {on_click= {char_key = "+"}}
-d_pad_left = {on_click= {char_key = "~"}}
-d_pad_right = {on_click= {char_key = "?"}}
-left_stick_up = {on_click= {char_key = "_"}}
-left_stick_down = {on_click= {char_key = "="}}
-left_stick_left = {on_click= {char_key = "`"}}
-left_stick_right = {on_click= {char_key = "/"}}
-right_stick_up = {on_click= {key = "Tab"}}
-right_stick_right = {on_click= {char_key = "\\"}}
+east = {on_click = {keyboard = {key = "|"}}}
+north = {on_click = {keyboard = {key = "Tab", modifiers=["Shift"]}}}
+d_pad_up = {on_click = {keyboard = {key = "_"}}}
+d_pad_down = {on_click = {keyboard = {key = "+"}}}
+d_pad_left = {on_click = {keyboard = {key = "~"}}}
+d_pad_right = {on_click = {keyboard = {key = "?"}}}
+left_stick_up = {on_click = {keyboard = {key = "_"}}}
+left_stick_down = {on_click = {keyboard = {key = "="}}}
+left_stick_left = {on_click = {keyboard = {key = "`"}}}
+left_stick_right = {on_click = {keyboard = {key = "/"}}}
+right_stick_up = {on_click = {keyboard = {key = "Tab"}}}
+right_stick_right = {on_click = {keyboard = {key = "\\"}}}
 [profiles.layers.switches.right_trigger]
 on_click_and_hold = {visit_layer="second-layer-step-4"}
 

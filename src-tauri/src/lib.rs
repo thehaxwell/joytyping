@@ -40,6 +40,9 @@ pub fn start_main_loop(
             None => 0
         });
 
+        // assert_eq!(
+        //     active_profile.layers.remove(0).switches.unwrap().east.unwrap().on_click.unwrap().keyboard.unwrap().key,
+        //     enigo::Key::Return);
         let mut gamepad = gamepad::Gamepad::new(
             Box::new(GilrsWrapper::new()),
             Box::new(StickSwitchInterpreter::new(

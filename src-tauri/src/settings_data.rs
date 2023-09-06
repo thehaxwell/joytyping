@@ -1,4 +1,6 @@
 use serde::Deserialize;
+use std::fmt;
+use serde::de::{self, Deserializer, Visitor, MapAccess};
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct SettingsData {
@@ -113,131 +115,14 @@ pub struct SwitchEventAndReaction {
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct SwitchOnClickReaction {
-    // first 3 taken from KeyClickConfig
-	pub key: Option<EnigoKey>,
-	pub modifiers: Option<Vec<EnigoKey>>,
-	pub char_key: Option<char>,
+    pub keyboard: Option<KeyboardInput>,
+
     pub mouse_button: Option<EnigoMouseButton>,
 
     pub visit_layer: Option<String>,
     pub move_to_layer: Option<String>,
 }
 
-impl SwitchOnClickReaction {
-    // If char_key is given, it takes precedence over key
-    pub fn get_enigo_key(&self) -> Option<enigo::Key> {
-        if let Some(key) = self.char_key {
-            Some(enigo::Key::Layout(key))
-        }
-        else if let Some(key) = self.key {
-            Some(SwitchOnClickReaction::to_enigo_key(key))
-        }
-        else {
-            None
-        }
-    }
-
-    pub fn get_enigo_modifiers(&self) -> Option<Vec<enigo::Key>> {
-        if let Some(mods) = &self.modifiers {
-            let keys = mods
-                .iter()
-                .map(|modifier|SwitchOnClickReaction::to_enigo_key(*modifier))
-                .collect();
-            Some(keys)
-        }
-        else {
-            None
-        }
-    }
-
-    fn to_enigo_key(key: EnigoKey) -> enigo::Key {
-        match key {
-            EnigoKey::Alt => enigo::Key::Alt,
-            EnigoKey::Backspace => enigo::Key::Backspace,
-            EnigoKey::Begin => enigo::Key::Begin,
-            EnigoKey::Break => enigo::Key::Break,
-            EnigoKey::Cancel => enigo::Key::Cancel,
-            EnigoKey::CapsLock => enigo::Key::CapsLock,
-            EnigoKey::Clear => enigo::Key::Clear,
-            EnigoKey::Control => enigo::Key::Control,
-            EnigoKey::Delete => enigo::Key::Delete,
-            EnigoKey::DownArrow => enigo::Key::DownArrow,
-            EnigoKey::End => enigo::Key::End,
-            EnigoKey::Escape => enigo::Key::Escape,
-            EnigoKey::Execute => enigo::Key::Execute,
-            EnigoKey::F1 => enigo::Key::F1,
-            EnigoKey::F2 => enigo::Key::F2,
-            EnigoKey::F3 => enigo::Key::F3,
-            EnigoKey::F4 => enigo::Key::F4,
-            EnigoKey::F5 => enigo::Key::F5,
-            EnigoKey::F6 => enigo::Key::F6,
-            EnigoKey::F7 => enigo::Key::F7,
-            EnigoKey::F8 => enigo::Key::F8,
-            EnigoKey::F9 => enigo::Key::F9,
-            EnigoKey::F10 => enigo::Key::F10,
-            EnigoKey::F11 => enigo::Key::F11,
-            EnigoKey::F12 => enigo::Key::F12,
-            EnigoKey::F13 => enigo::Key::F13,
-            EnigoKey::F14 => enigo::Key::F14,
-            EnigoKey::F15 => enigo::Key::F15,
-            EnigoKey::F16 => enigo::Key::F16,
-            EnigoKey::F17 => enigo::Key::F17,
-            EnigoKey::F18 => enigo::Key::F18,
-            EnigoKey::F19 => enigo::Key::F19,
-            EnigoKey::F20 => enigo::Key::F20,
-            EnigoKey::F21 => enigo::Key::F21,
-            EnigoKey::F22 => enigo::Key::F22,
-            EnigoKey::F23 => enigo::Key::F23,
-            EnigoKey::F24 => enigo::Key::F24,
-            EnigoKey::F25 => enigo::Key::F25,
-            EnigoKey::F26 => enigo::Key::F26,
-            EnigoKey::F27 => enigo::Key::F27,
-            EnigoKey::F28 => enigo::Key::F28,
-            EnigoKey::F29 => enigo::Key::F29,
-            EnigoKey::F30 => enigo::Key::F30,
-            EnigoKey::F31 => enigo::Key::F31,
-            EnigoKey::F32 => enigo::Key::F32,
-            EnigoKey::F33 => enigo::Key::F33,
-            EnigoKey::F34 => enigo::Key::F34,
-            EnigoKey::F35 => enigo::Key::F35,
-            EnigoKey::Find => enigo::Key::Find,
-            EnigoKey::Hangul => enigo::Key::Hangul,
-            EnigoKey::Hanja => enigo::Key::Hanja,
-            EnigoKey::Help => enigo::Key::Help,
-            EnigoKey::Home => enigo::Key::Home,
-            EnigoKey::Insert => enigo::Key::Insert,
-            EnigoKey::Kanji => enigo::Key::Kanji,
-            EnigoKey::LControl => enigo::Key::LControl,
-            EnigoKey::LeftArrow => enigo::Key::LeftArrow,
-            EnigoKey::Linefeed => enigo::Key::Linefeed,
-            EnigoKey::LMenu => enigo::Key::LMenu,
-            EnigoKey::LShift => enigo::Key::LShift,
-            EnigoKey::Meta => enigo::Key::Meta,
-            EnigoKey::ModeChange => enigo::Key::ModeChange,
-            EnigoKey::Numlock => enigo::Key::Numlock,
-            EnigoKey::Option => enigo::Key::Option,
-            EnigoKey::PageDown => enigo::Key::PageDown,
-            EnigoKey::PageUp => enigo::Key::PageUp,
-            EnigoKey::Pause => enigo::Key::Pause,
-            EnigoKey::Print => enigo::Key::Print,
-            EnigoKey::RControl => enigo::Key::RControl,
-            EnigoKey::Redo => enigo::Key::Redo,
-            EnigoKey::Return => enigo::Key::Return,
-            EnigoKey::RightArrow => enigo::Key::RightArrow,
-            EnigoKey::RShift => enigo::Key::RShift,
-            EnigoKey::ScrollLock => enigo::Key::ScrollLock,
-            EnigoKey::Select => enigo::Key::Select,
-            EnigoKey::ScriptSwitch => enigo::Key::ScriptSwitch,
-            EnigoKey::Shift => enigo::Key::Shift,
-            EnigoKey::ShiftLock => enigo::Key::ShiftLock,
-            EnigoKey::Space => enigo::Key::Space,
-            EnigoKey::SysReq => enigo::Key::SysReq,
-            EnigoKey::Tab => enigo::Key::Tab,
-            EnigoKey::UpArrow => enigo::Key::UpArrow,
-            EnigoKey::Undo => enigo::Key::Undo,
-        }
-    }
-}
 
 #[derive(Deserialize, Debug, Copy, Clone, PartialEq)]
 pub enum EnigoKey {
@@ -339,3 +224,191 @@ pub enum EnigoMouseButton {
     ScrollRight,
 }
 
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct KeyboardInput {
+    pub key: enigo::Key,
+    pub modifiers: Vec<enigo::Key>,
+}
+
+#[derive(Debug)]
+enum KeyboardInputError {
+    UnknownVariant(String)
+}
+
+impl KeyboardInput {
+    fn new(
+        key_arg: String,
+        modifiers_arg_option: Option<Vec<String>>,) -> Result<KeyboardInput, KeyboardInputError> {
+
+        let key = 
+            if key_arg.chars().count() == 1 {
+                enigo::Key::Layout(key_arg.chars().next().unwrap())}
+            else {
+                KeyboardInput::to_enigo_key(key_arg.clone())?
+            };
+
+        let mut modifiers = Vec::new();
+        if let Some(modifiers_arg) = modifiers_arg_option {
+            for modifier in modifiers_arg {
+                match KeyboardInput::to_enigo_key(modifier) {
+                    Ok(key) => modifiers.push(key),
+                    Err(err) => return Err(err)
+                }
+            }
+        }
+        Ok(Self{key, modifiers})
+    }
+
+    fn to_enigo_key(key: String) -> Result<enigo::Key, KeyboardInputError> {
+        match key.as_str() {
+            "Alt" => Ok(enigo::Key::Alt),
+            "Backspace" => Ok(enigo::Key::Backspace),
+            "Begin" => Ok(enigo::Key::Begin),
+            "Break" => Ok(enigo::Key::Break),
+            "Cancel" => Ok(enigo::Key::Cancel),
+            "CapsLock" => Ok(enigo::Key::CapsLock),
+            "Clear" => Ok(enigo::Key::Clear),
+            "Control" => Ok(enigo::Key::Control),
+            "Delete" => Ok(enigo::Key::Delete),
+            "DownArrow" => Ok(enigo::Key::DownArrow),
+            "End" => Ok(enigo::Key::End),
+            "Escape" => Ok(enigo::Key::Escape),
+            "Execute" => Ok(enigo::Key::Execute),
+            "F1" => Ok(enigo::Key::F1),
+            "F2" => Ok(enigo::Key::F2),
+            "F3" => Ok(enigo::Key::F3),
+            "F4" => Ok(enigo::Key::F4),
+            "F5" => Ok(enigo::Key::F5),
+            "F6" => Ok(enigo::Key::F6),
+            "F7" => Ok(enigo::Key::F7),
+            "F8" => Ok(enigo::Key::F8),
+            "F9" => Ok(enigo::Key::F9),
+            "F10" => Ok(enigo::Key::F10),
+            "F11" => Ok(enigo::Key::F11),
+            "F12" => Ok(enigo::Key::F12),
+            "F13" => Ok(enigo::Key::F13),
+            "F14" => Ok(enigo::Key::F14),
+            "F15" => Ok(enigo::Key::F15),
+            "F16" => Ok(enigo::Key::F16),
+            "F17" => Ok(enigo::Key::F17),
+            "F18" => Ok(enigo::Key::F18),
+            "F19" => Ok(enigo::Key::F19),
+            "F20" => Ok(enigo::Key::F20),
+            "F21" => Ok(enigo::Key::F21),
+            "F22" => Ok(enigo::Key::F22),
+            "F23" => Ok(enigo::Key::F23),
+            "F24" => Ok(enigo::Key::F24),
+            "F25" => Ok(enigo::Key::F25),
+            "F26" => Ok(enigo::Key::F26),
+            "F27" => Ok(enigo::Key::F27),
+            "F28" => Ok(enigo::Key::F28),
+            "F29" => Ok(enigo::Key::F29),
+            "F30" => Ok(enigo::Key::F30),
+            "F31" => Ok(enigo::Key::F31),
+            "F32" => Ok(enigo::Key::F32),
+            "F33" => Ok(enigo::Key::F33),
+            "F34" => Ok(enigo::Key::F34),
+            "F35" => Ok(enigo::Key::F35),
+            "Find" => Ok(enigo::Key::Find),
+            "Hangul" => Ok(enigo::Key::Hangul),
+            "Hanja" => Ok(enigo::Key::Hanja),
+            "Help" => Ok(enigo::Key::Help),
+            "Home" => Ok(enigo::Key::Home),
+            "Insert" => Ok(enigo::Key::Insert),
+            "Kanji" => Ok(enigo::Key::Kanji),
+            "LControl" => Ok(enigo::Key::LControl),
+            "LeftArrow" => Ok(enigo::Key::LeftArrow),
+            "Linefeed" => Ok(enigo::Key::Linefeed),
+            "LMenu" => Ok(enigo::Key::LMenu),
+            "LShift" => Ok(enigo::Key::LShift),
+            "Meta" => Ok(enigo::Key::Meta),
+            "ModeChange" => Ok(enigo::Key::ModeChange),
+            "Numlock" => Ok(enigo::Key::Numlock),
+            "Option" => Ok(enigo::Key::Option),
+            "PageDown" => Ok(enigo::Key::PageDown),
+            "PageUp" => Ok(enigo::Key::PageUp),
+            "Pause" => Ok(enigo::Key::Pause),
+            "Print" => Ok(enigo::Key::Print),
+            "RControl" => Ok(enigo::Key::RControl),
+            "Redo" => Ok(enigo::Key::Redo),
+            "Return" => Ok(enigo::Key::Return),
+            "RightArrow" => Ok(enigo::Key::RightArrow),
+            "RShift" => Ok(enigo::Key::RShift),
+            "ScrollLock" => Ok(enigo::Key::ScrollLock),
+            "Select" => Ok(enigo::Key::Select),
+            "ScriptSwitch" => Ok(enigo::Key::ScriptSwitch),
+            "Shift" => Ok(enigo::Key::Shift),
+            "ShiftLock" => Ok(enigo::Key::ShiftLock),
+            "Space" => Ok(enigo::Key::Space),
+            "SysReq" => Ok(enigo::Key::SysReq),
+            "Tab" => Ok(enigo::Key::Tab),
+            "UpArrow" => Ok(enigo::Key::UpArrow),
+            "Undo" => Ok(enigo::Key::Undo),
+            _other => return Err(KeyboardInputError::UnknownVariant(key)),
+        }
+    }
+}
+
+impl<'de> Deserialize<'de> for KeyboardInput {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        #[derive(Deserialize)]
+        #[serde(field_identifier, rename_all = "lowercase")]
+        enum Field { Key, Modifiers }
+
+
+        struct KeyboardInputVisitor;
+
+        impl<'de> Visitor<'de> for KeyboardInputVisitor {
+            type Value = KeyboardInput;
+
+            fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+                formatter.write_str("struct KeyboardInput")
+            }
+
+            // NOTE: I didn't implemented visit_seq because I only plan on importing toml
+            // fn visit_seq<V>(self, mut seq: V) -> Result<KeyboardInput, V::Error>
+
+            fn visit_map<V>(self, mut map: V) -> Result<KeyboardInput, V::Error>
+            where
+                V: MapAccess<'de>,
+            {
+                let mut key = None;
+                let mut modifiers = None;
+                while let Some(k) = map.next_key()? {
+                    match k {
+                        Field::Key => {
+                            if key.is_some() {
+                                return Err(de::Error::duplicate_field("key"));
+                            }
+                            key = Some(map.next_value()?);
+                        }
+                        Field::Modifiers => {
+                            if modifiers.is_some() {
+                                return Err(de::Error::duplicate_field("modifiers"));
+                            }
+                            modifiers = Some(map.next_value()?);
+                        }
+                    }
+                }
+                let key = key.ok_or_else(|| de::Error::missing_field("key"))?;
+                // let modifiers = modifiers.ok_or_else(|| de::Error::missing_field("modifiers"))?;
+
+                let result = KeyboardInput::new(key, modifiers).or_else(|err| match err {
+                    KeyboardInputError::UnknownVariant(var)
+                        => return Err(de::Error::unknown_variant(&var, 
+                            // Hard coded some valid values
+                            &["Meta","Alt", "Control", "..."])),
+                })?;
+                Ok(result)
+
+            }
+        }
+
+        const FIELDS: &'static [&'static str] = &["key", "modifiers"];
+        deserializer.deserialize_struct("KeyboardInput", FIELDS, KeyboardInputVisitor)
+    }
+}
