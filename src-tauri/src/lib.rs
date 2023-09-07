@@ -37,7 +37,7 @@ pub fn start_main_loop(
         let active_profile_index_option = settings_data.profiles.iter()
             .position(|profile| profile.name == settings_data.global.default_profile);
                 
-        let mut active_profile = settings_data.profiles.remove(match active_profile_index_option {
+        let active_profile = settings_data.profiles.remove(match active_profile_index_option {
             Some(idx) => idx,
             None => 0
         });
@@ -45,9 +45,15 @@ pub fn start_main_loop(
         // assert_eq!(
         //     active_profile.layers.remove(0).switches.unwrap().east.unwrap().on_click.unwrap().keyboard.unwrap().key,
         //     enigo::Key::Return);
-        assert_eq!(
-            active_profile.layers.remove(7).switches.unwrap().south.unwrap().on_click.unwrap().mouse.unwrap().button,
-            enigo::MouseButton::Left);
+
+        // assert_eq!(
+        //     active_profile.layers.remove(7).switches.unwrap().south.unwrap().on_click.unwrap().mouse.unwrap().button,
+        //     enigo::MouseButton::Left);
+
+        // assert_eq!(
+        //     active_profile.layers.remove(0).switches.unwrap().left_trigger.unwrap().on_click_and_hold.unwrap().visit_layer.unwrap(),
+        //     settings_data::LayerSpecifier{name: "first-layer-step-3".to_string(), pointer: None});
+
         let mut gamepad = gamepad::Gamepad::new(
             Box::new(GilrsWrapper::new()),
             Box::new(StickSwitchInterpreter::new(
@@ -72,6 +78,7 @@ pub fn start_main_loop(
                     right: stick_switch_interpreter::StickSwitchButton::RightStickRight,
                 }
             )),
+            active_profile.layers,
         );
 
         let mut keyboard_input_controller = KeyboardInputController::new(Box::new(EnigoWrapper::new()));
@@ -96,9 +103,9 @@ pub fn start_main_loop(
             mouse_input_controller.trigger_input();
             while let Some(event) = gamepad.next_event() {
                 match event {
-                    gamepad::InputEvent::KeyDown(key)
+                    gamepad::layer_node::InputEvent::KeyDown(key)
                         => keyboard_input_controller.key_down(key),
-                    gamepad::InputEvent::KeyUp
+                    gamepad::layer_node::InputEvent::KeyUp
                         => keyboard_input_controller.key_up(),
                 };
             }

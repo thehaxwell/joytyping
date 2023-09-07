@@ -3,6 +3,8 @@ use serde::Deserialize;
 use std::fmt;
 use serde::de::{self, Deserializer, Visitor, MapAccess};
 
+use crate::gamepad::layer_node::LayerNodeRef;
+
 #[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct SettingsData {
 	pub profiles: Vec<Profile>,
@@ -50,6 +52,17 @@ pub struct Layer {
     pub switches: Option<Switches>,
     // pub levers
     pub cardinal_levers: Option<CardinalLevers>,
+}
+
+impl Layer {
+    pub fn clone_and_set_layer_pointers(&self,pointers: &Vec<LayerNodeRef>) -> Self {
+        Self {
+            id: self.id.clone(),
+            switches: if let Some(key) = &self.switches { 
+				Some(key.clone_and_set_layer_pointers(pointers)) } else { None },
+            cardinal_levers: self.cardinal_levers.clone(),
+        }
+    }
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
@@ -103,6 +116,76 @@ pub struct Switches {
 
 }
 
+impl Switches {
+    pub fn get_ids_pointing_to_layers(&self) -> Vec<String> {
+        [
+            &self.south,
+            &self.east,
+            &self.north,
+            &self.west,
+            &self.d_pad_up,
+            &self.d_pad_down,
+            &self.d_pad_left,
+            &self.d_pad_right,
+            &self.left_stick_up,
+            &self.left_stick_down,
+            &self.left_stick_left,
+            &self.left_stick_right,
+            &self.right_stick_up,
+            &self.right_stick_down,
+            &self.right_stick_left,
+            &self.right_stick_right,
+            &self.right_trigger,
+            &self.left_trigger,
+        ]
+            .iter()
+            .filter_map(|key_opt| if let Some(key) = key_opt {Some(key.get_ids_pointing_to_layers())} else { None })
+            .flatten()
+            .collect()
+    }
+
+    pub fn clone_and_set_layer_pointers(&self,pointers: &Vec<LayerNodeRef>) -> Self {
+        Switches {
+            south: if let Some(key) = &self.south { 
+				Some(key.clone_and_set_layer_pointers(pointers)) } else { None },
+            east: if let Some(key) = &self.east { 
+				Some(key.clone_and_set_layer_pointers(pointers)) } else { None },
+            north: if let Some(key) = &self.north { 
+				Some(key.clone_and_set_layer_pointers(pointers)) } else { None },
+            west: if let Some(key) = &self.west { 
+				Some(key.clone_and_set_layer_pointers(pointers)) } else { None },
+            d_pad_up: if let Some(key) = &self.d_pad_up { 
+				Some(key.clone_and_set_layer_pointers(pointers)) } else { None },
+            d_pad_down: if let Some(key) = &self.d_pad_down { 
+				Some(key.clone_and_set_layer_pointers(pointers)) } else { None },
+            d_pad_left: if let Some(key) = &self.d_pad_left { 
+				Some(key.clone_and_set_layer_pointers(pointers)) } else { None },
+            d_pad_right: if let Some(key) = &self.d_pad_right { 
+				Some(key.clone_and_set_layer_pointers(pointers)) } else { None },
+            left_stick_up: if let Some(key) = &self.left_stick_up { 
+				Some(key.clone_and_set_layer_pointers(pointers)) } else { None },
+            left_stick_down: if let Some(key) = &self.left_stick_down { 
+				Some(key.clone_and_set_layer_pointers(pointers)) } else { None },
+            left_stick_left: if let Some(key) = &self.left_stick_left { 
+				Some(key.clone_and_set_layer_pointers(pointers)) } else { None },
+            left_stick_right: if let Some(key) = &self.left_stick_right { 
+				Some(key.clone_and_set_layer_pointers(pointers)) } else { None },
+            right_stick_up: if let Some(key) = &self.right_stick_up { 
+				Some(key.clone_and_set_layer_pointers(pointers)) } else { None },
+            right_stick_down: if let Some(key) = &self.right_stick_down { 
+				Some(key.clone_and_set_layer_pointers(pointers)) } else { None },
+            right_stick_left: if let Some(key) = &self.right_stick_left { 
+				Some(key.clone_and_set_layer_pointers(pointers)) } else { None },
+            right_stick_right: if let Some(key) = &self.right_stick_right { 
+				Some(key.clone_and_set_layer_pointers(pointers)) } else { None },
+            right_trigger: if let Some(key) = &self.right_trigger { 
+				Some(key.clone_and_set_layer_pointers(pointers)) } else { None },
+            left_trigger: if let Some(key) = &self.left_trigger { 
+				Some(key.clone_and_set_layer_pointers(pointers)) } else { None },
+        }
+    }
+}
+
 #[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct SwitchEventAndReaction {
     pub on_click: Option<SwitchOnClickReaction>,
@@ -111,14 +194,129 @@ pub struct SwitchEventAndReaction {
     pub on_double_click_and_hold: Option<SwitchOnClickReaction>,
 }
 
+impl SwitchEventAndReaction {
+    pub fn get_ids_pointing_to_layers(&self) -> Vec<String> {
+        [
+            &self.on_click,
+            &self.on_click_and_hold,
+            &self.on_double_click,
+            &self.on_double_click_and_hold,
+        ]
+            .iter()
+            .filter_map(|key_opt| if let Some(key) = key_opt {Some(key.get_ids_pointing_to_layers())} else { None })
+            .flatten()
+            .collect()
+    }
+
+    pub fn clone_and_set_layer_pointers(&self, pointers: &Vec<LayerNodeRef>) -> Self{
+        SwitchEventAndReaction {
+            on_click: if let Some(key) = &self.on_click { 
+				Some(key.clone_and_set_layer_pointers(pointers)) } else { None },
+            on_click_and_hold: if let Some(key) = &self.on_click_and_hold { 
+				Some(key.clone_and_set_layer_pointers(pointers)) } else { None },
+            on_double_click: if let Some(key) = &self.on_double_click { 
+				Some(key.clone_and_set_layer_pointers(pointers)) } else { None },
+            on_double_click_and_hold: if let Some(key) = &self.on_double_click_and_hold { 
+				Some(key.clone_and_set_layer_pointers(pointers)) } else { None },
+        }
+    }
+}
+
 #[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct SwitchOnClickReaction {
     pub keyboard: Option<KeyboardInput>,
 
     pub mouse: Option<MouseInput>,
 
-    pub visit_layer: Option<String>,
-    pub move_to_layer: Option<String>,
+    pub visit_layer: Option<LayerSpecifier>,
+    pub move_to_layer: Option<LayerSpecifier>,
+}
+
+impl SwitchOnClickReaction {
+    pub fn get_ids_pointing_to_layers(&self) -> Vec<String> {
+        [
+            &self.visit_layer,
+            &self.move_to_layer,
+        ]
+            .iter()
+            .filter_map(|key_opt| if let Some(key) = key_opt {Some(key.id.clone())} else { None })
+            .collect()
+    }
+
+    pub fn clone_and_set_layer_pointers(&self, pointers: &Vec<LayerNodeRef>) -> Self{
+        SwitchOnClickReaction{
+            keyboard: self.keyboard.clone(),
+            mouse: self.mouse,
+            visit_layer:
+                if let Some(key) = &self.visit_layer { Some(key.clone_and_set_layer_pointer(pointers)) } else { None },
+            move_to_layer: 
+                if let Some(key) = &self.move_to_layer { Some(key.clone_and_set_layer_pointer(pointers)) } else { None },
+        }
+
+    }
+}
+
+// this struct should allow serde to always accept a string
+// and assign it to name. The pointer will be assigned elsewhere
+#[derive(Debug, Clone, PartialEq)]
+pub struct LayerSpecifier {
+    pub id: String,
+    pub index_in_gamepad: Option<u32>,
+}
+
+impl LayerSpecifier {
+    pub fn new(id: String) -> Self {
+        Self {
+            id, index_in_gamepad: None
+        }
+    }
+
+    pub fn clone_and_set_layer_pointer(&self, pointers: &Vec<LayerNodeRef>) -> Self{
+        let ptr = pointers
+            .iter()
+            .find(|pointer| pointer.id == self.id);
+        if let Some(ptr) = ptr {
+            LayerSpecifier {
+                id: self.id.clone(),
+                index_in_gamepad: Some(ptr.index),
+            }
+        }
+        else {
+            self.clone()
+        }
+    }
+}
+
+// this impl should allow the following fields to look like this
+// to serde:
+//
+// SwitchOnClickReaction::visit_layer: Option<String>,
+// SwitchOnClickReaction::move_to_layer: Option<String>,
+// 
+impl<'de> Deserialize<'de> for LayerSpecifier {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        struct LayerSpecifierVisitor;
+
+        impl<'de> Visitor<'de> for LayerSpecifierVisitor {
+            type Value = LayerSpecifier;
+
+            fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+                formatter.write_str("string")
+            }
+
+            fn visit_str<E>(self, value: &str) -> Result<LayerSpecifier, E>
+            where
+                E: de::Error,
+            {
+                Ok(LayerSpecifier::new(value.to_string()))
+            }
+        }
+
+        deserializer.deserialize_string(LayerSpecifierVisitor)
+    }
 }
 
 #[derive(Deserialize, Debug, Copy, Clone, PartialEq)]

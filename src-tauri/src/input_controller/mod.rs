@@ -52,6 +52,7 @@ impl KeyboardInputControllerTrait for KeyboardInputController {
     // it will be allowed to be triggered many times by calling trigger_input()
     // until key_up() is called (or key_down() is called again).
     fn key_down(&mut self, key_to_click: KeyboardInput) {
+        println!("KeyboardInputController::key_down({:?})",key_to_click);
         self.active_key = Some(key_to_click);
         self.instant_to_start_delay_from = None;
         self.trigger_input();
@@ -59,6 +60,7 @@ impl KeyboardInputControllerTrait for KeyboardInputController {
     }
 
     fn key_up(&mut self) {
+        println!("KeyboardInputController::key_up");
         self.active_key = None;
         self.instant_to_start_delay_from = None;
     }
@@ -70,16 +72,13 @@ impl KeyboardInputControllerTrait for KeyboardInputController {
             }
 
             for modifier in active_key.modifiers.as_slice() {
-                    println!("-> {:?}",modifier);
-                    self.enigo.key_down(*modifier);
+                self.enigo.key_down(*modifier);
             }
 
-            println!("-> {:?}",active_key.key);
             self.enigo.key_click(active_key.key);
 
             for modifier in active_key.modifiers.as_slice() {
-                    println!("-> {:?}",modifier);
-                    self.enigo.key_up(*modifier);
+                self.enigo.key_up(*modifier);
             }
             self.instant_to_start_delay_from = None;
         }

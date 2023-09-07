@@ -1,17 +1,22 @@
-use crate::{gamepad::{gilrs_wrapper::Gilrs, stick_switch_interpreter::StickSwitchEvent}, settings_data::KeyboardInput};
+use std::rc::Rc;
 
-use self::{gilrs_wrapper::{GilrsEvent, GilrsEventType}, stick_switch_interpreter::StickSwitchInterpreterTrait};
+use crate::{gamepad::{gilrs_wrapper::Gilrs, stick_switch_interpreter::StickSwitchEvent}, settings_data::{KeyboardInput, self}};
+
+use self::{gilrs_wrapper::{GilrsEvent, GilrsEventType}, stick_switch_interpreter::StickSwitchInterpreterTrait, layer_node::{LayerNode, InputEvent, LayerNodeRef}};
 
 pub mod gilrs_wrapper;
 // #[cfg(test)]
 // mod tests;
 
 pub mod stick_switch_interpreter;
+pub mod layer_node;
 
 pub struct Gamepad {
    gilrs: Box<dyn Gilrs>,
    left_stick_switch_interpreter: Box<dyn StickSwitchInterpreterTrait>,
    right_stick_switch_interpreter: Box<dyn StickSwitchInterpreterTrait>,
+   layer_nodes: Vec<LayerNode>,
+   current_layer_node_index: usize,
 }
 
 impl Gamepad {
@@ -19,65 +24,44 @@ impl Gamepad {
         gilrs: Box<dyn Gilrs>,
         left_stick_switch_interpreter: Box<dyn StickSwitchInterpreterTrait>,
         right_stick_switch_interpreter: Box<dyn StickSwitchInterpreterTrait>,
+        layers_source: Vec<settings_data::Layer>,
     ) -> Self {
         Gamepad{
             gilrs,
             left_stick_switch_interpreter,
             right_stick_switch_interpreter,
+            layer_nodes: Gamepad::initialize_layer_nodes_vec(layers_source),
+            current_layer_node_index: 0, // we always start with the first node
         }
     }
 
+    fn initialize_layer_nodes_vec(source: Vec<settings_data::Layer>,) -> Vec<LayerNode> {
+        let mut idx: u32= 0;
+        let pointers: Vec<LayerNodeRef> = source
+            .iter()
+            .map(|layer|{
+                let res = LayerNodeRef{id: layer.id.to_string(), index: idx};
+                idx += 1;
+                res
+            })
+            .collect();
+
+        source
+            .iter()
+            .map(|layer|
+                 LayerNode::new(layer.clone(), &pointers)
+            )
+            .collect()
+    }
 
     pub fn next_event(&mut self) -> Option<InputEvent> {
         match self.next_gilrs_event() {
-            Some(GilrsEvent { event, time: _}) => {
-            match event {
-                GilrsEventType::ButtonPressed(button, )
-                    => Some(InputEvent::KeyDown(KeyboardInput {
-                            key: enigo::Key::Layout('a'),
-                            modifiers: vec![],
-                        })),
-                GilrsEventType::ButtonRepeated(button, ) => {
-                    print!("ButtonRepeated: {:?}\n",button);
-                    None
-                },
-                GilrsEventType::ButtonReleased(button, )
-                    => Some(InputEvent::KeyUp),
-                GilrsEventType::ButtonChanged(button, _value, ) => {
-                    print!("ButtonChanged: {:?}\n",button);
-                    None
-                },
-                GilrsEventType::AxisChanged(axis, value, switch_stick_event) => {
-                    print!("AxisChanged: {:?}: {:?}\n",axis,value);
-                    if let Some(event) = switch_stick_event {
-                        match event {
-                            StickSwitchEvent::ButtonPressed(_)
-                                => Some(InputEvent::KeyDown(KeyboardInput {
-                                    key: enigo::Key::Layout('a'),
-                                    modifiers: vec![],
-                                })),
-                            StickSwitchEvent::ButtonReleased(_)
-                                => Some(InputEvent::KeyUp),
-                        }
-                    }
-                    else {
-                        None
-                    }
-
-                },
-                GilrsEventType::Connected => {
-                    print!("Connected!\n");
-                    None
-                },
-                GilrsEventType::Disconnected => {
-                    print!("Disconnected!\n");
-                    None
-                },
-                GilrsEventType::Dropped => {
-                    print!("Droppedn!\n");
-                    None
+            Some(event) => {
+                let return_val = self.layer_nodes[self.current_layer_node_index].process_gamepad_event(event);
+                if let Some(new_index) = return_val.next_node_index {
+                    self.current_layer_node_index = new_index;
                 }
-            }
+                return_val.input_event
             },
             _other => None
         }
@@ -117,8 +101,3 @@ impl Gamepad {
     }
 }
 
-#[derive(Debug, PartialEq)]
-pub enum InputEvent {
-    KeyDown(KeyboardInput),
-    KeyUp,
-}
