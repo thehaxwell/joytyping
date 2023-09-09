@@ -203,57 +203,53 @@ impl SwitchEventAndReaction {
             &self.on_double_click_and_hold,
         ]
             .iter()
-            .filter_map(|key_opt| if let Some(key) = key_opt {Some(key.get_ids_pointing_to_layers())} else { None })
-            .flatten()
+            // .filter_map(|key_opt| if let Some(key) = key_opt {Some(key.get_ids_pointing_to_layers())} else { None })
+            .filter_map(|key_opt| match key_opt {
+                Some(SwitchOnClickReaction::VisitLayer(layer_specifier))
+                    => Some(layer_specifier.id.clone()),
+                Some(SwitchOnClickReaction::MoveToLayer(layer_specifier))
+                    => Some(layer_specifier.id.clone()),
+                _other => None,
+            })
             .collect()
     }
 
     pub fn clone_and_set_layer_pointers(&self, pointers: &Vec<LayerNodeRef>) -> Self{
         SwitchEventAndReaction {
-            on_click: if let Some(key) = &self.on_click { 
-				Some(key.clone_and_set_layer_pointers(pointers)) } else { None },
-            on_click_and_hold: if let Some(key) = &self.on_click_and_hold { 
-				Some(key.clone_and_set_layer_pointers(pointers)) } else { None },
-            on_double_click: if let Some(key) = &self.on_double_click { 
-				Some(key.clone_and_set_layer_pointers(pointers)) } else { None },
-            on_double_click_and_hold: if let Some(key) = &self.on_double_click_and_hold { 
-				Some(key.clone_and_set_layer_pointers(pointers)) } else { None },
+            on_click: SwitchEventAndReaction
+                ::clone_event_with_layer_pointers_possibly_set(&self.on_click,pointers),
+            on_click_and_hold: SwitchEventAndReaction
+                ::clone_event_with_layer_pointers_possibly_set(&self.on_click_and_hold,pointers),
+            on_double_click: SwitchEventAndReaction
+                ::clone_event_with_layer_pointers_possibly_set(&self.on_double_click,pointers),
+            on_double_click_and_hold: SwitchEventAndReaction
+                ::clone_event_with_layer_pointers_possibly_set(&self.on_double_click_and_hold,pointers),
+        }
+
+    }
+
+    fn clone_event_with_layer_pointers_possibly_set(
+        event: &Option<SwitchOnClickReaction>,
+        pointers: &Vec<LayerNodeRef>) -> Option<SwitchOnClickReaction>{
+        match event {
+            Some(SwitchOnClickReaction::VisitLayer(layer_specifier))
+                => Some(SwitchOnClickReaction::VisitLayer(
+                    layer_specifier.clone_and_set_layer_pointer(pointers))),
+            Some(SwitchOnClickReaction::MoveToLayer(layer_specifier))
+                => Some(SwitchOnClickReaction::MoveToLayer(
+                    layer_specifier.clone_and_set_layer_pointer(pointers))),
+            other => other.clone(),
         }
     }
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
-pub struct SwitchOnClickReaction {
-    pub keyboard: Option<KeyboardInput>,
-
-    pub mouse: Option<MouseInput>,
-
-    pub visit_layer: Option<LayerSpecifier>,
-    pub move_to_layer: Option<LayerSpecifier>,
-}
-
-impl SwitchOnClickReaction {
-    pub fn get_ids_pointing_to_layers(&self) -> Vec<String> {
-        [
-            &self.visit_layer,
-            &self.move_to_layer,
-        ]
-            .iter()
-            .filter_map(|key_opt| if let Some(key) = key_opt {Some(key.id.clone())} else { None })
-            .collect()
-    }
-
-    pub fn clone_and_set_layer_pointers(&self, pointers: &Vec<LayerNodeRef>) -> Self{
-        SwitchOnClickReaction{
-            keyboard: self.keyboard.clone(),
-            mouse: self.mouse,
-            visit_layer:
-                if let Some(key) = &self.visit_layer { Some(key.clone_and_set_layer_pointer(pointers)) } else { None },
-            move_to_layer: 
-                if let Some(key) = &self.move_to_layer { Some(key.clone_and_set_layer_pointer(pointers)) } else { None },
-        }
-
-    }
+#[serde(rename_all = "snake_case")]
+pub enum SwitchOnClickReaction {
+    Keyboard(KeyboardInput),
+    Mouse(MouseInput),
+    VisitLayer(LayerSpecifier),
+    MoveToLayer(LayerSpecifier),
 }
 
 // this struct should allow serde to always accept a string
