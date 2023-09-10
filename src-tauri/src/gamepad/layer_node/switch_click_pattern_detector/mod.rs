@@ -2,7 +2,7 @@ use std::time::{Duration, Instant};
 
 use gilrs::Button;
 
-use crate::{settings_data::{SwitchEventAndReaction,SwitchOnClickReaction, Switches}, gamepad::stick_switch_interpreter::{StickSwitchEvent, StickSwitchButton}};
+use crate::{settings_data::{SwitchEventAndReaction,SwitchOnClickReaction}, gamepad::stick_switch_interpreter::StickSwitchButton};
 
 #[cfg(test)]
 use mockall::{automock, predicate::*};
@@ -66,7 +66,6 @@ pub trait SwitchClickPatternDetectorTrait {
 // - a leaf in the tree is reached, there is no next step
 //
 pub struct SwitchClickPatternDetector {
-    //TODO: rename to latest_event
     latest_switch_click_pattern: Option<SwitchClickPattern>,
     latest_switch_event: Option<LatestSwitchEvent>,
 }
@@ -168,7 +167,7 @@ impl SwitchClickPatternDetectorTrait for SwitchClickPatternDetector {
                         = &latest_switch_event.event_and_reaction.on_double_click_and_hold {
                         if latest_switch_event.instant.elapsed() > CLICK_HOLD_INTERVAL_THRESHOLD {
                             self.latest_switch_click_pattern 
-                                = Some(SwitchClickPattern::ClickAndHold(
+                                = Some(SwitchClickPattern::DoubleClickAndHold(
                                         on_double_click_and_hold.clone()));
                         }
                     }
