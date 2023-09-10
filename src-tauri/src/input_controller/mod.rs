@@ -16,6 +16,7 @@ const DELAY_DURATION: Duration = Duration::from_millis(500);
 pub trait KeyboardInputControllerTrait {
     fn key_down(&mut self, key_to_click: KeyboardInput);
     fn key_up(&mut self);
+    fn key_click(&mut self, key_to_click: KeyboardInput);
     fn trigger_input(&mut self);
 }
 
@@ -45,6 +46,17 @@ impl KeyboardInputController {
         true
     }
 
+    fn click(&mut self, key: KeyboardInput) {
+        for modifier in key.modifiers.as_slice() {
+            self.enigo.key_down(*modifier);
+        }
+
+        self.enigo.key_click(key.key);
+
+        for modifier in key.modifiers.as_slice() {
+            self.enigo.key_up(*modifier);
+        }
+    }
 }
 
 impl KeyboardInputControllerTrait for KeyboardInputController {
@@ -70,18 +82,13 @@ impl KeyboardInputControllerTrait for KeyboardInputController {
             if !self.allow_input() {
                 return;
             }
-
-            for modifier in active_key.modifiers.as_slice() {
-                self.enigo.key_down(*modifier);
-            }
-
-            self.enigo.key_click(active_key.key);
-
-            for modifier in active_key.modifiers.as_slice() {
-                self.enigo.key_up(*modifier);
-            }
+            self.click(active_key.clone());
             self.instant_to_start_delay_from = None;
         }
+    }
+
+    fn key_click(&mut self, key_to_click: KeyboardInput) {
+        self.click(key_to_click);
     }
 }
 

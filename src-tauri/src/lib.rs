@@ -3,7 +3,7 @@ use std::sync::mpsc;
 use gamepad::gilrs_wrapper::GilrsWrapper;
 use gamepad::stick_switch_interpreter::{CardinalCustomButtons, StickSwitchInterpreter, AxisClickThresholds, self};
 use input_controller::{KeyboardInputController,KeyboardInputControllerTrait};
-use input_controller::enigo_wrapper::EnigoWrapper;
+use input_controller::enigo_wrapper::{EnigoWrapper, EnigoTrait};
 use settings::error_display_window::ErrorDisplayWindow;
 use settings::{Settings,SettingsDependenciesImpl};
 
@@ -54,6 +54,26 @@ pub fn start_main_loop(
         //     active_profile.layers.remove(0).switches.unwrap().left_trigger.unwrap().on_click_and_hold.unwrap().visit_layer.unwrap(),
         //     settings_data::LayerSpecifier{name: "first-layer-step-3".to_string(), pointer: None});
 
+        fn new_switch_click_pattern_detector()-> Box<dyn
+            gamepad::layer_node
+            ::switch_click_pattern_detector
+            ::SwitchClickPatternDetectorTrait>{
+            Box::new(gamepad::layer_node
+               ::switch_click_pattern_detector::SwitchClickPatternDetector::new())
+        }
+        fn new_layer_node(
+            source: settings_data::Layer,
+            pointers: &Vec<gamepad::layer_node::LayerNodeRef>,
+            switch_click_pattern_detector: Option<Box<dyn gamepad::layer_node
+               ::switch_click_pattern_detector::SwitchClickPatternDetectorTrait>>,
+        ) -> gamepad::layer_node::LayerNode {
+            gamepad::layer_node::LayerNode::new(
+                source,
+                pointers,
+                switch_click_pattern_detector,
+            )
+        }
+
         let mut gamepad = gamepad::Gamepad::new(
             Box::new(GilrsWrapper::new()),
             Box::new(StickSwitchInterpreter::new(
@@ -79,10 +99,12 @@ pub fn start_main_loop(
                 }
             )),
             active_profile.layers,
+            new_layer_node,
+            new_switch_click_pattern_detector,
         );
 
         let mut keyboard_input_controller = KeyboardInputController::new(Box::new(EnigoWrapper::new()));
-        let mut mouse_input_controller = MouseInputController::new(Box::new(EnigoWrapper::new()));
+        // let mut mouse_input_controller = MouseInputController::new(Box::new(EnigoWrapper::new()));
 
         'main_loop: loop {
             //TODO: check if this actually eases the load on the CPU
@@ -100,15 +122,17 @@ pub fn start_main_loop(
             }
 
             keyboard_input_controller.trigger_input();
-            mouse_input_controller.trigger_input();
-            while let Some(event) = gamepad.next_event() {
-                match event {
-                    gamepad::layer_node::InputEvent::KeyDown(key)
-                        => keyboard_input_controller.key_down(key),
-                    gamepad::layer_node::InputEvent::KeyUp
-                        => keyboard_input_controller.key_up(),
-                };
-            }
+            // mouse_input_controller.trigger_input();
+            while gamepad.next_event() {}
+            match gamepad.tick() {
+                Some(gamepad::layer_node::InputEvent::KeyClick(key))
+                    => keyboard_input_controller.key_click(key),
+                Some(gamepad::layer_node::InputEvent::KeyDown(key))
+                    => keyboard_input_controller.key_down(key),
+                Some(gamepad::layer_node::InputEvent::KeyUp(_key))
+                    => keyboard_input_controller.key_up(),
+                None => (),
+            };
         }
     }
 }
