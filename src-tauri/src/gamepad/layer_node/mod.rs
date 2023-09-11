@@ -32,49 +32,63 @@ impl LayerNode {
 
     // the return value is similar to ProcessGamepadEventReturnValue
     pub fn tick(&mut self) -> GamepadEventReaction {
-        let input_event = if let Some(detector) = &mut self.switch_click_pattern_detector {
+        if let Some(detector) = &mut self.switch_click_pattern_detector {
             match detector.tick() {
-                Some(SwitchClickPattern::KeyUp) => Some(InputEvent::KeyUp),
-                Some(SwitchClickPattern::Click(reaction)) => match reaction {
-                    SwitchOnClickReaction::Keyboard(KeyboardInput { key, modifiers })
-                        => Some(InputEvent::KeyClick(KeyboardInput {
-                            key,
-                            modifiers,
-                        })),
-                    _other => None,
+                Some(SwitchClickPattern::Click(switch)) => {
+                    if let Some(s_e_a_r)
+                    = self.get_switch_event_and_reaction_from_switch(switch) {
+                        return LayerNode::translate_reaction(s_e_a_r.on_click);
+                    };
                 },
-                Some(SwitchClickPattern::ClickAndHold(reaction)) => match reaction {
-                    SwitchOnClickReaction::Keyboard(KeyboardInput { key, modifiers })
-                        => Some(InputEvent::KeyDown(KeyboardInput {
-                            key,
-                            modifiers,
-                        })),
-                    _other => None,
+                Some(SwitchClickPattern::ClickAndHold(switch)) => {
+                    if let Some(s_e_a_r)
+                    = self.get_switch_event_and_reaction_from_switch(switch) {
+                        return LayerNode::translate_reaction(s_e_a_r.on_click_and_hold);
+                    };
                 },
-                Some(SwitchClickPattern::DoubleClick(reaction)) => match reaction {
-                    SwitchOnClickReaction::Keyboard(KeyboardInput { key, modifiers })
-                        => Some(InputEvent::KeyClick(KeyboardInput {
-                            key,
-                            modifiers,
-                        })),
-                    _other => None,
+                Some(SwitchClickPattern::DoubleClick(switch)) => {
+                    if let Some(s_e_a_r)
+                    = self.get_switch_event_and_reaction_from_switch(switch) {
+                        return LayerNode::translate_reaction(s_e_a_r.on_double_click);
+                    };
                 },
-                Some(SwitchClickPattern::DoubleClickAndHold(reaction)) => match reaction {
-                    SwitchOnClickReaction::Keyboard(KeyboardInput { key, modifiers })
-                        => Some(InputEvent::KeyDown(KeyboardInput {
-                            key,
-                            modifiers,
-                        })),
-                    _other => None,
+                Some(SwitchClickPattern::DoubleClickAndHold(switch)) => {
+                    if let Some(s_e_a_r)
+                    = self.get_switch_event_and_reaction_from_switch(switch) {
+                        return LayerNode::translate_reaction(s_e_a_r.on_double_click_and_hold);
+                    };
                 },
-                None => None,
+                None => (),
+                _other => { // the "...End" variants
+                    // TODO: probably a good place to go back on layer visits
+                    return GamepadEventReaction {
+                        input_event: Some(InputEvent::KeyUp),
+                        next_node_index: None,
+                    }
+                }
             }
-        }
-        else { None };
+        };
 
-        GamepadEventReaction {
-            input_event,
+        return GamepadEventReaction {
+            input_event: None,
             next_node_index: None,
+        }
+    }
+
+    fn translate_reaction(reaction: Option<SwitchOnClickReaction>)-> GamepadEventReaction{
+        match reaction {
+            Some(SwitchOnClickReaction::Keyboard(KeyboardInput { key, modifiers })) 
+            => GamepadEventReaction {
+                input_event: Some(InputEvent::KeyClick(KeyboardInput {
+                    key,
+                    modifiers,
+                })),
+                next_node_index: None,
+            },
+            _ => GamepadEventReaction {
+                input_event: None,
+                next_node_index: None,
+            }
         }
     }
     
@@ -82,12 +96,9 @@ impl LayerNode {
         match event.event {
             GilrsEventType::ButtonPressed(button, ) => {
                 print!("ButtonPressed: {:?}\n",button);
-                if let Some(s_e_a_r)
-                    = self.get_switch_event_and_reaction_from_button(button){
-                    if let Some(detector)
-                        = &mut self.switch_click_pattern_detector {
-                        detector.button_pressed(button,s_e_a_r);
-                    }
+                if let Some(detector)
+                    = &mut self.switch_click_pattern_detector {
+                    detector.button_pressed(button);
                 }
             }
             GilrsEventType::ButtonRepeated(button, ) => {
@@ -96,12 +107,9 @@ impl LayerNode {
             },
             GilrsEventType::ButtonReleased(button, ) => {
                 print!("ButtonReleased: {:?}\n",button);
-                if let Some(s_e_a_r) 
-                    = self.get_switch_event_and_reaction_from_button(button){
-                    if let Some(detector)
-                        = &mut self.switch_click_pattern_detector {
-                        detector.button_released(button,s_e_a_r);
-                    }
+                if let Some(detector)
+                    = &mut self.switch_click_pattern_detector {
+                    detector.button_released(button);
                 }
             },
             GilrsEventType::ButtonChanged(button, _value, ) => {
@@ -113,20 +121,14 @@ impl LayerNode {
                 if let Some(event) = switch_stick_event {
                     match event {
                         StickSwitchEvent::ButtonPressed(button)
-                            => if let Some(s_e_a_r) 
-                                = self.get_switch_event_and_reaction_from_stick_button(button){
-                                if let Some(detector)
-                                    = &mut self.switch_click_pattern_detector {
-                                    detector.axis_button_pressed(button,s_e_a_r);
-                                }
+                            => if let Some(detector)
+                                = &mut self.switch_click_pattern_detector {
+                                detector.axis_button_pressed(button);
                             }
                         StickSwitchEvent::ButtonReleased(button)
-                            => if let Some(s_e_a_r)
-                                = self.get_switch_event_and_reaction_from_stick_button(button){
-                                if let Some(detector)
-                                    = &mut self.switch_click_pattern_detector {
-                                    detector.axis_button_released(button,s_e_a_r);
-                                }
+                            => if let Some(detector)
+                                = &mut self.switch_click_pattern_detector {
+                                detector.axis_button_released(button);
                             }
                     };
                 }
@@ -143,38 +145,33 @@ impl LayerNode {
         };
     }
 
-    fn get_switch_event_and_reaction_from_button(&self, button: Button) -> Option<SwitchEventAndReaction> {
+    fn get_switch_event_and_reaction_from_switch(
+        &self,switch: Switch) -> Option<SwitchEventAndReaction> {
         if let Some(switches) = &self.source.switches {
-            match button {
-                Button::North => switches.north.clone(),
-                Button::South => switches.south.clone(),
-                Button::East => switches.east.clone(),
-                Button::West => switches.west.clone(),
-                Button::DPadUp => switches.d_pad_up.clone(),
-                Button::DPadDown => switches.d_pad_down.clone(),
-                Button::DPadRight => switches.d_pad_right.clone(),
-                Button::DPadLeft => switches.d_pad_left.clone(),
-                Button::LeftTrigger => switches.left_trigger.clone(),
-                Button::RightTrigger => switches.right_trigger.clone(),
-                _ => None
-            }
-        }
-        else {
-            None
-        }
-    }
-    fn get_switch_event_and_reaction_from_stick_button(
-        &self,button: StickSwitchButton) -> Option<SwitchEventAndReaction> {
-        if let Some(switches) = &self.source.switches {
-            match button {
-                StickSwitchButton::LeftStickUp => switches.left_stick_up.clone(),
-                StickSwitchButton::LeftStickDown => switches.left_stick_down.clone(),
-                StickSwitchButton::LeftStickRight => switches.left_stick_right.clone(),
-                StickSwitchButton::LeftStickLeft => switches.left_stick_left.clone(),
-                StickSwitchButton::RightStickUp => switches.right_stick_up.clone(),
-                StickSwitchButton::RightStickDown => switches.right_stick_down.clone(),
-                StickSwitchButton::RightStickRight => switches.right_stick_right.clone(),
-                StickSwitchButton::RightStickLeft => switches.right_stick_left.clone(),
+            match switch {
+                Switch::Button(button) => match button {
+                    Button::North => switches.north.clone(),
+                    Button::South => switches.south.clone(),
+                    Button::East => switches.east.clone(),
+                    Button::West => switches.west.clone(),
+                    Button::DPadUp => switches.d_pad_up.clone(),
+                    Button::DPadDown => switches.d_pad_down.clone(),
+                    Button::DPadRight => switches.d_pad_right.clone(),
+                    Button::DPadLeft => switches.d_pad_left.clone(),
+                    Button::LeftTrigger => switches.left_trigger.clone(),
+                    Button::RightTrigger => switches.right_trigger.clone(),
+                    _ => None
+                },
+                Switch::StickSwitchButton(button) => match button {
+                    StickSwitchButton::LeftStickUp => switches.left_stick_up.clone(),
+                    StickSwitchButton::LeftStickDown => switches.left_stick_down.clone(),
+                    StickSwitchButton::LeftStickRight => switches.left_stick_right.clone(),
+                    StickSwitchButton::LeftStickLeft => switches.left_stick_left.clone(),
+                    StickSwitchButton::RightStickUp => switches.right_stick_up.clone(),
+                    StickSwitchButton::RightStickDown => switches.right_stick_down.clone(),
+                    StickSwitchButton::RightStickRight => switches.right_stick_right.clone(),
+                    StickSwitchButton::RightStickLeft => switches.right_stick_left.clone(),
+                }
             }
         }
         else {
@@ -199,4 +196,10 @@ pub struct LayerNodeRef{
 pub struct GamepadEventReaction {
     pub input_event: Option<InputEvent>,
     pub next_node_index: Option<usize>,
+}
+
+#[derive(Debug,Clone,PartialEq)]
+pub enum Switch {
+    Button(Button),
+    StickSwitchButton(StickSwitchButton),
 }

@@ -2,10 +2,12 @@ use std::time::{Duration, Instant};
 
 use gilrs::Button;
 
-use crate::{settings_data::{SwitchEventAndReaction,SwitchOnClickReaction}, gamepad::stick_switch_interpreter::StickSwitchButton};
+use crate::gamepad::stick_switch_interpreter::StickSwitchButton;
 
 #[cfg(test)]
 use mockall::{automock, predicate::*};
+
+use super::Switch;
 
 #[cfg(test)]
 mod tests;
@@ -16,10 +18,10 @@ const DOUBLE_CLICK_INTERVAL_THRESHOLD: Duration = Duration::from_millis(500);
 #[cfg_attr(test, automock)]
 pub trait SwitchClickPatternDetectorTrait {
     fn tick(&mut self) -> Option<SwitchClickPattern>;
-    fn button_pressed(&mut self, button: Button, switch_event_and_reaction: SwitchEventAndReaction);
-    fn button_released(&mut self, button: Button, switch_event_and_reaction: SwitchEventAndReaction);
-    fn axis_button_pressed(&mut self, button: StickSwitchButton, switch_event_and_reaction: SwitchEventAndReaction);
-    fn axis_button_released(&mut self, button: StickSwitchButton, switch_event_and_reaction: SwitchEventAndReaction);
+    fn button_pressed(&mut self, button: Button);
+    fn button_released(&mut self, button: Button);
+    fn axis_button_pressed(&mut self, button: StickSwitchButton);
+    fn axis_button_released(&mut self, button: StickSwitchButton);
 }
 
 // READ ME to understand this struct
@@ -80,23 +82,21 @@ impl SwitchClickPatternDetector {
     }
 
     fn switch_pressed(
-        &mut self, switch: Switch, switch_event_and_reaction: SwitchEventAndReaction){
+        &mut self, switch: Switch){
         // if the latest button press qualifies for double_click
         // then let it be so; otherwise register as a click
         // The latter case is coded first and the former second
         let mut new_step = LatestSwitchEvent {
             switch: switch.clone(),
-            event_and_reaction: switch_event_and_reaction.clone(),
             instant: Instant::now(),
             event_type: SwitchEventType::KeyDownIntoClick,
         };
 
-        if let Some(LatestSwitchEvent { switch: sw, event_and_reaction, instant, event_type: _ })
+        if let Some(LatestSwitchEvent { switch: sw, instant, event_type: _ })
             = &self.latest_switch_event {
                 if switch == sw.clone() && instant.elapsed() < DOUBLE_CLICK_INTERVAL_THRESHOLD {
                     new_step = LatestSwitchEvent {
-                        switch,
-                        event_and_reaction: event_and_reaction.clone(),
+                        switch: switch.clone(),
                         instant: Instant::now(),
                         event_type: SwitchEventType::KeyDownIntoDoubleClick,
                     }
@@ -109,78 +109,66 @@ impl SwitchClickPatternDetector {
         // which can only either take on Click or DoubleClick here (fn button_pressed())
         match new_step.event_type {
             SwitchEventType::KeyDownIntoClick
-              =>if let Some(on_click) = switch_event_and_reaction.on_click {
-                    self.latest_switch_click_pattern
-                        = Some(SwitchClickPattern::Click(on_click));
-                }
+              => self.latest_switch_click_pattern
+                 = Some(SwitchClickPattern::Click(switch.clone())),
             SwitchEventType::KeyDownIntoDoubleClick
-              =>if let Some(on_double_click) = switch_event_and_reaction.on_double_click {
-                    self.latest_switch_click_pattern 
-                        = Some(SwitchClickPattern::DoubleClick(on_double_click));
-                }
+              => self.latest_switch_click_pattern 
+                 = Some(SwitchClickPattern::DoubleClick(switch.clone())),
             _ => (),
         }
     }
 
     fn switch_released(
-        &mut self, switch: Switch, switch_event_and_reaction: SwitchEventAndReaction){
-        if let Some(LatestSwitchEvent { switch: _, event_and_reaction: _, instant: _, event_type })
+        &mut self, switch: Switch){
+        if let Some(_event)
             = &self.latest_switch_event {
-                let new_event_type = match event_type {
-                    SwitchEventType::KeyDownIntoClick
-                        => Some(SwitchEventType::KeyUpAfterClick),
-                    SwitchEventType::KeyDownIntoDoubleClick
-                        => Some(SwitchEventType::KeyUpAfterDoubleClick,),
-                    _ => None,
-                };
-
-                if let Some(new_event_type) = new_event_type {
-                    self.latest_switch_event = Some(LatestSwitchEvent {
-                        switch,
-                        event_and_reaction: switch_event_and_reaction.clone(),
-                        instant: Instant::now(),
-                        event_type: new_event_type,
-                    });
-                }
-
+                self.latest_switch_event = Some(LatestSwitchEvent {
+                    switch: switch.clone(),
+                    instant: Instant::now(),
+                    event_type: SwitchEventType::KeyUp,
+                });
         }
+
+        // self.latest_switch_click_pattern = match &self.latest_switch_click_pattern {
+        //     Some(SwitchClickPattern::Click(switch))
+        //         => Some(SwitchClickPattern::ClickEnd(switch.clone())),
+        //     Some(SwitchClickPattern::DoubleClick(switch))
+        //         => Some(SwitchClickPattern::DoubleClickEnd(switch.clone())),
+        //     Some(SwitchClickPattern::ClickAndHold(switch))
+        //         => Some(SwitchClickPattern::ClickAndHoldEnd(switch.clone())),
+        //     Some(SwitchClickPattern::DoubleClickAndHold(switch))
+        //         => Some(SwitchClickPattern::DoubleClickAndHoldEnd(switch.clone())),
+        //     None => None,
+        //     other => other.clone(), // all the variants that end with "End" can stay the same
+        // };
+
+        self.latest_switch_click_pattern = Some(SwitchClickPattern::ClickEnd(switch.clone()));
+        println!(">>>>>>>>>>: {:?}",self.latest_switch_click_pattern);
     }
 }
 
 impl SwitchClickPatternDetectorTrait for SwitchClickPatternDetector {
     fn tick(&mut self) -> Option<SwitchClickPattern>{
-        if let Some(latest_switch_event) = &self.latest_switch_event {
-            match latest_switch_event.event_type {
+        if let Some(LatestSwitchEvent { switch, instant, event_type }) 
+            = &self.latest_switch_event {
+            match event_type {
                 SwitchEventType::KeyDownIntoClick
                     => {
-                    if let Some(on_click_and_hold) 
-                        = &latest_switch_event.event_and_reaction.on_click_and_hold {
-                        if latest_switch_event.instant.elapsed() > CLICK_HOLD_INTERVAL_THRESHOLD {
+                        if instant.elapsed() > CLICK_HOLD_INTERVAL_THRESHOLD {
                             self.latest_switch_click_pattern 
                                 = Some(SwitchClickPattern::ClickAndHold(
-                                        on_click_and_hold.clone()));
+                                        switch.clone()));
                         }
-                    }
                 }
                 SwitchEventType::KeyDownIntoDoubleClick
                     => {
-                    if let Some(on_double_click_and_hold) 
-                        = &latest_switch_event.event_and_reaction.on_double_click_and_hold {
-                        if latest_switch_event.instant.elapsed() > CLICK_HOLD_INTERVAL_THRESHOLD {
+                        if instant.elapsed() > CLICK_HOLD_INTERVAL_THRESHOLD {
                             self.latest_switch_click_pattern 
                                 = Some(SwitchClickPattern::DoubleClickAndHold(
-                                        on_double_click_and_hold.clone()));
+                                        switch.clone()));
                         }
-                    }
                 }
-                SwitchEventType::KeyUpAfterClick | SwitchEventType::KeyUpAfterDoubleClick
-                    => {
-                        self.latest_switch_click_pattern 
-                            = Some(SwitchClickPattern::KeyUp);
-                        // To prevent infinitely firing KeyUp
-                        // in between clicks
-                        self.latest_switch_event = None;
-                    }
+                SwitchEventType::KeyUp => ()
             }
         }
         let pattern = self.latest_switch_click_pattern.clone();
@@ -189,39 +177,38 @@ impl SwitchClickPatternDetectorTrait for SwitchClickPatternDetector {
     }
 
     fn button_pressed(
-        &mut self, button: Button, switch_event_and_reaction: SwitchEventAndReaction){
-        self.switch_pressed(Switch::Button(button),switch_event_and_reaction);
+        &mut self, button: Button){
+        self.switch_pressed(Switch::Button(button));
     }
 
     fn button_released(
-        &mut self, button: Button, switch_event_and_reaction: SwitchEventAndReaction){
-        self.switch_released(Switch::Button(button),switch_event_and_reaction);
+        &mut self, button: Button){
+        self.switch_released(Switch::Button(button));
     }
 
     fn axis_button_pressed(
-        &mut self, button: StickSwitchButton, switch_event_and_reaction: SwitchEventAndReaction){
-        self.switch_pressed(Switch::StickSwitchButton(button),switch_event_and_reaction);
+        &mut self, button: StickSwitchButton){
+        self.switch_pressed(Switch::StickSwitchButton(button));
     }
 
     fn axis_button_released(
-        &mut self, button: StickSwitchButton, switch_event_and_reaction: SwitchEventAndReaction){
-        self.switch_released(Switch::StickSwitchButton(button),switch_event_and_reaction);
+        &mut self, button: StickSwitchButton){
+        self.switch_released(Switch::StickSwitchButton(button));
     }
 }
 
 #[derive(Debug,Clone,PartialEq)]
 pub enum SwitchClickPattern {
-    Click(SwitchOnClickReaction),
-    ClickAndHold(SwitchOnClickReaction),
-    DoubleClick(SwitchOnClickReaction),
-    DoubleClickAndHold(SwitchOnClickReaction),
-    KeyUp,
+    Click(Switch),
+    ClickAndHold(Switch),
+    DoubleClick(Switch),
+    DoubleClickAndHold(Switch),
+    ClickEnd(Switch),
 }
 
 #[derive(Debug,Clone,PartialEq)]
 struct LatestSwitchEvent {
     switch: Switch,
-    event_and_reaction: SwitchEventAndReaction,
     instant: Instant,
     event_type: SwitchEventType,
 }
@@ -229,13 +216,6 @@ struct LatestSwitchEvent {
 #[derive(Debug,Clone,PartialEq)]
 enum SwitchEventType {
     KeyDownIntoClick,
-    KeyUpAfterClick,
     KeyDownIntoDoubleClick,
-    KeyUpAfterDoubleClick,
-}
-
-#[derive(Debug,Clone,PartialEq)]
-enum Switch {
-    Button(Button),
-    StickSwitchButton(StickSwitchButton),
+    KeyUp,
 }
