@@ -42,10 +42,7 @@ impl LayerNode {
                     key: enigo::Key::Layout('a'),
                     modifiers: vec![],
                 })),
-                Some(SwitchClickPattern::HoldRelease(_reaction)) => Some(InputEvent::KeyUp(KeyboardInput {
-                    key: enigo::Key::Layout('a'),
-                    modifiers: vec![],
-                })),
+                Some(SwitchClickPattern::KeyUp) => Some(InputEvent::KeyUp),
                 Some(SwitchClickPattern::DoubleClick(_reaction)) => None,
                 Some(SwitchClickPattern::DoubleClickAndHold(_reaction)) => None,
                 None => None,
@@ -168,7 +165,7 @@ impl LayerNode {
 pub enum InputEvent {
     KeyClick(KeyboardInput),
     KeyDown(KeyboardInput),
-    KeyUp(KeyboardInput),
+    KeyUp,
 }
 
 #[derive(Debug, PartialEq)]

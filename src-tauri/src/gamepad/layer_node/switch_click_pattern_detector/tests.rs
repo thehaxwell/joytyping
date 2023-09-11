@@ -87,6 +87,15 @@ fn click_and_hold_works() {
     assert_eq!(switch_click_pattern_detector.tick().unwrap(),
         SwitchClickPattern::ClickAndHold(
             on_click_and_hold_reaction.clone()));
+
+    // NEXT: call button_released to fire key-up
+    
+    switch_click_pattern_detector.button_released(
+        Button::South,
+        switch_event_and_reaction.clone());
+
+    assert_eq!(switch_click_pattern_detector.tick().unwrap(),
+        SwitchClickPattern::KeyUp);
 }
 
 #[test]
@@ -151,7 +160,8 @@ fn double_click_works() {
         });
 
     assert!(switch_click_pattern_detector.latest_switch_click_pattern.is_none());
-    assert!(switch_click_pattern_detector.tick().is_none());
+    assert_eq!(switch_click_pattern_detector.tick().unwrap(),
+        SwitchClickPattern::KeyUp);
 
 
     // NEXT: press again to trigger double-click
@@ -192,8 +202,10 @@ fn double_click_works() {
             instant: Instant::now(),
         });
 
-    assert!(switch_click_pattern_detector.latest_switch_click_pattern.is_none());
-    assert!(switch_click_pattern_detector.tick().is_none());
+    assert!(
+        switch_click_pattern_detector.latest_switch_click_pattern.is_none());
+    assert_eq!(switch_click_pattern_detector.tick().unwrap(),
+        SwitchClickPattern::KeyUp);
 }
 
 #[test]
@@ -260,7 +272,8 @@ fn double_click_and_hold_works() {
         });
 
     assert!(switch_click_pattern_detector.latest_switch_click_pattern.is_none());
-    assert!(switch_click_pattern_detector.tick().is_none());
+    assert_eq!(switch_click_pattern_detector.tick().clone().unwrap(),
+        SwitchClickPattern::KeyUp);
 
 
     // NEXT: press again to trigger double-click

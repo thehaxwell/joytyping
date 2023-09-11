@@ -173,7 +173,11 @@ impl SwitchClickPatternDetectorTrait for SwitchClickPatternDetector {
                         }
                     }
                 }
-                _ => ()
+                SwitchEventType::KeyUpAfterClick | SwitchEventType::KeyUpAfterDoubleClick
+                    => {
+                        self.latest_switch_click_pattern 
+                            = Some(SwitchClickPattern::KeyUp);
+                    }
             }
         }
         let pattern = self.latest_switch_click_pattern.clone();
@@ -208,7 +212,7 @@ pub enum SwitchClickPattern {
     ClickAndHold(SwitchOnClickReaction),
     DoubleClick(SwitchOnClickReaction),
     DoubleClickAndHold(SwitchOnClickReaction),
-    HoldRelease(SwitchOnClickReaction),
+    KeyUp,
 }
 
 #[derive(Debug,Clone,PartialEq)]

@@ -126,11 +126,19 @@ pub fn start_main_loop(
             while gamepad.next_event() {}
             match gamepad.tick() {
                 Some(gamepad::layer_node::InputEvent::KeyClick(key))
-                    => keyboard_input_controller.key_click(key),
+                => {
+                    keyboard_input_controller.key_up();
+                    keyboard_input_controller.key_click(key);
+                }
                 Some(gamepad::layer_node::InputEvent::KeyDown(key))
-                    => keyboard_input_controller.key_down(key),
-                Some(gamepad::layer_node::InputEvent::KeyUp(_key))
-                    => keyboard_input_controller.key_up(),
+                => {
+                    keyboard_input_controller.key_up();
+                    keyboard_input_controller.key_down(key);
+                }
+                Some(gamepad::layer_node::InputEvent::KeyUp)
+                => {
+                    keyboard_input_controller.key_up();
+                }
                 None => (),
             };
         }
