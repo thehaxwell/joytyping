@@ -1,6 +1,6 @@
 use gilrs::Button;
 
-use crate::{settings_data::{KeyboardInput, self, SwitchEventAndReaction}, gamepad::stick_switch_interpreter::StickSwitchEvent};
+use crate::{settings_data::{KeyboardInput, self, SwitchEventAndReaction, SwitchOnClickReaction}, gamepad::stick_switch_interpreter::StickSwitchEvent};
 
 use self::switch_click_pattern_detector::{SwitchClickPattern, SwitchClickPatternDetectorTrait};
 
@@ -34,17 +34,39 @@ impl LayerNode {
     pub fn tick(&mut self) -> GamepadEventReaction {
         let input_event = if let Some(detector) = &mut self.switch_click_pattern_detector {
             match detector.tick() {
-                Some(SwitchClickPattern::Click(_reaction)) => Some(InputEvent::KeyClick(KeyboardInput {
-                    key: enigo::Key::Layout('a'),
-                    modifiers: vec![],
-                })),
-                Some(SwitchClickPattern::ClickAndHold(_reaction)) => Some(InputEvent::KeyDown(KeyboardInput {
-                    key: enigo::Key::Layout('a'),
-                    modifiers: vec![],
-                })),
                 Some(SwitchClickPattern::KeyUp) => Some(InputEvent::KeyUp),
-                Some(SwitchClickPattern::DoubleClick(_reaction)) => None,
-                Some(SwitchClickPattern::DoubleClickAndHold(_reaction)) => None,
+                Some(SwitchClickPattern::Click(reaction)) => match reaction {
+                    SwitchOnClickReaction::Keyboard(KeyboardInput { key, modifiers })
+                        => Some(InputEvent::KeyClick(KeyboardInput {
+                            key,
+                            modifiers,
+                        })),
+                    _other => None,
+                },
+                Some(SwitchClickPattern::ClickAndHold(reaction)) => match reaction {
+                    SwitchOnClickReaction::Keyboard(KeyboardInput { key, modifiers })
+                        => Some(InputEvent::KeyDown(KeyboardInput {
+                            key,
+                            modifiers,
+                        })),
+                    _other => None,
+                },
+                Some(SwitchClickPattern::DoubleClick(reaction)) => match reaction {
+                    SwitchOnClickReaction::Keyboard(KeyboardInput { key, modifiers })
+                        => Some(InputEvent::KeyClick(KeyboardInput {
+                            key,
+                            modifiers,
+                        })),
+                    _other => None,
+                },
+                Some(SwitchClickPattern::DoubleClickAndHold(reaction)) => match reaction {
+                    SwitchOnClickReaction::Keyboard(KeyboardInput { key, modifiers })
+                        => Some(InputEvent::KeyDown(KeyboardInput {
+                            key,
+                            modifiers,
+                        })),
+                    _other => None,
+                },
                 None => None,
             }
         }

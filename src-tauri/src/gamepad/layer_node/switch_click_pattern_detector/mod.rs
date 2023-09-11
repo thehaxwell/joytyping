@@ -177,6 +177,9 @@ impl SwitchClickPatternDetectorTrait for SwitchClickPatternDetector {
                     => {
                         self.latest_switch_click_pattern 
                             = Some(SwitchClickPattern::KeyUp);
+                        // To prevent infinitely firing KeyUp
+                        // in between clicks
+                        self.latest_switch_event = None;
                     }
             }
         }
