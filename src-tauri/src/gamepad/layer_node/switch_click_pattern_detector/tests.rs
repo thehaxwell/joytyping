@@ -305,3 +305,28 @@ fn double_click_and_hold_works() {
             on_double_click_and_hold_reaction.clone()));
 }
 
+#[test]
+fn tick_consumes_the_latest_switch_event() {
+    let mut switch_click_pattern_detector = SwitchClickPatternDetector{
+        latest_switch_event: None,
+        latest_switch_click_pattern: Some(SwitchClickPattern::DoubleClickAndHold(
+            SwitchOnClickReaction::Mouse(
+            MouseInput{button: enigo::MouseButton::ScrollLeft}))),
+    };
+
+    assert_eq!(switch_click_pattern_detector.tick().unwrap(),
+        SwitchClickPattern::DoubleClickAndHold(
+        SwitchOnClickReaction::Mouse(
+        MouseInput{button: enigo::MouseButton::ScrollLeft})));
+    assert!(switch_click_pattern_detector.latest_switch_click_pattern.is_none());
+    assert!(switch_click_pattern_detector.latest_switch_event.is_none());
+}
+
+#[test]
+fn new_correcly_initializes_objects() {
+    assert_eq!(SwitchClickPatternDetector::new(),
+        SwitchClickPatternDetector{
+            latest_switch_click_pattern: None,
+            latest_switch_event: None,
+        });
+}

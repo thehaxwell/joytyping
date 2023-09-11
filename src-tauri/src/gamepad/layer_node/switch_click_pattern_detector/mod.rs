@@ -65,6 +65,7 @@ pub trait SwitchClickPatternDetectorTrait {
 //      to a double click)
 // - a leaf in the tree is reached, there is no next step
 //
+#[derive(Debug,PartialEq)]
 pub struct SwitchClickPatternDetector {
     latest_switch_click_pattern: Option<SwitchClickPattern>,
     latest_switch_event: Option<LatestSwitchEvent>,
