@@ -1,6 +1,8 @@
-use crate::{gamepad::gilrs_wrapper::Gilrs, settings_data};
+use gilrs::Button;
 
-use self::{gilrs_wrapper::{GilrsEvent, GilrsEventType}, stick_switch_interpreter::StickSwitchInterpreterTrait, layer_node::{LayerNode, InputEvent, LayerNodeRef, switch_click_pattern_detector::SwitchClickPatternDetectorTrait}};
+use crate::{gamepad::{gilrs_wrapper::Gilrs, stick_switch_interpreter::StickSwitchEvent}, settings_data::{self, Layer, SwitchOnClickReaction, KeyboardInput, SwitchEventAndReaction}};
+
+use self::{gilrs_wrapper::{GilrsEvent, GilrsEventType}, stick_switch_interpreter::{StickSwitchInterpreterTrait, StickSwitchButton}, layer_node::{LayerNode, InputEvent, LayerNodeRef, switch_click_pattern_detector::{SwitchClickPatternDetectorTrait, SwitchClickPatternDetector, SwitchClickPattern}, Switch}};
 
 pub mod gilrs_wrapper;
 // #[cfg(test)]
@@ -9,21 +11,14 @@ pub mod gilrs_wrapper;
 pub mod stick_switch_interpreter;
 pub mod layer_node;
 
-type NewLayerNodeFunction = fn(
-        source: settings_data::Layer,
-        pointers: &Vec<LayerNodeRef>,
-        switch_click_pattern_detector: Option<Box<dyn SwitchClickPatternDetectorTrait>>
-    ) -> LayerNode;
-
-type NewSwitchClickPatternDetectorFunction = fn(
-    ) -> Box<dyn SwitchClickPatternDetectorTrait>;
-
 pub struct Gamepad {
    gilrs: Box<dyn Gilrs>,
    left_stick_switch_interpreter: Box<dyn StickSwitchInterpreterTrait>,
    right_stick_switch_interpreter: Box<dyn StickSwitchInterpreterTrait>,
-   layer_nodes: Vec<LayerNode>,
-   current_layer_node_index: usize,
+
+   layers: Vec<Layer>,
+   current_layer_index: usize,
+   switch_click_pattern_detector: Box<dyn SwitchClickPatternDetectorTrait>,
 }
 
 impl Gamepad {
@@ -32,8 +27,6 @@ impl Gamepad {
         left_stick_switch_interpreter: Box<dyn StickSwitchInterpreterTrait>,
         right_stick_switch_interpreter: Box<dyn StickSwitchInterpreterTrait>,
         layers_source: Vec<settings_data::Layer>,
-        create_new_layer_node_fn: NewLayerNodeFunction,
-        create_new_switch_click_pattern_detector: NewSwitchClickPatternDetectorFunction,
     ) -> Self {
 
         let mut idx: u32= 0;
@@ -46,18 +39,10 @@ impl Gamepad {
             })
             .collect();
 
-        let layer_nodes: Vec<LayerNode> = layers_source
+        let layers: Vec<Layer> = layers_source
             .iter()
             .map(|layer|
-                create_new_layer_node_fn(
-                    layer.clone(),
-                    &pointers,
-                    if layer.switches.is_some() {
-                        Some(create_new_switch_click_pattern_detector())
-                    } else {
-                        None 
-                    }
-                )
+                layer.clone_and_set_layer_pointers(&pointers)
             )
             .collect();
 
@@ -65,23 +50,108 @@ impl Gamepad {
             gilrs,
             left_stick_switch_interpreter,
             right_stick_switch_interpreter,
-            layer_nodes,
-            current_layer_node_index: 0, // we always start with the first node
+
+            layers,
+            current_layer_index: 0,
+            switch_click_pattern_detector: Box::new(SwitchClickPatternDetector::new())
         }
     }
 
     pub fn tick(&mut self) -> Option<InputEvent> {
-        let return_val = self.layer_nodes[self.current_layer_node_index].tick();
-        if let Some(new_index) = return_val.next_node_index {
-            self.current_layer_node_index = new_index;
-        }
-        return_val.input_event
+        match self.switch_click_pattern_detector.tick() {
+            Some(SwitchClickPattern::Click(switch)) => {
+                if let Some(s_e_a_r)
+                = self.get_switch_event_and_reaction(switch) {
+                    match s_e_a_r.on_click {
+                        Some(SwitchOnClickReaction::Keyboard(keyboard_input)) 
+                        => return Some(InputEvent::KeyClick(keyboard_input)),
+                        _ => ()
+                    }
+                };
+            },
+            Some(SwitchClickPattern::ClickAndHold(switch)) => {
+                if let Some(s_e_a_r)
+                = self.get_switch_event_and_reaction(switch) {
+                    match s_e_a_r.on_click_and_hold {
+                        Some(SwitchOnClickReaction::Keyboard(keyboard_input)) 
+                        => return Some(InputEvent::KeyClick(keyboard_input)),
+                        _ => ()
+                    }
+                };
+            },
+            Some(SwitchClickPattern::DoubleClick(switch)) => {
+                if let Some(s_e_a_r)
+                = self.get_switch_event_and_reaction(switch) {
+                    match s_e_a_r.on_double_click {
+                        Some(SwitchOnClickReaction::Keyboard(keyboard_input)) 
+                        => return Some(InputEvent::KeyClick(keyboard_input)),
+                        _ => ()
+                    }
+                };
+            },
+            Some(SwitchClickPattern::DoubleClickAndHold(switch)) => {
+                if let Some(s_e_a_r)
+                = self.get_switch_event_and_reaction(switch) {
+                    match s_e_a_r.on_double_click_and_hold {
+                        Some(SwitchOnClickReaction::Keyboard(keyboard_input)) 
+                        => return Some(InputEvent::KeyClick(keyboard_input)),
+                        _ => ()
+                    }
+                };
+            },
+            Some(SwitchClickPattern::ClickEnd(_switch)) => { // the "...End" variants
+                // TODO: probably a good place to go back on layer visits
+                // self.current_layer_index = new_index;
+
+                return Some(InputEvent::KeyUp);
+            }
+            None => (),
+        };
+
+        None
     }
 
     // returns true if there is yet another event
     pub fn next_event(&mut self) -> bool{
         if let Some(event) = self.next_gilrs_event() {
-            self.layer_nodes[self.current_layer_node_index].process_gamepad_event(event);
+            match event.event {
+                GilrsEventType::ButtonPressed(button, ) => {
+                    print!("ButtonPressed: {:?}\n",button);
+                        self.switch_click_pattern_detector.button_pressed(button);
+                }
+                GilrsEventType::ButtonRepeated(button, ) => {
+                    print!("ButtonRepeated: {:?}\n",button);
+                    //     self.switch_click_pattern_detector.button_repeated(button);
+                },
+                GilrsEventType::ButtonReleased(button, ) => {
+                    print!("ButtonReleased: {:?}\n",button);
+                        self.switch_click_pattern_detector.button_released(button);
+                },
+                GilrsEventType::ButtonChanged(button, _value, ) => {
+                    print!("ButtonChanged: {:?}\n",button);
+                    //     self.switch_click_pattern_detector.button_changed(button);
+                },
+                GilrsEventType::AxisChanged(axis, value, switch_stick_event) => {
+                    print!("AxisChanged: {:?}: {:?}\n",axis,value);
+                    if let Some(event) = switch_stick_event {
+                        match event {
+                            StickSwitchEvent::ButtonPressed(button)
+                                => self.switch_click_pattern_detector.axis_button_pressed(button),
+                            StickSwitchEvent::ButtonReleased(button)
+                                => self.switch_click_pattern_detector.axis_button_released(button),
+                        };
+                    }
+                },
+                GilrsEventType::Connected => {
+                    print!("Connected!\n");
+                },
+                GilrsEventType::Disconnected => {
+                    print!("Disconnected!\n");
+                },
+                GilrsEventType::Dropped => {
+                    print!("Droppedn!\n");
+                }
+            }
             true
         }
         else {
@@ -121,5 +191,38 @@ impl Gamepad {
             _other => None
         }
     }
-}
 
+    fn get_switch_event_and_reaction(
+        &self,switch: Switch) -> Option<SwitchEventAndReaction> {
+        if let Some(switches) = &self.layers[self.current_layer_index].switches {
+            match switch {
+                Switch::Button(button) => match button {
+                    Button::North => switches.north.clone(),
+                    Button::South => switches.south.clone(),
+                    Button::East => switches.east.clone(),
+                    Button::West => switches.west.clone(),
+                    Button::DPadUp => switches.d_pad_up.clone(),
+                    Button::DPadDown => switches.d_pad_down.clone(),
+                    Button::DPadRight => switches.d_pad_right.clone(),
+                    Button::DPadLeft => switches.d_pad_left.clone(),
+                    Button::LeftTrigger => switches.left_trigger.clone(),
+                    Button::RightTrigger => switches.right_trigger.clone(),
+                    _ => None
+                },
+                Switch::StickSwitchButton(button) => match button {
+                    StickSwitchButton::LeftStickUp => switches.left_stick_up.clone(),
+                    StickSwitchButton::LeftStickDown => switches.left_stick_down.clone(),
+                    StickSwitchButton::LeftStickRight => switches.left_stick_right.clone(),
+                    StickSwitchButton::LeftStickLeft => switches.left_stick_left.clone(),
+                    StickSwitchButton::RightStickUp => switches.right_stick_up.clone(),
+                    StickSwitchButton::RightStickDown => switches.right_stick_down.clone(),
+                    StickSwitchButton::RightStickRight => switches.right_stick_right.clone(),
+                    StickSwitchButton::RightStickLeft => switches.right_stick_left.clone(),
+                }
+            }
+        }
+        else {
+            None
+        }
+    }
+}

@@ -99,8 +99,6 @@ pub fn start_main_loop(
                 }
             )),
             active_profile.layers,
-            new_layer_node,
-            new_switch_click_pattern_detector,
         );
 
         let mut keyboard_input_controller = KeyboardInputController::new(Box::new(EnigoWrapper::new()));
