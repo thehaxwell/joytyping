@@ -7,6 +7,7 @@ use input_controller::enigo_wrapper::{EnigoWrapper, EnigoTrait};
 use settings::error_display_window::ErrorDisplayWindow;
 use settings::{Settings,SettingsDependenciesImpl};
 
+use crate::gamepad::switch_click_pattern_detector::SwitchClickPatternDetector;
 use crate::input_controller::{MouseInputController, MouseInputControllerTrait};
 
 pub mod settings;
@@ -54,25 +55,6 @@ pub fn start_main_loop(
         //     active_profile.layers.remove(0).switches.unwrap().left_trigger.unwrap().on_click_and_hold.unwrap().visit_layer.unwrap(),
         //     settings_data::LayerSpecifier{name: "first-layer-step-3".to_string(), pointer: None});
 
-        fn new_switch_click_pattern_detector()-> Box<dyn
-            gamepad::layer_node
-            ::switch_click_pattern_detector
-            ::SwitchClickPatternDetectorTrait>{
-            Box::new(gamepad::layer_node
-               ::switch_click_pattern_detector::SwitchClickPatternDetector::new())
-        }
-        fn new_layer_node(
-            source: settings_data::Layer,
-            pointers: &Vec<gamepad::layer_node::LayerNodeRef>,
-            switch_click_pattern_detector: Option<Box<dyn gamepad::layer_node
-               ::switch_click_pattern_detector::SwitchClickPatternDetectorTrait>>,
-        ) -> gamepad::layer_node::LayerNode {
-            gamepad::layer_node::LayerNode::new(
-                source,
-                pointers,
-                switch_click_pattern_detector,
-            )
-        }
 
         let mut gamepad = gamepad::Gamepad::new(
             Box::new(GilrsWrapper::new()),
@@ -99,6 +81,8 @@ pub fn start_main_loop(
                 }
             )),
             active_profile.layers,
+            Box::new(SwitchClickPatternDetector::new()),
+            Box::new(gamepad::on_release_reactions::OnReleaseReactions::new()),
         );
 
         let mut keyboard_input_controller = KeyboardInputController::new(Box::new(EnigoWrapper::new()));
@@ -123,17 +107,17 @@ pub fn start_main_loop(
             // mouse_input_controller.trigger_input();
             while gamepad.next_event() {}
             match gamepad.tick() {
-                Some(gamepad::layer_node::InputEvent::KeyClick(key))
+                Some(gamepad::InputEvent::KeyClick(key))
                 => {
                     keyboard_input_controller.key_up();
                     keyboard_input_controller.key_click(key);
                 }
-                Some(gamepad::layer_node::InputEvent::KeyDown(key))
+                Some(gamepad::InputEvent::KeyDown(key))
                 => {
                     keyboard_input_controller.key_up();
                     keyboard_input_controller.key_down(key);
                 }
-                Some(gamepad::layer_node::InputEvent::KeyUp)
+                Some(gamepad::InputEvent::KeyUp)
                 => {
                     keyboard_input_controller.key_up();
                 }

@@ -129,21 +129,8 @@ impl SwitchClickPatternDetector {
                 });
         }
 
-        // self.latest_switch_click_pattern = match &self.latest_switch_click_pattern {
-        //     Some(SwitchClickPattern::Click(switch))
-        //         => Some(SwitchClickPattern::ClickEnd(switch.clone())),
-        //     Some(SwitchClickPattern::DoubleClick(switch))
-        //         => Some(SwitchClickPattern::DoubleClickEnd(switch.clone())),
-        //     Some(SwitchClickPattern::ClickAndHold(switch))
-        //         => Some(SwitchClickPattern::ClickAndHoldEnd(switch.clone())),
-        //     Some(SwitchClickPattern::DoubleClickAndHold(switch))
-        //         => Some(SwitchClickPattern::DoubleClickAndHoldEnd(switch.clone())),
-        //     None => None,
-        //     other => other.clone(), // all the variants that end with "End" can stay the same
-        // };
-
-        self.latest_switch_click_pattern = Some(SwitchClickPattern::ClickEnd(switch.clone()));
-        println!(">>>>>>>>>>: {:?}",self.latest_switch_click_pattern);
+        self.latest_switch_click_pattern 
+            = Some(SwitchClickPattern::ClickEnd(switch.clone()));
     }
 }
 

@@ -3,7 +3,7 @@ use serde::Deserialize;
 use std::fmt;
 use serde::de::{self, Deserializer, Visitor, MapAccess};
 
-use crate::gamepad::layer_node::LayerNodeRef;
+use crate::gamepad::LayerNodeRef;
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct SettingsData {
