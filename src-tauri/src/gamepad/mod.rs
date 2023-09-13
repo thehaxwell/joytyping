@@ -132,6 +132,12 @@ impl Gamepad {
                                         self.current_layer_index));
                             self.current_layer_index = layer_specifier.index_in_gamepad.unwrap().try_into().unwrap();
                         },
+                        // if on_double_click is not set and on_click is set to
+                        // type out some key, then click that key
+                        None => if let Some(SwitchOnClickReaction::Keyboard(keyboard_input)) 
+                            = s_e_a_r.on_click {
+                            return Some(InputEvent::KeyClick(keyboard_input))
+                        },
                         _ => ()
                     }
                 };
