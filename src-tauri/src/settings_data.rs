@@ -257,7 +257,7 @@ pub enum SwitchOnClickReaction {
 #[derive(Debug, Clone, PartialEq)]
 pub struct LayerSpecifier {
     pub id: String,
-    pub index_in_gamepad: Option<u32>,
+    pub index_in_gamepad: Option<usize>,
 }
 
 impl LayerSpecifier {

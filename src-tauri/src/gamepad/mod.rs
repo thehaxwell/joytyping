@@ -36,12 +36,14 @@ impl Gamepad {
        on_release_reactions: Box<dyn OnReleaseReactionsTrait>,
     ) -> Self {
 
-        let mut idx: u32= 0;
         let pointers: Vec<LayerNodeRef> = layers_source
             .iter()
-            .map(|layer|{
-                let res = LayerNodeRef{id: layer.id.to_string(), index: idx};
-                idx += 1;
+            .enumerate()
+            .map(|(idx,layer)|{
+                let res = LayerNodeRef{
+                    id: layer.id.to_string(),
+                    index: idx.try_into().unwrap(),
+                };
                 res
             })
             .collect();
@@ -320,7 +322,7 @@ pub enum InputEvent {
 #[derive(Debug, PartialEq)]
 pub struct LayerNodeRef{
     pub id: String,
-    pub index: u32,
+    pub index: usize,
 }
 
 #[derive(Debug,Clone,PartialEq)]
