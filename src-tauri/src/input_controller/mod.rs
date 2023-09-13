@@ -7,10 +7,12 @@ pub mod enigo_wrapper;
 
 #[cfg(test)]
 use mockall::{automock, predicate::*};
-#[cfg(test)]
-mod tests;
 
-const DELAY_DURATION: Duration = Duration::from_millis(500);
+// TODO: redefine these tests, the effect mentioned
+// there is now achieved by the natural wait between
+// click/double-click and click-and-hold/double-click-and-hold
+// #[cfg(test)]
+// mod tests;
 
 #[cfg_attr(test, automock)]
 pub trait KeyboardInputControllerTrait {
@@ -23,7 +25,6 @@ pub trait KeyboardInputControllerTrait {
 pub struct KeyboardInputController {
     enigo: Box<dyn EnigoTrait>,
     active_key: Option<KeyboardInput>,
-    instant_to_start_delay_from: Option<std::time::Instant>,
 }
 
 impl KeyboardInputController {
@@ -33,17 +34,7 @@ impl KeyboardInputController {
         Self{
             enigo,
             active_key: None,
-            instant_to_start_delay_from: None,
         }
-    }
-
-    fn allow_input(&self) -> bool {
-        if let Some(instant) = self.instant_to_start_delay_from {
-            if instant.elapsed() <= DELAY_DURATION {
-                return false;
-            }
-        }
-        true
     }
 
     fn click(&mut self, key: KeyboardInput) {
@@ -60,30 +51,23 @@ impl KeyboardInputController {
 }
 
 impl KeyboardInputControllerTrait for KeyboardInputController {
-    // The key is immediately triggered and then after DELAY_DURATION
+    // The key is immediately triggered and then 
     // it will be allowed to be triggered many times by calling trigger_input()
     // until key_up() is called (or key_down() is called again).
     fn key_down(&mut self, key_to_click: KeyboardInput) {
         println!("KeyboardInputController::key_down({:?})",key_to_click);
         self.active_key = Some(key_to_click);
-        self.instant_to_start_delay_from = None;
         self.trigger_input();
-        self.instant_to_start_delay_from = Some(std::time::Instant::now());
     }
 
     fn key_up(&mut self) {
         println!("KeyboardInputController::key_up");
         self.active_key = None;
-        self.instant_to_start_delay_from = None;
     }
 
     fn trigger_input(&mut self) {
         if let Some(active_key) = &self.active_key {
-            if !self.allow_input() {
-                return;
-            }
             self.click(active_key.clone());
-            self.instant_to_start_delay_from = None;
         }
     }
 

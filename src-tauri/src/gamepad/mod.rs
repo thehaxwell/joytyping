@@ -93,7 +93,7 @@ impl Gamepad {
                 = self.get_switch_event_and_reaction(switch.clone()) {
                     match s_e_a_r.on_click_and_hold {
                         Some(SwitchOnClickReaction::Keyboard(keyboard_input)) 
-                        => return Some(InputEvent::KeyClick(keyboard_input)),
+                        => return Some(InputEvent::KeyDown(keyboard_input)),
                         Some(SwitchOnClickReaction::MoveToLayer(layer_specifier))
                         => self.current_layer_index = layer_specifier.index_in_gamepad.unwrap().try_into().unwrap(),
                         Some(SwitchOnClickReaction::VisitLayer(layer_specifier))
@@ -105,7 +105,13 @@ impl Gamepad {
                                         self.current_layer_index));
                             self.current_layer_index = layer_specifier.index_in_gamepad.unwrap().try_into().unwrap();
                         },
-                        _ => ()
+                        // if on_click_and_hold is not set and on_click is set to
+                        // type out some key, then hold down that key
+                        None => if let Some(SwitchOnClickReaction::Keyboard(keyboard_input)) 
+                            = s_e_a_r.on_click {
+                            return Some(InputEvent::KeyDown(keyboard_input))
+                        },
+                        _ => (),
                     }
                 };
             },
@@ -135,7 +141,7 @@ impl Gamepad {
                 = self.get_switch_event_and_reaction(switch.clone()) {
                     match s_e_a_r.on_double_click_and_hold {
                         Some(SwitchOnClickReaction::Keyboard(keyboard_input)) 
-                        => return Some(InputEvent::KeyClick(keyboard_input)),
+                        => return Some(InputEvent::KeyDown(keyboard_input)),
                         Some(SwitchOnClickReaction::MoveToLayer(layer_specifier))
                         => self.current_layer_index = layer_specifier.index_in_gamepad.unwrap().try_into().unwrap(),
                         Some(SwitchOnClickReaction::VisitLayer(layer_specifier))
@@ -146,6 +152,12 @@ impl Gamepad {
                                     SwitchOnReleaseReaction::MoveToLayerAtIndex(
                                         self.current_layer_index));
                             self.current_layer_index = layer_specifier.index_in_gamepad.unwrap().try_into().unwrap();
+                        },
+                        // if on_click_and_hold is not set and on_click is set to
+                        // type out some key, then hold down that key
+                        None => if let Some(SwitchOnClickReaction::Keyboard(keyboard_input)) 
+                            = s_e_a_r.on_click {
+                            return Some(InputEvent::KeyDown(keyboard_input))
                         },
                         _ => ()
                     }
