@@ -189,25 +189,22 @@ impl Switches {
 #[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct SwitchEventAndReaction {
     pub on_click: Option<SwitchOnClickReaction>,
-    pub on_click_and_hold: Option<SwitchOnClickReaction>,
     pub on_double_click: Option<SwitchOnClickReaction>,
-    pub on_double_click_and_hold: Option<SwitchOnClickReaction>,
 }
 
 impl SwitchEventAndReaction {
     pub fn get_ids_pointing_to_layers(&self) -> Vec<String> {
         [
             &self.on_click,
-            &self.on_click_and_hold,
             &self.on_double_click,
-            &self.on_double_click_and_hold,
         ]
             .iter()
-            // .filter_map(|key_opt| if let Some(key) = key_opt {Some(key.get_ids_pointing_to_layers())} else { None })
             .filter_map(|key_opt| match key_opt {
                 Some(SwitchOnClickReaction::VisitLayer(layer_specifier))
                     => Some(layer_specifier.id.clone()),
                 Some(SwitchOnClickReaction::MoveToLayer(layer_specifier))
+                    => Some(layer_specifier.id.clone()),
+                Some(SwitchOnClickReaction::MoveToOrVisitLayer(layer_specifier))
                     => Some(layer_specifier.id.clone()),
                 _other => None,
             })
@@ -218,12 +215,8 @@ impl SwitchEventAndReaction {
         SwitchEventAndReaction {
             on_click: SwitchEventAndReaction
                 ::clone_event_with_layer_pointers_possibly_set(&self.on_click,pointers),
-            on_click_and_hold: SwitchEventAndReaction
-                ::clone_event_with_layer_pointers_possibly_set(&self.on_click_and_hold,pointers),
             on_double_click: SwitchEventAndReaction
                 ::clone_event_with_layer_pointers_possibly_set(&self.on_double_click,pointers),
-            on_double_click_and_hold: SwitchEventAndReaction
-                ::clone_event_with_layer_pointers_possibly_set(&self.on_double_click_and_hold,pointers),
         }
 
     }
@@ -238,6 +231,9 @@ impl SwitchEventAndReaction {
             Some(SwitchOnClickReaction::MoveToLayer(layer_specifier))
                 => Some(SwitchOnClickReaction::MoveToLayer(
                     layer_specifier.clone_and_set_layer_pointer(pointers))),
+            Some(SwitchOnClickReaction::MoveToOrVisitLayer(layer_specifier))
+                => Some(SwitchOnClickReaction::MoveToOrVisitLayer(
+                    layer_specifier.clone_and_set_layer_pointer(pointers))),
             other => other.clone(),
         }
     }
@@ -248,8 +244,15 @@ impl SwitchEventAndReaction {
 pub enum SwitchOnClickReaction {
     Keyboard(KeyboardInput),
     Mouse(MouseInput),
+
+    // visit_layer goes to the layer until the click ends
     VisitLayer(LayerSpecifier),
+    // move_to_layer goes to the layer
     MoveToLayer(LayerSpecifier),
+    // move_to_or_visit_layer goes to the layer,
+    // but if the click is active for long enough then 
+    // come back to this layer when the click ends
+    MoveToOrVisitLayer(LayerSpecifier),
 }
 
 // this struct should allow serde to always accept a string
