@@ -113,7 +113,7 @@ fn double_click_works() {
         switch_click_pattern_detector.latest_switch_event.clone().unwrap(),
         LatestSwitchEvent {
             switch: Switch::Button(Button::South),
-            event_type: SwitchEventType::KeyUp,
+            event_type: SwitchEventType::KeyUpAfterClick,
             instant: Instant::now(),
         });
 
@@ -156,7 +156,7 @@ fn double_click_works() {
         switch_click_pattern_detector.latest_switch_event.clone().unwrap(),
         LatestSwitchEvent {
             switch: Switch::Button(Button::South),
-            event_type: SwitchEventType::KeyUp,
+            event_type: SwitchEventType::KeyUpAfterDoubleClick,
             instant: Instant::now(),
         });
 
@@ -206,7 +206,7 @@ fn double_click_and_hold_works() {
         switch_click_pattern_detector.latest_switch_event.clone().unwrap(),
         LatestSwitchEvent {
             switch: Switch::Button(Button::South),
-            event_type: SwitchEventType::KeyUp,
+            event_type: SwitchEventType::KeyUpAfterClick,
             instant: Instant::now(),
         });
 
@@ -281,4 +281,90 @@ fn new_correcly_initializes_objects() {
             latest_switch_click_pattern: None,
             latest_switch_event: None,
         });
+}
+
+#[test]
+fn double_clicks_are_mutually_exclusive() {
+    assert!(true);
+    let mut switch_click_pattern_detector = SwitchClickPatternDetector{
+        latest_switch_event: None,
+        latest_switch_click_pattern: None,
+    };
+
+    // this loop tests that only every second click 
+    // counts as a double-click
+    for idx in (1..10).into_iter() {
+        switch_click_pattern_detector.button_pressed(
+            Button::South);
+
+        if idx % 2 == 0 {
+            assert_latest_switch_events_are_equal(
+                switch_click_pattern_detector.latest_switch_event.clone().unwrap(),
+                LatestSwitchEvent {
+                    switch: Switch::Button(Button::South),
+                    event_type: SwitchEventType::KeyDownIntoDoubleClick,
+                    instant: Instant::now(),
+                });
+
+            assert_eq!(
+                switch_click_pattern_detector.latest_switch_click_pattern.clone().unwrap(),
+                SwitchClickPattern::DoubleClick(
+                    Switch::Button(Button::South)));
+
+            assert_eq!(switch_click_pattern_detector.tick().unwrap(),
+                SwitchClickPattern::DoubleClick(
+                    Switch::Button(Button::South)));
+        }
+        else {
+            assert_latest_switch_events_are_equal(
+                switch_click_pattern_detector.latest_switch_event.clone().unwrap(),
+                LatestSwitchEvent {
+                    switch: Switch::Button(Button::South),
+                    event_type: SwitchEventType::KeyDownIntoClick,
+                    instant: Instant::now(),
+                });
+
+            assert_eq!(
+                switch_click_pattern_detector.latest_switch_click_pattern.clone().unwrap(),
+                SwitchClickPattern::Click(
+                    Switch::Button(Button::South)));
+
+            assert_eq!(switch_click_pattern_detector.tick().unwrap(),
+                SwitchClickPattern::Click(
+                    Switch::Button(Button::South)));
+        }
+
+        // NEXT: release quickly enough to not count as click-and-hold
+
+        switch_click_pattern_detector.button_released(
+            Button::South);
+        
+        if idx % 2 == 0 {
+            assert_latest_switch_events_are_equal(
+                switch_click_pattern_detector.latest_switch_event.clone().unwrap(),
+                LatestSwitchEvent {
+                    switch: Switch::Button(Button::South),
+                    event_type: SwitchEventType::KeyUpAfterDoubleClick,
+                    instant: Instant::now(),
+                });
+        }
+        else {
+            assert_latest_switch_events_are_equal(
+                switch_click_pattern_detector.latest_switch_event.clone().unwrap(),
+                LatestSwitchEvent {
+                    switch: Switch::Button(Button::South),
+                    event_type: SwitchEventType::KeyUpAfterClick,
+                    instant: Instant::now(),
+                });
+        }
+
+        assert_eq!(switch_click_pattern_detector
+                   .latest_switch_click_pattern.clone().unwrap(),
+            SwitchClickPattern::ClickEnd(
+                Switch::Button(Button::South)));
+        assert_eq!(switch_click_pattern_detector.tick().unwrap(),
+            SwitchClickPattern::ClickEnd(
+                Switch::Button(Button::South)));
+
+    }
 }

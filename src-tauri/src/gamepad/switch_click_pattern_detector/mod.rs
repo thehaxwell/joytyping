@@ -92,9 +92,13 @@ impl SwitchClickPatternDetector {
             event_type: SwitchEventType::KeyDownIntoClick,
         };
 
-        if let Some(LatestSwitchEvent { switch: sw, instant, event_type: _ })
+        if let Some(LatestSwitchEvent { switch: sw, instant, event_type })
             = &self.latest_switch_event {
-                if switch == sw.clone() && instant.elapsed() < DOUBLE_CLICK_INTERVAL_THRESHOLD {
+                if switch == sw.clone() 
+                && instant.elapsed() < DOUBLE_CLICK_INTERVAL_THRESHOLD 
+                // prevent chaining double-clicks
+                && *event_type != SwitchEventType::KeyUpAfterDoubleClick 
+                {
                     new_step = LatestSwitchEvent {
                         switch: switch.clone(),
                         instant: Instant::now(),
@@ -120,13 +124,26 @@ impl SwitchClickPatternDetector {
 
     fn switch_released(
         &mut self, switch: Switch){
-        if let Some(_event)
-            = &self.latest_switch_event {
-                self.latest_switch_event = Some(LatestSwitchEvent {
-                    switch: switch.clone(),
-                    instant: Instant::now(),
-                    event_type: SwitchEventType::KeyUp,
-                });
+        let new_event_type 
+            = if let Some(event) = &self.latest_switch_event {
+                match event.event_type {
+                    SwitchEventType::KeyDownIntoClick
+                        =>Some(SwitchEventType::KeyUpAfterClick),
+                    SwitchEventType::KeyDownIntoDoubleClick
+                        =>Some(SwitchEventType::KeyUpAfterDoubleClick),
+                    _ => None
+                }
+            }
+            else {
+                None
+            };
+
+        if let Some(event_type) = new_event_type {
+            self.latest_switch_event = Some(LatestSwitchEvent {
+                switch: switch.clone(),
+                instant: Instant::now(),
+                event_type,
+            });
         }
 
         self.latest_switch_click_pattern 
@@ -155,7 +172,7 @@ impl SwitchClickPatternDetectorTrait for SwitchClickPatternDetector {
                                         switch.clone()));
                         }
                 }
-                SwitchEventType::KeyUp => ()
+                _ => (),
             }
         }
         let pattern = self.latest_switch_click_pattern.clone();
@@ -204,5 +221,6 @@ struct LatestSwitchEvent {
 enum SwitchEventType {
     KeyDownIntoClick,
     KeyDownIntoDoubleClick,
-    KeyUp,
+    KeyUpAfterClick,
+    KeyUpAfterDoubleClick,
 }
