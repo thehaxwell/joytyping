@@ -69,7 +69,7 @@ pub trait SwitchClickPatternDetectorTrait {
 //
 #[derive(Debug,PartialEq)]
 pub struct SwitchClickPatternDetector {
-    latest_switch_click_pattern: Option<SwitchClickPattern>,
+    latest_switch_click_pattern: Option<SwitchClickPatternWrapper>,
     latest_switch_event: Option<LatestSwitchEvent>,
 }
 
@@ -114,10 +114,12 @@ impl SwitchClickPatternDetector {
         match new_step.event_type {
             SwitchEventType::KeyDownIntoClick
               => self.latest_switch_click_pattern
-                 = Some(SwitchClickPattern::Click(switch.clone())),
+                 = Some(SwitchClickPatternWrapper
+                        ::new(SwitchClickPattern::Click(switch.clone()))),
             SwitchEventType::KeyDownIntoDoubleClick
               => self.latest_switch_click_pattern 
-                 = Some(SwitchClickPattern::DoubleClick(switch.clone())),
+                 = Some(SwitchClickPatternWrapper
+                        ::new(SwitchClickPattern::DoubleClick(switch.clone()))),
             _ => (),
         }
     }
@@ -147,7 +149,27 @@ impl SwitchClickPatternDetector {
         }
 
         self.latest_switch_click_pattern 
-            = Some(SwitchClickPattern::ClickEnd(switch.clone()));
+            = Some(SwitchClickPatternWrapper::new(SwitchClickPattern::ClickEnd(switch.clone())));
+    }
+
+    fn latest_switch_click_pattern_is_consumed_click_and_hold(&self) -> bool {
+        if let Some(pattern) = &self.latest_switch_click_pattern {
+            if let SwitchClickPattern::ClickAndHold(_switch)
+                = &pattern.pattern {
+                    return pattern.is_consumed
+                }
+        }
+        false
+    }
+
+    fn latest_switch_click_pattern_is_consumed_double_click_and_hold(&self) -> bool {
+        if let Some(pattern) = &self.latest_switch_click_pattern {
+            if let SwitchClickPattern::DoubleClickAndHold(_switch)
+                = &pattern.pattern {
+                    return pattern.is_consumed
+                }
+        }
+        false
     }
 }
 
@@ -155,29 +177,40 @@ impl SwitchClickPatternDetectorTrait for SwitchClickPatternDetector {
     fn tick(&mut self) -> Option<SwitchClickPattern>{
         if let Some(LatestSwitchEvent { switch, instant, event_type }) 
             = &self.latest_switch_event {
+
             match event_type {
                 SwitchEventType::KeyDownIntoClick
                     => {
-                        if instant.elapsed() > CLICK_HOLD_INTERVAL_THRESHOLD {
+                        if instant.elapsed() > CLICK_HOLD_INTERVAL_THRESHOLD 
+                        && !self.latest_switch_click_pattern_is_consumed_click_and_hold(){
                             self.latest_switch_click_pattern 
-                                = Some(SwitchClickPattern::ClickAndHold(
-                                        switch.clone()));
+                                = Some(SwitchClickPatternWrapper::new(
+                                        SwitchClickPattern::ClickAndHold(
+                                        switch.clone())));
                         }
                 }
                 SwitchEventType::KeyDownIntoDoubleClick
                     => {
-                        if instant.elapsed() > CLICK_HOLD_INTERVAL_THRESHOLD {
+                        if instant.elapsed() > CLICK_HOLD_INTERVAL_THRESHOLD 
+                        && !self.latest_switch_click_pattern_is_consumed_double_click_and_hold(){
                             self.latest_switch_click_pattern 
-                                = Some(SwitchClickPattern::DoubleClickAndHold(
-                                        switch.clone()));
+                                = Some(SwitchClickPatternWrapper::new(
+                                        SwitchClickPattern::DoubleClickAndHold(
+                                        switch.clone())));
                         }
                 }
                 _ => (),
             }
         }
-        let pattern = self.latest_switch_click_pattern.clone();
-        self.latest_switch_click_pattern = None;
-        pattern
+
+        if let Some(pattern) 
+            = self.latest_switch_click_pattern.as_mut() {
+            if !pattern.is_consumed {
+                pattern.is_consumed = true;
+                return Some(pattern.pattern.clone())
+            }
+        }
+        None
     }
 
     fn button_pressed(
@@ -198,6 +231,19 @@ impl SwitchClickPatternDetectorTrait for SwitchClickPatternDetector {
     fn axis_button_released(
         &mut self, button: StickSwitchButton){
         self.switch_released(Switch::StickSwitchButton(button));
+    }
+}
+
+#[derive(Clone,PartialEq,Debug)]
+struct SwitchClickPatternWrapper {
+    pattern: SwitchClickPattern,
+    is_consumed: bool,
+}
+impl SwitchClickPatternWrapper {
+    fn new(pattern: SwitchClickPattern) -> Self {
+        Self {
+            pattern, is_consumed: false,
+        }
     }
 }
 

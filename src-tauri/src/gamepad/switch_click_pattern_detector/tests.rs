@@ -14,6 +14,7 @@ use super::LatestSwitchEvent;
 use super::SwitchClickPattern;
 use super::Switch;
 use super::SwitchEventType;
+use super::SwitchClickPatternWrapper;
 
 fn assert_latest_switch_events_are_equal(
     event1: LatestSwitchEvent, event2: LatestSwitchEvent){
@@ -42,9 +43,13 @@ fn click_and_hold_works() {
         });
 
     assert_eq!(
-        switch_click_pattern_detector.latest_switch_click_pattern.clone().unwrap(),
-        SwitchClickPattern::Click(
-            Switch::Button(Button::South),));
+        switch_click_pattern_detector
+        .latest_switch_click_pattern.clone().unwrap(),
+        SwitchClickPatternWrapper {
+            pattern: SwitchClickPattern::Click(
+                Switch::Button(Button::South)),
+            is_consumed: false,
+        });
 
     assert_eq!(switch_click_pattern_detector.tick().unwrap(),
         SwitchClickPattern::Click(
@@ -66,6 +71,9 @@ fn click_and_hold_works() {
     assert_eq!(switch_click_pattern_detector.tick().unwrap(),
         SwitchClickPattern::ClickAndHold(
             Switch::Button(Button::South),));
+
+    assert!(switch_click_pattern_detector.tick().is_none(),"ClickAndHold fires only once");
+    assert!(switch_click_pattern_detector.tick().is_none(),"ClickAndHold fires only once");
 
     // NEXT: call button_released to fire key-up
     
@@ -96,9 +104,13 @@ fn double_click_works() {
         });
 
     assert_eq!(
-        switch_click_pattern_detector.latest_switch_click_pattern.clone().unwrap(),
-        SwitchClickPattern::Click(
-            Switch::Button(Button::South)));
+        switch_click_pattern_detector
+        .latest_switch_click_pattern.clone().unwrap(),
+        SwitchClickPatternWrapper {
+            pattern: SwitchClickPattern::Click(
+                Switch::Button(Button::South)),
+            is_consumed: false,
+        });
 
     assert_eq!(switch_click_pattern_detector.tick().unwrap(),
         SwitchClickPattern::Click(
@@ -117,10 +129,14 @@ fn double_click_works() {
             instant: Instant::now(),
         });
 
-    assert_eq!(switch_click_pattern_detector
-               .latest_switch_click_pattern.clone().unwrap(),
-        SwitchClickPattern::ClickEnd(
-            Switch::Button(Button::South)));
+    assert_eq!(
+        switch_click_pattern_detector
+        .latest_switch_click_pattern.clone().unwrap(),
+        SwitchClickPatternWrapper {
+            pattern: SwitchClickPattern::ClickEnd(
+                Switch::Button(Button::South)),
+            is_consumed: false,
+        });
     assert_eq!(switch_click_pattern_detector.tick().unwrap(),
         SwitchClickPattern::ClickEnd(
             Switch::Button(Button::South)));
@@ -139,9 +155,13 @@ fn double_click_works() {
         });
 
     assert_eq!(
-        switch_click_pattern_detector.latest_switch_click_pattern.clone().unwrap(),
-        SwitchClickPattern::DoubleClick(
-            Switch::Button(Button::South)));
+        switch_click_pattern_detector
+        .latest_switch_click_pattern.clone().unwrap(),
+        SwitchClickPatternWrapper {
+            pattern: SwitchClickPattern::DoubleClick(
+                Switch::Button(Button::South)),
+            is_consumed: false,
+        });
 
     assert_eq!(switch_click_pattern_detector.tick().unwrap(),
         SwitchClickPattern::DoubleClick(
@@ -160,10 +180,14 @@ fn double_click_works() {
             instant: Instant::now(),
         });
 
-    assert_eq!(switch_click_pattern_detector
-               .latest_switch_click_pattern.clone().unwrap(),
-        SwitchClickPattern::ClickEnd(
-            Switch::Button(Button::South)));
+    assert_eq!(
+        switch_click_pattern_detector
+        .latest_switch_click_pattern.clone().unwrap(),
+        SwitchClickPatternWrapper {
+            pattern: SwitchClickPattern::ClickEnd(
+                Switch::Button(Button::South)),
+            is_consumed: false,
+        });
 
     assert_eq!(switch_click_pattern_detector.tick().unwrap(),
         SwitchClickPattern::ClickEnd(
@@ -189,9 +213,13 @@ fn double_click_and_hold_works() {
         });
 
     assert_eq!(
-        switch_click_pattern_detector.latest_switch_click_pattern.clone().unwrap(),
-        SwitchClickPattern::Click(
-            Switch::Button(Button::South)));
+        switch_click_pattern_detector
+        .latest_switch_click_pattern.clone().unwrap(),
+        SwitchClickPatternWrapper {
+            pattern: SwitchClickPattern::Click(
+                Switch::Button(Button::South)),
+            is_consumed: false,
+        });
 
     assert_eq!(switch_click_pattern_detector.tick().unwrap(),
         SwitchClickPattern::Click(
@@ -210,10 +238,14 @@ fn double_click_and_hold_works() {
             instant: Instant::now(),
         });
 
-    assert_eq!(switch_click_pattern_detector
-               .latest_switch_click_pattern.clone().unwrap(),
-        SwitchClickPattern::ClickEnd(
-            Switch::Button(Button::South)));
+    assert_eq!(
+        switch_click_pattern_detector
+        .latest_switch_click_pattern.clone().unwrap(),
+        SwitchClickPatternWrapper {
+            pattern: SwitchClickPattern::ClickEnd(
+                Switch::Button(Button::South)),
+            is_consumed: false,
+        });
 
     assert_eq!(switch_click_pattern_detector.tick().clone().unwrap(),
         SwitchClickPattern::ClickEnd(
@@ -233,9 +265,13 @@ fn double_click_and_hold_works() {
         });
 
     assert_eq!(
-        switch_click_pattern_detector.latest_switch_click_pattern.clone().unwrap(),
-        SwitchClickPattern::DoubleClick(
-            Switch::Button(Button::South)));
+        switch_click_pattern_detector
+        .latest_switch_click_pattern.clone().unwrap(),
+        SwitchClickPatternWrapper {
+            pattern: SwitchClickPattern::DoubleClick(
+                Switch::Button(Button::South)),
+            is_consumed: false,
+        });
 
     assert_eq!(switch_click_pattern_detector.tick().unwrap(),
         SwitchClickPattern::DoubleClick(
@@ -263,14 +299,24 @@ fn double_click_and_hold_works() {
 fn tick_consumes_the_latest_switch_event() {
     let mut switch_click_pattern_detector = SwitchClickPatternDetector{
         latest_switch_event: None,
-        latest_switch_click_pattern: Some(SwitchClickPattern::DoubleClickAndHold(
-            Switch::Button(Button::East))),
+        latest_switch_click_pattern: Some(SwitchClickPatternWrapper {
+            pattern: SwitchClickPattern::DoubleClickAndHold(
+            Switch::Button(Button::East)),
+            is_consumed: false,
+        }),
     };
 
     assert_eq!(switch_click_pattern_detector.tick().unwrap(),
         SwitchClickPattern::DoubleClickAndHold(
         Switch::Button(Button::East)));
-    assert!(switch_click_pattern_detector.latest_switch_click_pattern.is_none());
+    assert_eq!(
+        switch_click_pattern_detector
+        .latest_switch_click_pattern.clone().unwrap(),
+        SwitchClickPatternWrapper {
+            pattern: SwitchClickPattern::DoubleClickAndHold(
+                Switch::Button(Button::East)),
+            is_consumed: true,
+        });
     assert!(switch_click_pattern_detector.latest_switch_event.is_none());
 }
 
@@ -307,9 +353,13 @@ fn double_clicks_are_mutually_exclusive() {
                 });
 
             assert_eq!(
-                switch_click_pattern_detector.latest_switch_click_pattern.clone().unwrap(),
-                SwitchClickPattern::DoubleClick(
-                    Switch::Button(Button::South)));
+                switch_click_pattern_detector
+                .latest_switch_click_pattern.clone().unwrap(),
+                SwitchClickPatternWrapper {
+                    pattern: SwitchClickPattern::DoubleClick(
+                        Switch::Button(Button::South)),
+                    is_consumed: false,
+                });
 
             assert_eq!(switch_click_pattern_detector.tick().unwrap(),
                 SwitchClickPattern::DoubleClick(
@@ -325,9 +375,13 @@ fn double_clicks_are_mutually_exclusive() {
                 });
 
             assert_eq!(
-                switch_click_pattern_detector.latest_switch_click_pattern.clone().unwrap(),
-                SwitchClickPattern::Click(
-                    Switch::Button(Button::South)));
+                switch_click_pattern_detector
+                .latest_switch_click_pattern.clone().unwrap(),
+                SwitchClickPatternWrapper {
+                    pattern: SwitchClickPattern::Click(
+                        Switch::Button(Button::South)),
+                    is_consumed: false,
+                });
 
             assert_eq!(switch_click_pattern_detector.tick().unwrap(),
                 SwitchClickPattern::Click(
@@ -358,10 +412,14 @@ fn double_clicks_are_mutually_exclusive() {
                 });
         }
 
-        assert_eq!(switch_click_pattern_detector
-                   .latest_switch_click_pattern.clone().unwrap(),
-            SwitchClickPattern::ClickEnd(
-                Switch::Button(Button::South)));
+        assert_eq!(
+            switch_click_pattern_detector
+            .latest_switch_click_pattern.clone().unwrap(),
+            SwitchClickPatternWrapper {
+                pattern: SwitchClickPattern::ClickEnd(
+                    Switch::Button(Button::South)),
+                is_consumed: false,
+            });
         assert_eq!(switch_click_pattern_detector.tick().unwrap(),
             SwitchClickPattern::ClickEnd(
                 Switch::Button(Button::South)));
