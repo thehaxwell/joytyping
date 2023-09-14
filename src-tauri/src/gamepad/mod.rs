@@ -1,25 +1,21 @@
 use gilrs::Button;
 
-use crate::{gamepad::{gilrs_wrapper::Gilrs, stick_switch_interpreter::StickSwitchEvent}, settings_data::{self, Layer, SwitchOnClickReaction, KeyboardInput, SwitchEventAndReaction, LayerSpecifier}};
+use crate::settings_data::{self, Layer, SwitchOnClickReaction, KeyboardInput, SwitchEventAndReaction, LayerSpecifier};
 
-use self::{gilrs_wrapper::{GilrsEvent, GilrsEventType}, stick_switch_interpreter::{StickSwitchInterpreterTrait, StickSwitchButton}};
+use self::gilrs_events::{gilrs_wrapper::GilrsEventType, GilrsEventsTrait,stick_switch_interpreter::{StickSwitchButton,StickSwitchEvent}};
 
 use self::switch_click_pattern_detector::{SwitchClickPatternDetectorTrait, SwitchClickPattern};
 use self::dynamic_switch_event_reactions::DynamicSwitchEventReactionsTrait;
 
-pub mod gilrs_wrapper;
+pub mod gilrs_events;
 // #[cfg(test)]
 // mod tests;
 
-pub mod stick_switch_interpreter;
 pub mod switch_click_pattern_detector;
 pub mod dynamic_switch_event_reactions;
 
 pub struct Gamepad {
-   gilrs: Box<dyn Gilrs>,
-   left_stick_switch_interpreter: Box<dyn StickSwitchInterpreterTrait>,
-   right_stick_switch_interpreter: Box<dyn StickSwitchInterpreterTrait>,
-
+   gilrs_events: Box<dyn GilrsEventsTrait>,
    layers: Vec<Layer>,
    current_layer_index: usize,
    switch_click_pattern_detector: Box<dyn SwitchClickPatternDetectorTrait>,
@@ -28,9 +24,7 @@ pub struct Gamepad {
 
 impl Gamepad {
     pub fn new(
-       gilrs: Box<dyn Gilrs>,
-       left_stick_switch_interpreter: Box<dyn StickSwitchInterpreterTrait>,
-       right_stick_switch_interpreter: Box<dyn StickSwitchInterpreterTrait>,
+       gilrs_events: Box<dyn GilrsEventsTrait>,
        layers_source: Vec<settings_data::Layer>,
        switch_click_pattern_detector: Box<dyn SwitchClickPatternDetectorTrait>,
        dynamic_switch_event_responses: Box<dyn DynamicSwitchEventReactionsTrait>,
@@ -56,10 +50,7 @@ impl Gamepad {
             .collect();
 
         Gamepad{
-            gilrs,
-            left_stick_switch_interpreter,
-            right_stick_switch_interpreter,
-
+            gilrs_events,
             layers,
             current_layer_index: 0,
             switch_click_pattern_detector,
@@ -223,7 +214,7 @@ impl Gamepad {
 
     // returns true if there is yet another event
     pub fn next_event(&mut self) -> bool{
-        if let Some(event) = self.next_gilrs_event() {
+        if let Some(event) = self.gilrs_events.next() {
             match event.event {
                 GilrsEventType::ButtonPressed(button, ) => {
                     print!("ButtonPressed: {:?}\n",button);
@@ -269,38 +260,38 @@ impl Gamepad {
         }
     }
 
-    fn next_gilrs_event(&mut self) -> Option<GilrsEvent> {
-        match self.gilrs.next_event() {
-            Some(gilrs_event) => {
-                match gilrs_event.event {
-                    GilrsEventType::AxisChanged(axis, value, _) => {
-                         let stick_switch_event_option = match axis {
-                            gilrs::ev::Axis::LeftStickX | gilrs::ev::Axis::LeftStickY=> {
-                                self.left_stick_switch_interpreter.interpret_stick_move(
-                                    self.gilrs.get_gamepad_axis_data_value(gilrs::Axis::LeftStickX),
-                                    self.gilrs.get_gamepad_axis_data_value(gilrs::Axis::LeftStickY),
-                                )
-                            },
-                            gilrs::ev::Axis::RightStickX | gilrs::ev::Axis::RightStickY=> {
-                                self.right_stick_switch_interpreter.interpret_stick_move(
-                                    self.gilrs.get_gamepad_axis_data_value(gilrs::Axis::RightStickX),
-                                    self.gilrs.get_gamepad_axis_data_value(gilrs::Axis::RightStickY),
-                                ) 
-                            }
-                            _other => None
-                        };
-
-                        Some(GilrsEvent{
-                            time: gilrs_event.time,
-                            event: GilrsEventType::AxisChanged(axis, value, stick_switch_event_option), 
-                        })
-                    },
-                    _other => Some(gilrs_event),
-                }
-            },
-            _other => None
-        }
-    }
+    // fn next_gilrs_event(&mut self) -> Option<GilrsEvent> {
+    //     match self.gilrs.next_event() {
+    //         Some(gilrs_event) => {
+    //             match gilrs_event.event {
+    //                 GilrsEventType::AxisChanged(axis, value, _) => {
+    //                      let stick_switch_event_option = match axis {
+    //                         gilrs::ev::Axis::LeftStickX | gilrs::ev::Axis::LeftStickY=> {
+    //                             self.left_stick_switch_interpreter.interpret_stick_move(
+    //                                 self.gilrs.get_gamepad_axis_data_value(gilrs::Axis::LeftStickX),
+    //                                 self.gilrs.get_gamepad_axis_data_value(gilrs::Axis::LeftStickY),
+    //                             )
+    //                         },
+    //                         gilrs::ev::Axis::RightStickX | gilrs::ev::Axis::RightStickY=> {
+    //                             self.right_stick_switch_interpreter.interpret_stick_move(
+    //                                 self.gilrs.get_gamepad_axis_data_value(gilrs::Axis::RightStickX),
+    //                                 self.gilrs.get_gamepad_axis_data_value(gilrs::Axis::RightStickY),
+    //                             ) 
+    //                         }
+    //                         _other => None
+    //                     };
+    //
+    //                     Some(GilrsEvent{
+    //                         time: gilrs_event.time,
+    //                         event: GilrsEventType::AxisChanged(axis, value, stick_switch_event_option), 
+    //                     })
+    //                 },
+    //                 _other => Some(gilrs_event),
+    //             }
+    //         },
+    //         _other => None
+    //     }
+    // }
 
     fn get_switch_event_and_reaction(
         &self,switch: Switch) -> Option<SwitchEventAndReaction> {

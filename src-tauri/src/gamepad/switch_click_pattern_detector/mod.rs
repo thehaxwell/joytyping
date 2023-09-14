@@ -2,7 +2,7 @@ use std::time::{Duration, Instant};
 
 use gilrs::Button;
 
-use crate::gamepad::stick_switch_interpreter::StickSwitchButton;
+use crate::gamepad::gilrs_events::stick_switch_interpreter::StickSwitchButton;
 
 #[cfg(test)]
 use mockall::{automock, predicate::*};

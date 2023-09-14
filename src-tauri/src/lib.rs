@@ -1,7 +1,8 @@
 use std::sync::mpsc;
 
-use gamepad::gilrs_wrapper::GilrsWrapper;
-use gamepad::stick_switch_interpreter::{CardinalCustomButtons, StickSwitchInterpreter, AxisClickThresholds, self};
+use gamepad::gilrs_events::GilrsEvents;
+use gamepad::gilrs_events::gilrs_wrapper::GilrsWrapper;
+use gamepad::gilrs_events::stick_switch_interpreter::{CardinalCustomButtons, StickSwitchInterpreter, AxisClickThresholds, self};
 use input_controller::{KeyboardInputController,KeyboardInputControllerTrait};
 use input_controller::enigo_wrapper::{EnigoWrapper, EnigoTrait};
 use settings::error_display_window::ErrorDisplayWindow;
@@ -57,28 +58,30 @@ pub fn start_main_loop(
 
 
         let mut gamepad = gamepad::Gamepad::new(
-            Box::new(GilrsWrapper::new()),
-            Box::new(StickSwitchInterpreter::new(
-                AxisClickThresholds::get_from_setting(
-                    active_profile.stick_switches_click_thresholds,
-                    LeftOrRight::Left),
-                CardinalCustomButtons {
-                    up: stick_switch_interpreter::StickSwitchButton::LeftStickUp,
-                    down: stick_switch_interpreter::StickSwitchButton::LeftStickDown,
-                    left: stick_switch_interpreter::StickSwitchButton::LeftStickLeft,
-                    right: stick_switch_interpreter::StickSwitchButton::LeftStickRight,
-                }
-            )),
-            Box::new(StickSwitchInterpreter::new(
-                AxisClickThresholds::get_from_setting(
-                    active_profile.stick_switches_click_thresholds,
-                    LeftOrRight::Right),
-                CardinalCustomButtons {
-                    up: stick_switch_interpreter::StickSwitchButton::RightStickUp,
-                    down: stick_switch_interpreter::StickSwitchButton::RightStickDown,
-                    left: stick_switch_interpreter::StickSwitchButton::RightStickLeft,
-                    right: stick_switch_interpreter::StickSwitchButton::RightStickRight,
-                }
+            Box::new(GilrsEvents::new(
+                Box::new(GilrsWrapper::new()),
+                Box::new(StickSwitchInterpreter::new(
+                    AxisClickThresholds::get_from_setting(
+                        active_profile.stick_switches_click_thresholds,
+                        LeftOrRight::Left),
+                    CardinalCustomButtons {
+                        up: stick_switch_interpreter::StickSwitchButton::LeftStickUp,
+                        down: stick_switch_interpreter::StickSwitchButton::LeftStickDown,
+                        left: stick_switch_interpreter::StickSwitchButton::LeftStickLeft,
+                        right: stick_switch_interpreter::StickSwitchButton::LeftStickRight,
+                    }
+                )),
+                Box::new(StickSwitchInterpreter::new(
+                    AxisClickThresholds::get_from_setting(
+                        active_profile.stick_switches_click_thresholds,
+                        LeftOrRight::Right),
+                    CardinalCustomButtons {
+                        up: stick_switch_interpreter::StickSwitchButton::RightStickUp,
+                        down: stick_switch_interpreter::StickSwitchButton::RightStickDown,
+                        left: stick_switch_interpreter::StickSwitchButton::RightStickLeft,
+                        right: stick_switch_interpreter::StickSwitchButton::RightStickRight,
+                    }
+                )),
             )),
             active_profile.layers,
             Box::new(SwitchClickPatternDetector::new()),
