@@ -1,19 +1,19 @@
 use gilrs::Button;
 
-use crate::{gamepad::{gilrs_wrapper::Gilrs, stick_switch_interpreter::StickSwitchEvent}, settings_data::{self, Layer, SwitchOnClickReaction, KeyboardInput, SwitchEventAndReaction}};
+use crate::{gamepad::{gilrs_wrapper::Gilrs, stick_switch_interpreter::StickSwitchEvent}, settings_data::{self, Layer, SwitchOnClickReaction, KeyboardInput, SwitchEventAndReaction, LayerSpecifier}};
 
 use self::{gilrs_wrapper::{GilrsEvent, GilrsEventType}, stick_switch_interpreter::{StickSwitchInterpreterTrait, StickSwitchButton}};
 
 use self::switch_click_pattern_detector::{SwitchClickPatternDetectorTrait, SwitchClickPattern};
-use self::on_release_reactions::OnReleaseReactionsTrait;
+use self::dynamic_switch_event_reactions::DynamicSwitchEventReactionsTrait;
 
 pub mod gilrs_wrapper;
 // #[cfg(test)]
 // mod tests;
 
 pub mod stick_switch_interpreter;
-pub mod on_release_reactions;
 pub mod switch_click_pattern_detector;
+pub mod dynamic_switch_event_reactions;
 
 pub struct Gamepad {
    gilrs: Box<dyn Gilrs>,
@@ -23,17 +23,17 @@ pub struct Gamepad {
    layers: Vec<Layer>,
    current_layer_index: usize,
    switch_click_pattern_detector: Box<dyn SwitchClickPatternDetectorTrait>,
-   on_release_reactions: Box<dyn OnReleaseReactionsTrait>,
+   dynamic_switch_event_responses: Box<dyn DynamicSwitchEventReactionsTrait>,
 }
 
 impl Gamepad {
     pub fn new(
-        gilrs: Box<dyn Gilrs>,
-        left_stick_switch_interpreter: Box<dyn StickSwitchInterpreterTrait>,
-        right_stick_switch_interpreter: Box<dyn StickSwitchInterpreterTrait>,
-        layers_source: Vec<settings_data::Layer>,
+       gilrs: Box<dyn Gilrs>,
+       left_stick_switch_interpreter: Box<dyn StickSwitchInterpreterTrait>,
+       right_stick_switch_interpreter: Box<dyn StickSwitchInterpreterTrait>,
+       layers_source: Vec<settings_data::Layer>,
        switch_click_pattern_detector: Box<dyn SwitchClickPatternDetectorTrait>,
-       on_release_reactions: Box<dyn OnReleaseReactionsTrait>,
+       dynamic_switch_event_responses: Box<dyn DynamicSwitchEventReactionsTrait>,
     ) -> Self {
 
         let pointers: Vec<LayerNodeRef> = layers_source
@@ -63,100 +63,157 @@ impl Gamepad {
             layers,
             current_layer_index: 0,
             switch_click_pattern_detector,
-            on_release_reactions,
+            dynamic_switch_event_responses,
         }
+    }
+
+    // fn on_click_end_come_back_to(from_layer_at_index: usize) -> DynamicSwitchEventReaction{
+    //     DynamicSwitchEventReaction::ClickEnd(
+    //         EventReactionOrNesting::Reaction(
+    //             SwitchOnClickReaction::MoveToLayer(
+    //                 LayerSpecifier{
+    //                     id: String::new(),
+    //                     index_in_gamepad: Some(from_layer_at_index),
+    //                 })))
+    // }
+
+    fn react_to_swtich_event(
+        &mut self,
+        switch: Switch,
+        reaction: Option<SwitchOnClickReaction>,) -> Option<InputEvent> {
+        match reaction {
+            Some(SwitchOnClickReaction::Keyboard(keyboard_input)) 
+            => return Some(InputEvent::KeyClick(keyboard_input)),
+            Some(SwitchOnClickReaction::MoveToLayer(layer_specifier))
+            => self.current_layer_index = layer_specifier.index_in_gamepad.unwrap(),
+            Some(SwitchOnClickReaction::VisitLayer(layer_specifier))
+            => {
+                self.dynamic_switch_event_responses
+                    .add(switch,
+                        DynamicSwitchEventReaction::ClickEnd(
+                            EventReactionOrNesting::Reaction(
+                                SwitchOnClickReaction::MoveToLayer(
+                                    LayerSpecifier{
+                                        id: String::new(),
+                                        index_in_gamepad: Some(self.current_layer_index),
+                                    }))));
+                self.current_layer_index = layer_specifier.index_in_gamepad.unwrap();
+            },
+            Some(SwitchOnClickReaction::MoveToOrVisitLayer(layer_specifier))
+            => {
+                let move_to_layer 
+                    = SwitchOnClickReaction::MoveToLayer(
+                        LayerSpecifier {
+                        id: String::new(),
+                        index_in_gamepad: Some(self.current_layer_index),
+                    });
+                self.dynamic_switch_event_responses
+                    .add(switch,
+                        DynamicSwitchEventReaction::DoubleClick(
+                            EventReactionOrNesting::Nesting(
+                                Box::new(DynamicSwitchEventReaction::ClickEnd(
+                                    EventReactionOrNesting::Reaction(
+                                    move_to_layer))))));
+                self.current_layer_index = layer_specifier.index_in_gamepad.unwrap();
+            },
+            _ => ()
+        }
+        None
     }
 
     pub fn tick(&mut self) -> Option<InputEvent> {
         match self.switch_click_pattern_detector.tick() {
             Some(SwitchClickPattern::Click(switch)) => {
-                if let Some(s_e_a_r)
-                = self.get_switch_event_and_reaction(switch.clone()) {
-                    match s_e_a_r.on_click {
-                        Some(SwitchOnClickReaction::Keyboard(keyboard_input)) 
-                        => return Some(InputEvent::KeyClick(keyboard_input)),
-                        Some(SwitchOnClickReaction::MoveToLayer(layer_specifier))
-                        => self.current_layer_index = layer_specifier.index_in_gamepad.unwrap().try_into().unwrap(),
-                        Some(SwitchOnClickReaction::VisitLayer(layer_specifier))
-                        => {
-                            self.on_release_reactions
-                                .add_consumable(
-                                    switch,
-                                    SwitchOnReleaseReaction::MoveToLayerAtIndex(
-                                        self.current_layer_index));
-                            self.current_layer_index = layer_specifier.index_in_gamepad.unwrap().try_into().unwrap();
-                        },
-                        _ => ()
+                let on_click = 
+                    if let Some(reaction) 
+                        = self.dynamic_switch_event_responses.get(switch.clone(),Handle::Click){
+                            Some(reaction)
                     }
-                };
+                    else {
+                        self.get_switch_event_and_reaction(switch.clone())
+                            .and_then(|s_e_a_r| s_e_a_r.on_click)
+                    };
+
+                if let Some(input_event) 
+                    = self.react_to_swtich_event(switch,on_click) {
+                    return Some(input_event);
+                }
             },
             Some(SwitchClickPattern::ClickAndHold(switch)) => {
-                if let Some(s_e_a_r)
-                = self.get_switch_event_and_reaction(switch.clone()) {
-                    // if on_click is set to
-                    // type out some key, then hold down that key
-                    if let Some(SwitchOnClickReaction::Keyboard(keyboard_input)) 
-                        = s_e_a_r.on_click {
-                        return Some(InputEvent::KeyDown(keyboard_input))
+                if let Some(reaction) 
+                    = self.dynamic_switch_event_responses.get(switch.clone(),Handle::ClickAndHold){
+                    if let Some(input_event) 
+                        = self.react_to_swtich_event(switch,Some(reaction)) {
+                        return Some(input_event);
                     }
+                }
+                else {
+                    if let Some(s_e_a_r)
+                    = self.get_switch_event_and_reaction(switch.clone()) {
+                        // if on_click is set to
+                        // type out some key, then hold down that key
+                        if let Some(SwitchOnClickReaction::Keyboard(keyboard_input)) 
+                            = s_e_a_r.on_click {
+                            return Some(InputEvent::KeyDown(keyboard_input))
+                        }
+                    };
                 };
             },
             Some(SwitchClickPattern::DoubleClick(switch)) => {
-                if let Some(s_e_a_r)
-                = self.get_switch_event_and_reaction(switch.clone()) {
-                    match s_e_a_r.on_double_click {
-                        Some(SwitchOnClickReaction::Keyboard(keyboard_input)) 
-                        => return Some(InputEvent::KeyClick(keyboard_input)),
-                        Some(SwitchOnClickReaction::MoveToLayer(layer_specifier))
-                        => self.current_layer_index = layer_specifier.index_in_gamepad.unwrap().try_into().unwrap(),
-                        Some(SwitchOnClickReaction::VisitLayer(layer_specifier))
-                        => {
-                            self.on_release_reactions
-                                .add_consumable(
-                                    switch,
-                                    SwitchOnReleaseReaction::MoveToLayerAtIndex(
-                                        self.current_layer_index));
-                            self.current_layer_index = layer_specifier.index_in_gamepad.unwrap().try_into().unwrap();
-                        },
-                        // if on_double_click is not set and on_click is set to
-                        // type out some key, then click that key
-                        None => if let Some(SwitchOnClickReaction::Keyboard(keyboard_input)) 
-                            = s_e_a_r.on_click {
-                            return Some(InputEvent::KeyClick(keyboard_input))
-                        },
-                        _ => ()
+                let on_double_click = 
+                    if let Some(reaction) 
+                        = self.dynamic_switch_event_responses.get(switch.clone(),Handle::DoubleClick){
+                            Some(reaction)
                     }
-                };
+                    else {
+                        self.get_switch_event_and_reaction(switch.clone())
+                            .and_then(
+                                // use on_double_click or on_click if it isn't set
+                                |s_e_a_r| s_e_a_r.on_double_click
+                                                 .or_else(|| s_e_a_r.on_click ))
+                    };
+
+                if let Some(input_event) 
+                    = self.react_to_swtich_event(switch,on_double_click) {
+                    return Some(input_event);
+                }
             },
             Some(SwitchClickPattern::DoubleClickAndHold(switch)) => {
-                if let Some(s_e_a_r)
-                = self.get_switch_event_and_reaction(switch.clone()) {
-                    // if on_double_click (or fallback to on_click) is set to
-                    // type out some key, then hold down that key
-                    if let Some(SwitchOnClickReaction::Keyboard(keyboard_input)) 
-                        = s_e_a_r.on_double_click {
-                        return Some(InputEvent::KeyDown(keyboard_input))
+                if let Some(reaction) 
+                    = self.dynamic_switch_event_responses.get(switch.clone(),Handle::DoubleClickAndHold){
+                    if let Some(input_event) 
+                        = self.react_to_swtich_event(switch,Some(reaction)) {
+                        return Some(input_event);
                     }
-                    else if let Some(SwitchOnClickReaction::Keyboard(keyboard_input)) 
-                        = s_e_a_r.on_click {
-                        return Some(InputEvent::KeyDown(keyboard_input))
-                    }
+                }
+                else {
+                    if let Some(s_e_a_r)
+                    = self.get_switch_event_and_reaction(switch.clone()) {
+                        // if on_double_click (or fallback to on_click) is set to
+                        // type out some key, then hold down that key
+                        if let Some(SwitchOnClickReaction::Keyboard(keyboard_input)) 
+                            = s_e_a_r.on_double_click {
+                            return Some(InputEvent::KeyDown(keyboard_input))
+                        }
+                        else if let Some(SwitchOnClickReaction::Keyboard(keyboard_input)) 
+                            = s_e_a_r.on_click {
+                            return Some(InputEvent::KeyDown(keyboard_input))
+                        }
 
-                };
+                    };
+                }
             },
             Some(SwitchClickPattern::ClickEnd(switch)) => {
-                // TODO: probably a good place to go back on layer visits
-                // self.current_layer_index = new_index;
-
-                match self.on_release_reactions.get(switch.clone()) {
-                    Some(SwitchOnReleaseReaction::MoveToLayerAtIndex(index))
-                    => {
-                        self.current_layer_index = index;
+                if let Some(reaction) 
+                    = self.dynamic_switch_event_responses.get(switch.clone(),Handle::ClickEnd){
+                    if let Some(input_event) 
+                        = self.react_to_swtich_event(switch,Some(reaction)) {
+                        return Some(input_event);
                     }
-                    None => (),
+                }
+                else {
+                    return Some(InputEvent::KeyUp);
                 };
-
-                return Some(InputEvent::KeyUp);
             }
             None => (),
         };
@@ -280,11 +337,6 @@ impl Gamepad {
     }
 }
 
-#[derive(Debug,Clone,PartialEq)]
-pub enum SwitchOnReleaseReaction {
-    MoveToLayerAtIndex(usize),
-}
-
 #[derive(Debug, PartialEq)]
 pub enum InputEvent {
     KeyClick(KeyboardInput),
@@ -302,4 +354,27 @@ pub struct LayerNodeRef{
 pub enum Switch {
     Button(Button),
     StickSwitchButton(StickSwitchButton),
+}
+
+pub enum Handle {
+    Click,
+    ClickAndHold,
+    DoubleClick,
+    DoubleClickAndHold,
+    ClickEnd,
+}
+
+#[derive(Debug,Clone,PartialEq)]
+pub enum DynamicSwitchEventReaction {
+    DoubleClick(EventReactionOrNesting),
+    DoubleClickAndHold(EventReactionOrNesting),
+    ClickEnd(EventReactionOrNesting),
+    Click(EventReactionOrNesting),
+    ClickAndHold(EventReactionOrNesting),
+}
+
+#[derive(Debug,Clone,PartialEq)]
+pub enum EventReactionOrNesting {
+    Reaction(SwitchOnClickReaction),
+    Nesting(Box<DynamicSwitchEventReaction>),
 }

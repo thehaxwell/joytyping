@@ -82,7 +82,7 @@ pub fn start_main_loop(
             )),
             active_profile.layers,
             Box::new(SwitchClickPatternDetector::new()),
-            Box::new(gamepad::on_release_reactions::OnReleaseReactions::new()),
+            Box::new(gamepad::dynamic_switch_event_reactions::DynamicSwitchEventReactions::new()),
         );
 
         let mut keyboard_input_controller = KeyboardInputController::new(Box::new(EnigoWrapper::new()));
