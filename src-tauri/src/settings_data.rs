@@ -67,14 +67,15 @@ impl Layer {
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct CardinalLevers {
-    pub left_stick: CardinalLeverFunction,
-    pub right_stick: CardinalLeverFunction,
+    pub left_stick: Option<SingleCardinalLever>,
+    pub right_stick: Option<SingleCardinalLever>,
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
-pub struct CardinalLeverFunction {
-    pub control_mouse_cursor: Option<ControlMouseCursorFunction>,
-    pub control_mouse_scrollwheel: Option<ControlMouseScrollwheelFunction>,
+#[serde(rename_all = "snake_case")]
+pub enum SingleCardinalLever {
+    ControlMouseCursor(ControlMouseCursorFunction),
+    ControlMouseScrollwheel(ControlMouseScrollwheelFunction),
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]

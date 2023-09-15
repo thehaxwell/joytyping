@@ -55,6 +55,18 @@ pub fn start_main_loop(
         // assert_eq!(
         //     active_profile.layers.remove(0).switches.unwrap().left_trigger.unwrap().on_click_and_hold.unwrap().visit_layer.unwrap(),
         //     settings_data::LayerSpecifier{name: "first-layer-step-3".to_string(), pointer: None});
+        
+        // assert_eq!(
+        //     active_profile.clone().layers.remove(7).cardinal_levers.unwrap().left_stick.unwrap(),
+        //     settings_data::SingleCardinalLever::ControlMouseCursor(
+        //         settings_data::ControlMouseCursorFunction{
+        //             center_at: settings_data::ControlMouseCursorCenterCoordinates{x: 0.0, y: 0.0}}));
+        //
+        // assert_eq!(
+        //     active_profile.clone().layers.remove(7).cardinal_levers.unwrap().right_stick.unwrap(),
+        //     settings_data::SingleCardinalLever::ControlMouseScrollwheel(
+        //         settings_data::ControlMouseScrollwheelFunction{
+        //             center_at_y: 0.0}));
 
 
         let mut gamepad = gamepad::Gamepad::new(
