@@ -8,11 +8,12 @@ use self::switch_click_pattern_detector::{SwitchClickPatternDetectorTrait, Switc
 use self::dynamic_switch_event_reactions::DynamicSwitchEventReactionsTrait;
 
 pub mod gilrs_events;
-// #[cfg(test)]
-// mod tests;
-
 pub mod switch_click_pattern_detector;
 pub mod dynamic_switch_event_reactions;
+
+#[cfg(test)]
+mod tests;
+
 
 pub struct Gamepad {
    gilrs_events: Box<dyn GilrsEventsTrait>,
@@ -347,6 +348,7 @@ pub enum Switch {
     StickSwitchButton(StickSwitchButton),
 }
 
+#[derive(Debug,Clone,PartialEq)]
 pub enum Handle {
     Click,
     ClickAndHold,

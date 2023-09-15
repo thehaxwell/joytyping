@@ -8,6 +8,10 @@ use super::Handle;
 #[cfg(test)]
 mod tests;
 
+#[cfg(test)]
+use mockall::{automock, predicate::*};
+
+#[cfg_attr(test, automock)]
 pub trait DynamicSwitchEventReactionsTrait {
     fn add(
         &mut self,
