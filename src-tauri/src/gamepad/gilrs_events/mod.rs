@@ -2,9 +2,16 @@ use self::gilrs_wrapper::{GilrsEvent, Gilrs, GilrsEventType};
 
 use self::stick_switch_interpreter::StickSwitchInterpreterTrait;
 
+#[cfg(test)]
+use mockall::{automock, predicate::*};
+
 pub mod gilrs_wrapper;
 pub mod stick_switch_interpreter;
 
+#[cfg(test)]
+mod tests;
+
+#[cfg_attr(test, automock)]
 pub trait GilrsEventsTrait {
     fn next(&mut self) -> Option<GilrsEvent>;
 }
