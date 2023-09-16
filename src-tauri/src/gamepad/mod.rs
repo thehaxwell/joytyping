@@ -101,7 +101,7 @@ impl Gamepad {
                     });
                 self.dynamic_switch_event_responses
                     .add(switch,
-                        DynamicSwitchEventReaction::DoubleClick(
+                        DynamicSwitchEventReaction::DoubleClickAndHold(
                             EventReactionOrNesting::Nesting(
                                 Box::new(DynamicSwitchEventReaction::ClickEnd(
                                     EventReactionOrNesting::Reaction(

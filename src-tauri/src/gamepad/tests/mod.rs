@@ -6,7 +6,7 @@ mod layers_examples;
 use crate::{gamepad::{switch_click_pattern_detector::{MockSwitchClickPatternDetectorTrait, SwitchClickPattern}, dynamic_switch_event_reactions::MockDynamicSwitchEventReactionsTrait, gilrs_events::MockGilrsEventsTrait, Gamepad, Switch, Handle, InputEvent}, settings_data::{SwitchOnClickReaction, KeyboardInput, LayerSpecifier}};
 use self::layers_examples::setup_layers_examples;
 
-use super::gilrs_events::stick_switch_interpreter::StickSwitchButton;
+use super::{gilrs_events::stick_switch_interpreter::StickSwitchButton, DynamicSwitchEventReaction, EventReactionOrNesting};
 
 // use super::gilrs_wrapper::{GilrsEvent, GilrsEventType};
 
@@ -242,6 +242,452 @@ fn tick_responds_correctly_with_move_to_layer_dynamic_switch_events() {
             id: String::new(),
             index_in_gamepad: Some(index_in_gamepad)
         }))
+        .in_sequence(&mut seq);
+    indexes_vec.push(index_in_gamepad);
+
+    
+    let mut gamepad = Gamepad {
+       gilrs_events: Box::new(mock_gilrs_events),
+       layers: setup_layers_examples(),
+       current_layer_index: 0,
+       switch_click_pattern_detector: Box::new(mock_switch_click_pattern_detector),
+       dynamic_switch_event_responses: Box::new(mock_dynamic_switch_event_responses),
+    };
+
+    for result in indexes_vec.iter() {
+        assert!(gamepad.tick().is_none());
+        assert_eq!(gamepad.current_layer_index,*result);
+        assert_eq!(gamepad.layers,setup_layers_examples());
+    }
+}
+
+#[test]
+fn tick_responds_correctly_with_visit_layer_dynamic_switch_events() {
+    let mut mock_switch_click_pattern_detector = MockSwitchClickPatternDetectorTrait::new();
+    let mut mock_dynamic_switch_event_responses = MockDynamicSwitchEventReactionsTrait::new();
+    let mock_gilrs_events = MockGilrsEventsTrait::new();
+
+    let mut seq = Sequence::new();
+    let mut indexes_vec:Vec<usize> = Vec::new();
+
+
+    let switch = Switch::Button(Button::North);
+    let index_in_gamepad = 1;
+    mock_switch_click_pattern_detector
+        .expect_tick()
+        .times(1)
+        .return_const(Some(SwitchClickPattern::Click(switch.clone())))
+        .in_sequence(&mut seq);
+    mock_dynamic_switch_event_responses
+        .expect_get()
+        .with(eq(switch.clone()),eq(Handle::Click))
+        .times(1)
+        .return_const(SwitchOnClickReaction::VisitLayer(LayerSpecifier {
+            id: String::new(),
+            index_in_gamepad: Some(index_in_gamepad)
+        }))
+        .in_sequence(&mut seq);
+    mock_dynamic_switch_event_responses
+        .expect_add()
+        .with(eq(switch.clone()),eq(
+            DynamicSwitchEventReaction::ClickEnd(
+                EventReactionOrNesting::Reaction(
+                    SwitchOnClickReaction::MoveToLayer(
+                        LayerSpecifier{
+                            id: String::new(),
+                            index_in_gamepad: Some(*indexes_vec.last().or(Some(&0)).unwrap())
+                        })))))
+        .times(1)
+        .return_const(())
+        .in_sequence(&mut seq);
+    indexes_vec.push(index_in_gamepad);
+
+
+    let switch = Switch::Button(Button::East);
+    let index_in_gamepad = 123;
+    mock_switch_click_pattern_detector
+        .expect_tick()
+        .times(1)
+        .return_const(Some(SwitchClickPattern::ClickAndHold(switch.clone())))
+        .in_sequence(&mut seq);
+    mock_dynamic_switch_event_responses
+        .expect_get()
+        .with(eq(switch.clone()),eq(Handle::ClickAndHold))
+        .times(1)
+        .return_const(SwitchOnClickReaction::VisitLayer(LayerSpecifier {
+            id: String::new(),
+            index_in_gamepad: Some(index_in_gamepad)
+        }))
+        .in_sequence(&mut seq);
+    mock_dynamic_switch_event_responses
+        .expect_add()
+        .with(eq(switch.clone()),eq(
+            DynamicSwitchEventReaction::ClickEnd(
+                EventReactionOrNesting::Reaction(
+                    SwitchOnClickReaction::MoveToLayer(
+                        LayerSpecifier{
+                            id: String::new(),
+                            index_in_gamepad: Some(*indexes_vec.last().or(Some(&0)).unwrap())
+                        })))))
+        .times(1)
+        .return_const(())
+        .in_sequence(&mut seq);
+    indexes_vec.push(index_in_gamepad);
+    
+    
+    let switch = Switch::Button(Button::North);
+    let index_in_gamepad = 123;
+    mock_switch_click_pattern_detector
+        .expect_tick()
+        .times(1)
+        .return_const(Some(SwitchClickPattern::ClickAndHold(switch.clone())))
+        .in_sequence(&mut seq);
+    mock_dynamic_switch_event_responses
+        .expect_get()
+        .with(eq(switch.clone()),eq(Handle::ClickAndHold))
+        .times(1)
+        .return_const(SwitchOnClickReaction::VisitLayer(LayerSpecifier {
+            id: String::new(),
+            index_in_gamepad: Some(index_in_gamepad)
+        }))
+        .in_sequence(&mut seq);
+    mock_dynamic_switch_event_responses
+        .expect_add()
+        .with(eq(switch.clone()),eq(
+            DynamicSwitchEventReaction::ClickEnd(
+                EventReactionOrNesting::Reaction(
+                    SwitchOnClickReaction::MoveToLayer(
+                        LayerSpecifier{
+                            id: String::new(),
+                            index_in_gamepad: Some(*indexes_vec.last().or(Some(&0)).unwrap())
+                        })))))
+        .times(1)
+        .return_const(())
+        .in_sequence(&mut seq);
+    indexes_vec.push(index_in_gamepad);
+    
+    
+    let switch = Switch::StickSwitchButton(StickSwitchButton::LeftStickLeft);
+    let index_in_gamepad = 99;
+    mock_switch_click_pattern_detector
+        .expect_tick()
+        .times(1)
+        .return_const(Some(SwitchClickPattern::DoubleClick(switch.clone())))
+        .in_sequence(&mut seq);
+    mock_dynamic_switch_event_responses
+        .expect_get()
+        .with(eq(switch.clone()),eq(Handle::DoubleClick))
+        .times(1)
+        .return_const(SwitchOnClickReaction::VisitLayer(LayerSpecifier {
+            id: String::new(),
+            index_in_gamepad: Some(index_in_gamepad)
+        }))
+        .in_sequence(&mut seq);
+    mock_dynamic_switch_event_responses
+        .expect_add()
+        .with(eq(switch.clone()),eq(
+            DynamicSwitchEventReaction::ClickEnd(
+                EventReactionOrNesting::Reaction(
+                    SwitchOnClickReaction::MoveToLayer(
+                        LayerSpecifier{
+                            id: String::new(),
+                            index_in_gamepad: Some(*indexes_vec.last().or(Some(&0)).unwrap())
+                        })))))
+        .times(1)
+        .return_const(())
+        .in_sequence(&mut seq);
+    indexes_vec.push(index_in_gamepad);
+    
+    
+    let switch = Switch::StickSwitchButton(StickSwitchButton::RightStickRight);
+    let index_in_gamepad = 8900;
+    mock_switch_click_pattern_detector
+        .expect_tick()
+        .times(1)
+        .return_const(Some(SwitchClickPattern::DoubleClickAndHold(switch.clone())))
+        .in_sequence(&mut seq);
+    mock_dynamic_switch_event_responses
+        .expect_get()
+        .with(eq(switch.clone()),eq(Handle::DoubleClickAndHold))
+        .times(1)
+        .return_const(SwitchOnClickReaction::VisitLayer(LayerSpecifier {
+            id: String::new(),
+            index_in_gamepad: Some(index_in_gamepad)
+        }))
+        .in_sequence(&mut seq);
+    mock_dynamic_switch_event_responses
+        .expect_add()
+        .with(eq(switch.clone()),eq(
+            DynamicSwitchEventReaction::ClickEnd(
+                EventReactionOrNesting::Reaction(
+                    SwitchOnClickReaction::MoveToLayer(
+                        LayerSpecifier{
+                            id: String::new(),
+                            index_in_gamepad: Some(*indexes_vec.last().or(Some(&0)).unwrap())
+                        })))))
+        .times(1)
+        .return_const(())
+        .in_sequence(&mut seq);
+    indexes_vec.push(index_in_gamepad);
+    
+    
+    let switch = Switch::StickSwitchButton(StickSwitchButton::RightStickUp);
+    let index_in_gamepad = 89;
+    mock_switch_click_pattern_detector
+        .expect_tick()
+        .times(1)
+        .return_const(Some(SwitchClickPattern::ClickEnd(switch.clone())))
+        .in_sequence(&mut seq);
+    mock_dynamic_switch_event_responses
+        .expect_get()
+        .with(eq(switch.clone()),eq(Handle::ClickEnd))
+        .times(1)
+        .return_const(SwitchOnClickReaction::VisitLayer(LayerSpecifier {
+            id: String::new(),
+            index_in_gamepad: Some(index_in_gamepad)
+        }))
+        .in_sequence(&mut seq);
+    mock_dynamic_switch_event_responses
+        .expect_add()
+        .with(eq(switch.clone()),eq(
+            DynamicSwitchEventReaction::ClickEnd(
+                EventReactionOrNesting::Reaction(
+                    SwitchOnClickReaction::MoveToLayer(
+                        LayerSpecifier{
+                            id: String::new(),
+                            index_in_gamepad: Some(*indexes_vec.last().or(Some(&0)).unwrap())
+                        })))))
+        .times(1)
+        .return_const(())
+        .in_sequence(&mut seq);
+    indexes_vec.push(index_in_gamepad);
+
+    
+    let mut gamepad = Gamepad {
+       gilrs_events: Box::new(mock_gilrs_events),
+       layers: setup_layers_examples(),
+       current_layer_index: 0,
+       switch_click_pattern_detector: Box::new(mock_switch_click_pattern_detector),
+       dynamic_switch_event_responses: Box::new(mock_dynamic_switch_event_responses),
+    };
+
+    for result in indexes_vec.iter() {
+        assert!(gamepad.tick().is_none());
+        assert_eq!(gamepad.current_layer_index,*result);
+        assert_eq!(gamepad.layers,setup_layers_examples());
+    }
+}
+
+#[test]
+fn tick_responds_correctly_with_move_to_or_visit_layer_dynamic_switch_events() {
+    let mut mock_switch_click_pattern_detector = MockSwitchClickPatternDetectorTrait::new();
+    let mut mock_dynamic_switch_event_responses = MockDynamicSwitchEventReactionsTrait::new();
+    let mock_gilrs_events = MockGilrsEventsTrait::new();
+
+    let mut seq = Sequence::new();
+    let mut indexes_vec:Vec<usize> = Vec::new();
+
+
+    let switch = Switch::Button(Button::North);
+    let index_in_gamepad = 1;
+    mock_switch_click_pattern_detector
+        .expect_tick()
+        .times(1)
+        .return_const(Some(SwitchClickPattern::Click(switch.clone())))
+        .in_sequence(&mut seq);
+    mock_dynamic_switch_event_responses
+        .expect_get()
+        .with(eq(switch.clone()),eq(Handle::Click))
+        .times(1)
+        .return_const(SwitchOnClickReaction::MoveToOrVisitLayer(LayerSpecifier {
+            id: String::new(),
+            index_in_gamepad: Some(index_in_gamepad)
+        }))
+        .in_sequence(&mut seq);
+    mock_dynamic_switch_event_responses
+        .expect_add()
+        .with(eq(switch.clone()),eq(
+            DynamicSwitchEventReaction::DoubleClickAndHold(
+                EventReactionOrNesting::Nesting(
+                    Box::new(DynamicSwitchEventReaction::ClickEnd(
+                        EventReactionOrNesting::Reaction(
+                            SwitchOnClickReaction::MoveToLayer(
+                                LayerSpecifier {
+                                    id: String::new(),
+                                    index_in_gamepad: Some(*indexes_vec.last().or(Some(&0)).unwrap())
+                    }))))))))
+        .times(1)
+        .return_const(())
+        .in_sequence(&mut seq);
+    indexes_vec.push(index_in_gamepad);
+
+
+    let switch = Switch::Button(Button::East);
+    let index_in_gamepad = 123;
+    mock_switch_click_pattern_detector
+        .expect_tick()
+        .times(1)
+        .return_const(Some(SwitchClickPattern::ClickAndHold(switch.clone())))
+        .in_sequence(&mut seq);
+    mock_dynamic_switch_event_responses
+        .expect_get()
+        .with(eq(switch.clone()),eq(Handle::ClickAndHold))
+        .times(1)
+        .return_const(SwitchOnClickReaction::MoveToOrVisitLayer(LayerSpecifier {
+            id: String::new(),
+            index_in_gamepad: Some(index_in_gamepad)
+        }))
+        .in_sequence(&mut seq);
+    mock_dynamic_switch_event_responses
+        .expect_add()
+        .with(eq(switch.clone()),eq(
+            DynamicSwitchEventReaction::DoubleClickAndHold(
+                EventReactionOrNesting::Nesting(
+                    Box::new(DynamicSwitchEventReaction::ClickEnd(
+                        EventReactionOrNesting::Reaction(
+                            SwitchOnClickReaction::MoveToLayer(
+                                LayerSpecifier {
+                                    id: String::new(),
+                                    index_in_gamepad: Some(*indexes_vec.last().or(Some(&0)).unwrap())
+                    }))))))))
+        .times(1)
+        .return_const(())
+        .in_sequence(&mut seq);
+    indexes_vec.push(index_in_gamepad);
+    
+    
+    let switch = Switch::Button(Button::North);
+    let index_in_gamepad = 123;
+    mock_switch_click_pattern_detector
+        .expect_tick()
+        .times(1)
+        .return_const(Some(SwitchClickPattern::ClickAndHold(switch.clone())))
+        .in_sequence(&mut seq);
+    mock_dynamic_switch_event_responses
+        .expect_get()
+        .with(eq(switch.clone()),eq(Handle::ClickAndHold))
+        .times(1)
+        .return_const(SwitchOnClickReaction::MoveToOrVisitLayer(LayerSpecifier {
+            id: String::new(),
+            index_in_gamepad: Some(index_in_gamepad)
+        }))
+        .in_sequence(&mut seq);
+    mock_dynamic_switch_event_responses
+        .expect_add()
+        .with(eq(switch.clone()),eq(
+            DynamicSwitchEventReaction::DoubleClickAndHold(
+                EventReactionOrNesting::Nesting(
+                    Box::new(DynamicSwitchEventReaction::ClickEnd(
+                        EventReactionOrNesting::Reaction(
+                            SwitchOnClickReaction::MoveToLayer(
+                                LayerSpecifier {
+                                    id: String::new(),
+                                    index_in_gamepad: Some(*indexes_vec.last().or(Some(&0)).unwrap())
+                    }))))))))
+        .times(1)
+        .return_const(())
+        .in_sequence(&mut seq);
+    indexes_vec.push(index_in_gamepad);
+    
+    
+    let switch = Switch::StickSwitchButton(StickSwitchButton::LeftStickLeft);
+    let index_in_gamepad = 99;
+    mock_switch_click_pattern_detector
+        .expect_tick()
+        .times(1)
+        .return_const(Some(SwitchClickPattern::DoubleClick(switch.clone())))
+        .in_sequence(&mut seq);
+    mock_dynamic_switch_event_responses
+        .expect_get()
+        .with(eq(switch.clone()),eq(Handle::DoubleClick))
+        .times(1)
+        .return_const(SwitchOnClickReaction::MoveToOrVisitLayer(LayerSpecifier {
+            id: String::new(),
+            index_in_gamepad: Some(index_in_gamepad)
+        }))
+        .in_sequence(&mut seq);
+    mock_dynamic_switch_event_responses
+        .expect_add()
+        .with(eq(switch.clone()),eq(
+            DynamicSwitchEventReaction::DoubleClickAndHold(
+                EventReactionOrNesting::Nesting(
+                    Box::new(DynamicSwitchEventReaction::ClickEnd(
+                        EventReactionOrNesting::Reaction(
+                            SwitchOnClickReaction::MoveToLayer(
+                                LayerSpecifier {
+                                    id: String::new(),
+                                    index_in_gamepad: Some(*indexes_vec.last().or(Some(&0)).unwrap())
+                    }))))))))
+        .times(1)
+        .return_const(())
+        .in_sequence(&mut seq);
+    indexes_vec.push(index_in_gamepad);
+    
+    
+    let switch = Switch::StickSwitchButton(StickSwitchButton::RightStickRight);
+    let index_in_gamepad = 8900;
+    mock_switch_click_pattern_detector
+        .expect_tick()
+        .times(1)
+        .return_const(Some(SwitchClickPattern::DoubleClickAndHold(switch.clone())))
+        .in_sequence(&mut seq);
+    mock_dynamic_switch_event_responses
+        .expect_get()
+        .with(eq(switch.clone()),eq(Handle::DoubleClickAndHold))
+        .times(1)
+        .return_const(SwitchOnClickReaction::MoveToOrVisitLayer(LayerSpecifier {
+            id: String::new(),
+            index_in_gamepad: Some(index_in_gamepad)
+        }))
+        .in_sequence(&mut seq);
+    mock_dynamic_switch_event_responses
+        .expect_add()
+        .with(eq(switch.clone()),eq(
+            DynamicSwitchEventReaction::DoubleClickAndHold(
+                EventReactionOrNesting::Nesting(
+                    Box::new(DynamicSwitchEventReaction::ClickEnd(
+                        EventReactionOrNesting::Reaction(
+                            SwitchOnClickReaction::MoveToLayer(
+                                LayerSpecifier {
+                                    id: String::new(),
+                                    index_in_gamepad: Some(*indexes_vec.last().or(Some(&0)).unwrap())
+                    }))))))))
+        .times(1)
+        .return_const(())
+        .in_sequence(&mut seq);
+    indexes_vec.push(index_in_gamepad);
+    
+    
+    let switch = Switch::StickSwitchButton(StickSwitchButton::RightStickUp);
+    let index_in_gamepad = 89;
+    mock_switch_click_pattern_detector
+        .expect_tick()
+        .times(1)
+        .return_const(Some(SwitchClickPattern::ClickEnd(switch.clone())))
+        .in_sequence(&mut seq);
+    mock_dynamic_switch_event_responses
+        .expect_get()
+        .with(eq(switch.clone()),eq(Handle::ClickEnd))
+        .times(1)
+        .return_const(SwitchOnClickReaction::MoveToOrVisitLayer(LayerSpecifier {
+            id: String::new(),
+            index_in_gamepad: Some(index_in_gamepad)
+        }))
+        .in_sequence(&mut seq);
+    mock_dynamic_switch_event_responses
+        .expect_add()
+        .with(eq(switch.clone()),eq(
+            DynamicSwitchEventReaction::DoubleClickAndHold(
+                EventReactionOrNesting::Nesting(
+                    Box::new(DynamicSwitchEventReaction::ClickEnd(
+                        EventReactionOrNesting::Reaction(
+                            SwitchOnClickReaction::MoveToLayer(
+                                LayerSpecifier {
+                                    id: String::new(),
+                                    index_in_gamepad: Some(*indexes_vec.last().or(Some(&0)).unwrap())
+                    }))))))))
+        .times(1)
+        .return_const(())
         .in_sequence(&mut seq);
     indexes_vec.push(index_in_gamepad);
 
