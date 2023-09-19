@@ -41,9 +41,7 @@ impl Gamepad {
     pub fn tick(&mut self) -> Option<InputEvent> {
         match self.switch_click_pattern_detector.tick() {
             Some(SwitchClickPattern::Click(switch)) => {
-                // self.commit_potential_visit_conditionally_and_unset(
-                //     |potential_visit_trigger_switch| switch.clone() != potential_visit_trigger_switch );
-                self.layers_navigator.commit_potential_visit_if_trigger_switch_not_equals_and_unset(switch.clone());
+                self.layers_navigator.on_click(switch.clone());
 
                 match self.get_switch_event_and_reaction(switch.clone())
                             .and_then(|s_e_a_r| s_e_a_r.on_click) {
@@ -60,9 +58,7 @@ impl Gamepad {
 
             },
             Some(SwitchClickPattern::ClickAndHold(switch)) => {
-            // self.commit_potential_visit_conditionally_and_unset(
-            //     |potential_visit_trigger_switch| switch.clone() == potential_visit_trigger_switch );
-                self.layers_navigator.commit_potential_visit_if_trigger_switch_equals_and_unset(switch.clone());
+                self.layers_navigator.on_click_and_hold(switch.clone());
                     if let Some(s_e_a_r)
                     = self.get_switch_event_and_reaction(switch.clone()) {
                         // if on_click is set to
@@ -74,9 +70,7 @@ impl Gamepad {
                     };
             },
             Some(SwitchClickPattern::DoubleClick(switch)) => {
-                // self.commit_potential_visit_conditionally_and_unset(
-                //     |potential_visit_trigger_switch| switch.clone() != potential_visit_trigger_switch );
-                self.layers_navigator.commit_potential_visit_if_trigger_switch_not_equals_and_unset(switch.clone());
+                self.layers_navigator.on_double_click(switch.clone());
 
                 match self.get_switch_event_and_reaction(switch.clone())
                             .and_then(
@@ -95,9 +89,7 @@ impl Gamepad {
                 }
             },
             Some(SwitchClickPattern::DoubleClickAndHold(switch)) => {
-            // self.commit_potential_visit_conditionally_and_unset(
-            //     |potential_visit_trigger_switch| switch.clone() == potential_visit_trigger_switch );
-                self.layers_navigator.commit_potential_visit_if_trigger_switch_equals_and_unset(switch.clone());
+                self.layers_navigator.on_double_click_and_hold(switch.clone());
                     if let Some(s_e_a_r)
                     = self.get_switch_event_and_reaction(switch.clone()) {
                         // if on_double_click (or fallback to on_click) is set to
@@ -115,9 +107,7 @@ impl Gamepad {
 
             },
             Some(SwitchClickPattern::ClickEnd(switch)) => {
-                self.layers_navigator.unset_potential_visit();
-
-                self.layers_navigator.undo_last_layer_visit_with_switch(switch);
+                self.layers_navigator.on_click_end(switch);
 
                 return Some(InputEvent::KeyUp);
             }
@@ -174,39 +164,6 @@ impl Gamepad {
             false
         }
     }
-
-    // fn next_gilrs_event(&mut self) -> Option<GilrsEvent> {
-    //     match self.gilrs.next_event() {
-    //         Some(gilrs_event) => {
-    //             match gilrs_event.event {
-    //                 GilrsEventType::AxisChanged(axis, value, _) => {
-    //                      let stick_switch_event_option = match axis {
-    //                         gilrs::ev::Axis::LeftStickX | gilrs::ev::Axis::LeftStickY=> {
-    //                             self.left_stick_switch_interpreter.interpret_stick_move(
-    //                                 self.gilrs.get_gamepad_axis_data_value(gilrs::Axis::LeftStickX),
-    //                                 self.gilrs.get_gamepad_axis_data_value(gilrs::Axis::LeftStickY),
-    //                             )
-    //                         },
-    //                         gilrs::ev::Axis::RightStickX | gilrs::ev::Axis::RightStickY=> {
-    //                             self.right_stick_switch_interpreter.interpret_stick_move(
-    //                                 self.gilrs.get_gamepad_axis_data_value(gilrs::Axis::RightStickX),
-    //                                 self.gilrs.get_gamepad_axis_data_value(gilrs::Axis::RightStickY),
-    //                             ) 
-    //                         }
-    //                         _other => None
-    //                     };
-    //
-    //                     Some(GilrsEvent{
-    //                         time: gilrs_event.time,
-    //                         event: GilrsEventType::AxisChanged(axis, value, stick_switch_event_option), 
-    //                     })
-    //                 },
-    //                 _other => Some(gilrs_event),
-    //             }
-    //         },
-    //         _other => None
-    //     }
-    // }
 
     fn get_switch_event_and_reaction_from_switches(
         switch: Switch, switches: &Switches) -> Option<SwitchEventAndReaction> {
@@ -266,28 +223,4 @@ pub struct LayerNodeRef{
 pub enum Switch {
     Button(Button),
     StickSwitchButton(StickSwitchButton),
-}
-
-#[derive(Debug,Clone,PartialEq)]
-pub enum Handle {
-    Click,
-    ClickAndHold,
-    DoubleClick,
-    DoubleClickAndHold,
-    ClickEnd,
-}
-
-#[derive(Debug,Clone,PartialEq)]
-pub enum DynamicSwitchEventReaction {
-    DoubleClick(EventReactionOrNesting),
-    DoubleClickAndHold(EventReactionOrNesting),
-    ClickEnd(EventReactionOrNesting),
-    Click(EventReactionOrNesting),
-    ClickAndHold(EventReactionOrNesting),
-}
-
-#[derive(Debug,Clone,PartialEq)]
-pub enum EventReactionOrNesting {
-    Reaction(SwitchOnClickReaction),
-    Nesting(Box<DynamicSwitchEventReaction>),
 }

@@ -50,8 +50,7 @@ fn click_end_to_backtrack_from_top_of_layer_visit_vec() {
        ],
     };
 
-    gamepad.unset_potential_visit();
-    gamepad.undo_last_layer_visit_with_switch(Switch::Button(Button::LeftTrigger));
+    gamepad.on_click_end(Switch::Button(Button::LeftTrigger));
 
     assert_eq!(gamepad.layer_visits.len(), 1);
     assert_eq!(gamepad.layer_visits[0], layer_visits[0].clone());
@@ -107,8 +106,7 @@ fn click_end_to_backtrack_from_middle_of_layer_visit_vec() {
        ],
     };
 
-    gamepad.unset_potential_visit();
-    gamepad.undo_last_layer_visit_with_switch(Switch::Button(Button::RightTrigger));
+    gamepad.on_click_end(Switch::Button(Button::RightTrigger));
     assert_eq!(gamepad.layer_visits.len(), 1);
     assert_eq!(gamepad.layer_visits[0], LayerVisit{
             trigger_switch: Switch::Button(Button::LeftTrigger),
@@ -132,8 +130,9 @@ fn tick_move_to_and_visit_layer_are_handled_correctly() {
        layer_visits_specified_for_each_layer: Vec::new(),
     };
 
-    gamepad.commit_potential_visit_if_trigger_switch_not_equals_and_unset(
+    gamepad.on_double_click(
         Switch::Button(Button::RightTrigger));
+
     gamepad.move_to_or_visit_layer(Switch::Button(Button::RightTrigger),LayerSpecifier {
         id: "second-layer-step-1".to_string(),
         index_in_gamepad: Some(4),
