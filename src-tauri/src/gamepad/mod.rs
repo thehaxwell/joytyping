@@ -1,6 +1,6 @@
 use gilrs::Button;
 
-use crate::settings_data::{self, Layer, SwitchOnClickReaction, KeyboardInput, SwitchEventAndReaction, Switches, LayerSpecifier};
+use crate::settings_data::{self, Layer, SwitchOnClickReaction, KeyboardInput, SwitchEventAndReaction, Switches};
 
 use self::{gilrs_events::{gilrs_wrapper::GilrsEventType, GilrsEventsTrait,stick_switch_interpreter::{StickSwitchButton,StickSwitchEvent}}, layers_navigator::LayersNavigatorTrait};
 
@@ -41,7 +41,8 @@ impl Gamepad {
     pub fn tick(&mut self) -> Option<InputEvent> {
         match self.switch_click_pattern_detector.tick() {
             Some(SwitchClickPattern::Click(switch)) => {
-                self.layers_navigator.on_click(switch.clone());
+                self.layers_navigator.process_current_potential_visit(
+                    SwitchClickPattern::Click(switch.clone()));
 
                 match self.get_switch_event_and_reaction(switch.clone())
                             .and_then(|s_e_a_r| s_e_a_r.on_click) {
@@ -58,19 +59,22 @@ impl Gamepad {
 
             },
             Some(SwitchClickPattern::ClickAndHold(switch)) => {
-                self.layers_navigator.on_click_and_hold(switch.clone());
-                    if let Some(s_e_a_r)
-                    = self.get_switch_event_and_reaction(switch.clone()) {
-                        // if on_click is set to
-                        // type out some key, then hold down that key
-                        if let Some(SwitchOnClickReaction::Keyboard(keyboard_input)) 
-                            = s_e_a_r.on_click {
-                            return Some(InputEvent::KeyDown(keyboard_input))
-                        }
-                    };
+                self.layers_navigator.process_current_potential_visit(
+                    SwitchClickPattern::ClickAndHold(switch.clone()));
+
+                if let Some(s_e_a_r)
+                = self.get_switch_event_and_reaction(switch.clone()) {
+                    // if on_click is set to
+                    // type out some key, then hold down that key
+                    if let Some(SwitchOnClickReaction::Keyboard(keyboard_input)) 
+                        = s_e_a_r.on_click {
+                        return Some(InputEvent::KeyDown(keyboard_input))
+                    }
+                };
             },
             Some(SwitchClickPattern::DoubleClick(switch)) => {
-                self.layers_navigator.on_double_click(switch.clone());
+                self.layers_navigator.process_current_potential_visit(
+                    SwitchClickPattern::DoubleClick(switch.clone()));
 
                 match self.get_switch_event_and_reaction(switch.clone())
                             .and_then(
@@ -89,26 +93,30 @@ impl Gamepad {
                 }
             },
             Some(SwitchClickPattern::DoubleClickAndHold(switch)) => {
-                self.layers_navigator.on_double_click_and_hold(switch.clone());
-                    if let Some(s_e_a_r)
-                    = self.get_switch_event_and_reaction(switch.clone()) {
-                        // if on_double_click (or fallback to on_click) is set to
-                        // type out some key, then hold down that key
-                        if let Some(SwitchOnClickReaction::Keyboard(keyboard_input)) 
-                            = s_e_a_r.on_double_click {
-                            return Some(InputEvent::KeyDown(keyboard_input))
-                        }
-                        else if let Some(SwitchOnClickReaction::Keyboard(keyboard_input)) 
-                            = s_e_a_r.on_click {
-                            return Some(InputEvent::KeyDown(keyboard_input))
-                        }
+                self.layers_navigator.process_current_potential_visit(
+                    SwitchClickPattern::DoubleClickAndHold(switch.clone()));
 
-                    };
+                if let Some(s_e_a_r)
+                = self.get_switch_event_and_reaction(switch.clone()) {
+                    // if on_double_click (or fallback to on_click) is set to
+                    // type out some key, then hold down that key
+                    if let Some(SwitchOnClickReaction::Keyboard(keyboard_input)) 
+                        = s_e_a_r.on_double_click {
+                        return Some(InputEvent::KeyDown(keyboard_input))
+                    }
+                    else if let Some(SwitchOnClickReaction::Keyboard(keyboard_input)) 
+                        = s_e_a_r.on_click {
+                        return Some(InputEvent::KeyDown(keyboard_input))
+                    }
+
+                };
 
             },
             Some(SwitchClickPattern::ClickEnd(switch)) => {
-                self.layers_navigator.on_click_end(switch);
+                self.layers_navigator.process_current_potential_visit(
+                    SwitchClickPattern::ClickEnd(switch.clone()));
 
+                self.layers_navigator.undo_last_layer_visit_with_switch(switch);
                 return Some(InputEvent::KeyUp);
             }
             None => (),

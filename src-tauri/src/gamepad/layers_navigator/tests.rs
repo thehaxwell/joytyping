@@ -1,6 +1,6 @@
 use gilrs::Button;
 
-use crate::{gamepad::{layers_navigator::{LayersNavigator,LayersNavigatorTrait, LayerVisit}, Switch}, settings_data::LayerSpecifier};
+use crate::{gamepad::{layers_navigator::{LayersNavigator,LayersNavigatorTrait, LayerVisit}, Switch, switch_click_pattern_detector::SwitchClickPattern}, settings_data::LayerSpecifier};
 
 
 #[test]
@@ -50,7 +50,10 @@ fn click_end_to_backtrack_from_top_of_layer_visit_vec() {
        ],
     };
 
-    gamepad.on_click_end(Switch::Button(Button::LeftTrigger));
+    let switch = Switch::Button(Button::LeftTrigger);
+    gamepad.process_current_potential_visit(
+            SwitchClickPattern::ClickEnd(switch.clone()));
+    gamepad.undo_last_layer_visit_with_switch(switch);
 
     assert_eq!(gamepad.layer_visits.len(), 1);
     assert_eq!(gamepad.layer_visits[0], layer_visits[0].clone());
@@ -106,7 +109,11 @@ fn click_end_to_backtrack_from_middle_of_layer_visit_vec() {
        ],
     };
 
-    gamepad.on_click_end(Switch::Button(Button::RightTrigger));
+    let switch = Switch::Button(Button::RightTrigger);
+    gamepad.process_current_potential_visit(
+            SwitchClickPattern::ClickEnd(switch.clone()));
+    gamepad.undo_last_layer_visit_with_switch(switch);
+
     assert_eq!(gamepad.layer_visits.len(), 1);
     assert_eq!(gamepad.layer_visits[0], LayerVisit{
             trigger_switch: Switch::Button(Button::LeftTrigger),
@@ -130,8 +137,10 @@ fn tick_move_to_and_visit_layer_are_handled_correctly() {
        layer_visits_specified_for_each_layer: Vec::new(),
     };
 
-    gamepad.on_double_click(
-        Switch::Button(Button::RightTrigger));
+    let switch = Switch::Button(Button::RightTrigger);
+    gamepad.process_current_potential_visit(
+            SwitchClickPattern::ClickEnd(switch.clone()));
+    gamepad.undo_last_layer_visit_with_switch(switch);
 
     gamepad.move_to_or_visit_layer(Switch::Button(Button::RightTrigger),LayerSpecifier {
         id: "second-layer-step-1".to_string(),
