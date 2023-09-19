@@ -3,6 +3,7 @@ use std::sync::mpsc;
 use gamepad::gilrs_events::GilrsEvents;
 use gamepad::gilrs_events::gilrs_wrapper::GilrsWrapper;
 use gamepad::gilrs_events::stick_switch_interpreter::{CardinalCustomButtons, StickSwitchInterpreter, AxisClickThresholds, self};
+use gamepad::layers_navigator::LayersNavigator;
 use input_controller::{KeyboardInputController,KeyboardInputControllerTrait};
 use input_controller::enigo_wrapper::{EnigoWrapper, EnigoTrait};
 use settings::error_display_window::ErrorDisplayWindow;
@@ -69,6 +70,24 @@ pub fn start_main_loop(
         //             center_at_y: 0.0}));
 
 
+        let pointers: Vec<gamepad::LayerNodeRef> = active_profile.layers
+            .iter()
+            .enumerate()
+            .map(|(idx,layer)|{
+                let res = gamepad::LayerNodeRef{
+                    id: layer.id.to_string(),
+                    index: idx.try_into().unwrap(),
+                };
+                res
+            })
+            .collect();
+
+        let settings_layers: Vec<settings_data::Layer> = active_profile.layers
+            .iter()
+            .map(|layer|
+                layer.clone_and_set_layer_pointers(&pointers)
+            )
+            .collect();
         let mut gamepad = gamepad::Gamepad::new(
             Box::new(GilrsEvents::new(
                 Box::new(GilrsWrapper::new()),
@@ -95,9 +114,9 @@ pub fn start_main_loop(
                     }
                 )),
             )),
-            active_profile.layers,
+            settings_layers.clone(),
             Box::new(SwitchClickPatternDetector::new()),
-            Box::new(gamepad::dynamic_switch_event_reactions::DynamicSwitchEventReactions::new()),
+            Box::new(LayersNavigator::new(settings_layers)),
         );
 
         let mut keyboard_input_controller = KeyboardInputController::new(Box::new(EnigoWrapper::new()));
