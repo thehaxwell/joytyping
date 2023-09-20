@@ -172,7 +172,7 @@ fn undo_last_layer_visit_with_switch_works() {
        potential_layer_visit: None,
        // these layers_and_their_available_layer_visits,
        // are minimally to make the recorded layer_visits
-       // possible.
+       // possible (expect where it's a "SPECIAL CASE")
        layers_and_their_available_layer_visits: vec![
             AvailableLayerVisitsFromLayer {
                 index_in_gamepad: 0,
