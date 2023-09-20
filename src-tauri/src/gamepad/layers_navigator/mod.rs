@@ -169,12 +169,10 @@ impl LayersNavigatorTrait for LayersNavigator {
             let start_from_index = self.layer_visits[0].from_index;
             self.layer_visits.remove(to_remove_index);
 
-            // re-evaluate the current index
-            self.layer_visits = self.layer_visits
-                .iter()
-                .enumerate()
-                .filter_map(|(layer_visit_index, layer_visit)|
-                    self.layers_and_their_available_layer_visits
+            // re-evaluate the layer_visits and current index
+            let mut new_layer_visits: Vec<LayerVisit> = Vec::new();
+            for (layer_visit_index, layer_visit) in self.layer_visits.iter().enumerate() {
+                let next_doable_visit_opt = self.layers_and_their_available_layer_visits
                         .iter()
                         .find_map(|layer|{ 
                             if layer.index_in_gamepad 
@@ -183,25 +181,42 @@ impl LayersNavigatorTrait for LayersNavigator {
                                     } else {
                                         layer_visit.from_index
                                     }) { 
+                                // ignore this iteration if this layers_and_their_available_layer_visits
+                                // is not the layer at the index we want
                                 return None; 
                             }
 
-                            layer.layer_visits.iter().find(|l| l.trigger_switch == layer_visit.trigger_switch.clone())
+                            let index_to_go_from 
+                                = if let Some(new_layer_visits_last) = new_layer_visits.last() {
+                                new_layer_visits_last.to_index
+                            } else {
+                                0
+                            };
+
+                            layer.layer_visits
+                                .iter()
+                                .find(|l| l.trigger_switch == layer_visit.trigger_switch.clone()
+                                          && l.from_index == index_to_go_from)
                                 .map(|layer_visit|LayerVisit{
                                     trigger_switch: layer_visit.trigger_switch.clone(),
                                     from_index: layer.index_in_gamepad, // this is the outer-scope from_index
                                     to_index: layer_visit.to_index.clone(),
                                 })
-                    })
-                )
-                .collect();
+                        });
 
-                if self.layer_visits.is_empty() {
-                    self.current_layer_index = 0;
+                if let Some(next_doable_visit) = next_doable_visit_opt {
+                    new_layer_visits.push(next_doable_visit);
                 }
-                else {
-                    self.current_layer_index = self.layer_visits.last().unwrap().to_index;
-                }
+                else {break}
+            }
+            self.layer_visits = new_layer_visits;
+
+            if let Some(layer_visit) = self.layer_visits.last() {
+                self.current_layer_index = layer_visit.to_index;
+            }
+            else {
+                self.current_layer_index = 0;
+            }
         }
     }
 }

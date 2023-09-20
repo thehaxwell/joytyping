@@ -137,6 +137,152 @@ fn visit_or_move_to_layer_works() {
 }
 
 #[test]
+fn undo_last_layer_visit_with_switch_works() {
+    let layer_visits = vec![
+       LayerVisit{
+            trigger_switch: Switch::Button(Button::RightTrigger),
+            from_index: 0,
+            to_index: 1,
+       },
+       LayerVisit{
+            trigger_switch: Switch::Button(Button::South),
+            from_index: 1,
+            to_index: 3,
+       },
+       LayerVisit{
+            trigger_switch: Switch::Button(Button::LeftTrigger),
+            from_index: 3,
+            to_index: 4,
+       },
+       LayerVisit{
+            trigger_switch: Switch::StickSwitchButton(StickSwitchButton::LeftStickUp),
+            from_index: 4,
+            to_index: 6,
+       },
+       LayerVisit{
+            trigger_switch: Switch::StickSwitchButton(StickSwitchButton::RightStickRight),
+            from_index: 6,
+            to_index: 7,
+       },
+   ];
+
+    let mut layers_navigator = LayersNavigator {
+       current_layer_index: 6,
+       layer_visits: layer_visits.clone(),
+       potential_layer_visit: None,
+       // these layers_and_their_available_layer_visits,
+       // are minimally to make the recorded layer_visits
+       // possible.
+       layers_and_their_available_layer_visits: vec![
+            AvailableLayerVisitsFromLayer {
+                index_in_gamepad: 0,
+                layer_visits: vec![
+                   LayerVisit{
+                       trigger_switch: Switch::Button(Button::RightTrigger),
+                       from_index: 0,
+                       to_index: 1,
+                   },
+                   // SPECIAL CASE, allows the use of layer_visits[1]
+                   // to go from 0 to 3 (as opposed to the original 1 to 3)
+                   LayerVisit{
+                       trigger_switch: Switch::Button(Button::South),
+                       from_index: 0,
+                       to_index: 3,
+                   },
+                ]
+            },
+            AvailableLayerVisitsFromLayer {
+                index_in_gamepad: 1,
+                layer_visits: vec![
+                   LayerVisit{
+                       trigger_switch: Switch::Button(Button::South),
+                       from_index: 1,
+                       to_index: 3,
+                   },
+                ]
+            },
+            AvailableLayerVisitsFromLayer {
+                index_in_gamepad: 3,
+                layer_visits: vec![
+                   LayerVisit{
+                       trigger_switch: Switch::Button(Button::LeftTrigger),
+                       from_index: 3,
+                       to_index: 4,
+                   },
+                ]
+            },
+            AvailableLayerVisitsFromLayer {
+                index_in_gamepad: 4,
+                layer_visits: vec![
+                   LayerVisit{
+                       trigger_switch: Switch::StickSwitchButton(StickSwitchButton::LeftStickUp),
+                       from_index: 4,
+                       to_index: 6,
+                   },
+                ]
+            },
+            AvailableLayerVisitsFromLayer {
+                index_in_gamepad: 6,
+                layer_visits: vec![
+                   LayerVisit{
+                       trigger_switch: Switch::StickSwitchButton(StickSwitchButton::RightStickRight),
+                       from_index: 6,
+                       to_index: 7,
+                   },
+                ]
+            },
+       ],
+    };
+
+    // undo the last visit (the 5th)
+    layers_navigator.undo_last_layer_visit_with_switch(
+        layer_visits[4].trigger_switch.clone());
+
+    assert_eq!(layers_navigator.current_layer_index,6);
+
+    assert_eq!(layers_navigator.layer_visits.len(),4);
+    assert_eq!(layers_navigator.layer_visits[0],layer_visits[0]);
+    assert_eq!(layers_navigator.layer_visits[1],layer_visits[1]);
+    assert_eq!(layers_navigator.layer_visits[2],layer_visits[2]);
+    assert_eq!(layers_navigator.layer_visits[3],layer_visits[3]);
+
+    // There are now 4 visits
+    // undo the third visit, which cuts off the fourth(4th)
+    // since it's no longer reachable, leaving only 2 visits
+    layers_navigator.undo_last_layer_visit_with_switch(
+        layer_visits[2].trigger_switch.clone());
+
+    assert_eq!(layers_navigator.current_layer_index,3);
+
+    assert_eq!(layers_navigator.layer_visits.len(),2);
+    assert_eq!(layers_navigator.layer_visits[0],layer_visits[0]);
+    assert_eq!(layers_navigator.layer_visits[1],layer_visits[1]);
+
+    // There are now 4 visits
+    // Undo the first visit but still go to the second visit
+    // via a different path, leaving the second visit still there
+    layers_navigator.undo_last_layer_visit_with_switch(
+        layer_visits[0].trigger_switch.clone());
+
+    assert_eq!(layers_navigator.current_layer_index,3);
+
+    assert_eq!(layers_navigator.layer_visits.len(),1);
+    assert_eq!(layers_navigator.layer_visits[0],LayerVisit{
+        trigger_switch: layer_visits[1].trigger_switch.clone(),
+        from_index: 0,
+        to_index: layer_visits[1].to_index});
+
+}
+
+
+
+// OLD TESTS START HERE
+
+
+
+
+
+#[test]
 fn click_end_to_backtrack_from_top_of_layer_visit_vec() {
     // simulate tick emitted ClickEnd LeftTrigger
 
