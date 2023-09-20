@@ -1,6 +1,6 @@
 use gilrs::Button;
 
-use crate::{gamepad::{layers_navigator::{LayersNavigator,LayersNavigatorTrait, LayerVisit}, Switch, switch_click_pattern_detector::SwitchClickPattern}, settings_data::LayerSpecifier};
+use crate::{gamepad::{layers_navigator::{LayersNavigator,LayersNavigatorTrait, LayerVisit, AvailableLayerVisitsFromLayer}, Switch, switch_click_pattern_detector::SwitchClickPattern}, settings_data::LayerSpecifier};
 
 
 #[test]
@@ -27,26 +27,32 @@ fn click_end_to_backtrack_from_top_of_layer_visit_vec() {
        current_layer_index: 3,
        layer_visits: layer_visits.clone(),
        potential_layer_visit: None,
-       layer_visits_specified_for_each_layer: vec![
-           (0, vec![
-               LayerVisit{
-                   trigger_switch: Switch::Button(Button::RightTrigger),
-                   from_index: 0,
-                   to_index: 1,
-               },
-               LayerVisit{
-                   trigger_switch: Switch::Button(Button::LeftTrigger),
-                   from_index: 0,
-                   to_index: 2,
-               },
-           ]),
-           (1, vec![
-               LayerVisit{
-                   trigger_switch: Switch::Button(Button::LeftTrigger),
-                   from_index: 1,
-                   to_index: 3,
-               },
-           ])
+       layers_and_their_available_layer_visits: vec![
+            AvailableLayerVisitsFromLayer {
+                index_in_gamepad: 0,
+                layer_visits: vec![
+                   LayerVisit{
+                       trigger_switch: Switch::Button(Button::RightTrigger),
+                       from_index: 0,
+                       to_index: 1,
+                   },
+                   LayerVisit{
+                       trigger_switch: Switch::Button(Button::LeftTrigger),
+                       from_index: 0,
+                       to_index: 2,
+                   },
+               ]
+            },
+            AvailableLayerVisitsFromLayer {
+                index_in_gamepad: 1,
+                layer_visits:vec![
+                   LayerVisit{
+                       trigger_switch: Switch::Button(Button::LeftTrigger),
+                       from_index: 1,
+                       to_index: 3,
+                   },
+                ],
+            }
        ],
     };
 
@@ -86,26 +92,32 @@ fn click_end_to_backtrack_from_middle_of_layer_visit_vec() {
        current_layer_index: 3,
        layer_visits: layer_visits.clone(),
        potential_layer_visit: None,
-       layer_visits_specified_for_each_layer: vec![
-           (0, vec![
-               LayerVisit{
-                   trigger_switch: Switch::Button(Button::RightTrigger),
-                   from_index: 0,
-                   to_index: 1,
-               },
-               LayerVisit{
-                   trigger_switch: Switch::Button(Button::LeftTrigger),
-                   from_index: 0,
-                   to_index: 2,
-               },
-           ]),
-           (1, vec![
-               LayerVisit{
-                   trigger_switch: Switch::Button(Button::LeftTrigger),
-                   from_index: 1,
-                   to_index: 3,
-               },
-           ])
+       layers_and_their_available_layer_visits: vec![
+            AvailableLayerVisitsFromLayer {
+                index_in_gamepad: 0,
+                layer_visits: vec![
+                   LayerVisit{
+                       trigger_switch: Switch::Button(Button::RightTrigger),
+                       from_index: 0,
+                       to_index: 1,
+                   },
+                   LayerVisit{
+                       trigger_switch: Switch::Button(Button::LeftTrigger),
+                       from_index: 0,
+                       to_index: 2,
+                   },
+                ],
+            },
+            AvailableLayerVisitsFromLayer {
+                index_in_gamepad: 0,
+                layer_visits: vec![
+                   LayerVisit{
+                       trigger_switch: Switch::Button(Button::LeftTrigger),
+                       from_index: 1,
+                       to_index: 3,
+                   },
+                ],
+            }
        ],
     };
 
@@ -134,7 +146,7 @@ fn tick_move_to_and_visit_layer_are_handled_correctly() {
        current_layer_index: 0,
        layer_visits: Vec::new(),
        potential_layer_visit: None,
-       layer_visits_specified_for_each_layer: Vec::new(),
+       layers_and_their_available_layer_visits: Vec::new(),
     };
 
     let switch = Switch::Button(Button::RightTrigger);

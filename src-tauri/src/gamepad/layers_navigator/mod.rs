@@ -27,7 +27,7 @@ pub struct LayersNavigator {
     // any interruption cause an emptying
     potential_layer_visit: Option<LayerVisit>,
 
-    layer_visits_specified_for_each_layer: Vec<(usize,Vec<LayerVisit>)>
+    layers_and_their_available_layer_visits: Vec<AvailableLayerVisitsFromLayer>,
 }
 
 impl LayersNavigator {
@@ -36,11 +36,12 @@ impl LayersNavigator {
             current_layer_index: 0,
             layer_visits: Vec::new(),
             potential_layer_visit: None,
-            layer_visits_specified_for_each_layer: LayersNavigator::build_layer_visits(layers),
+            layers_and_their_available_layer_visits: LayersNavigator::build_layer_visits(layers),
         }
     }
 
-    fn build_layer_visits(layers: Vec<Layer>) -> Vec<(usize,Vec<LayerVisit>)> {
+    // fn build_layer_visits(layers: Vec<Layer>) -> Vec<(usize,Vec<LayerVisit>)> {
+    fn build_layer_visits(layers: Vec<Layer>) -> Vec<AvailableLayerVisitsFromLayer> {
         layers
             .iter()
             .enumerate()
@@ -68,7 +69,11 @@ impl LayersNavigator {
                             else { None }
                         )
                         .collect();
-                    Some((index,layer_visits))
+                    // Some((index,layer_visits))
+                    Some(AvailableLayerVisitsFromLayer{
+                        index_in_gamepad: index,
+                        layer_visits,
+                    })
                 }
                 else { None }
             )
@@ -81,21 +86,23 @@ impl LayersNavigatorTrait for LayersNavigator {
     fn move_to_layer(&mut self, layer_specifier: LayerSpecifier) {
         self.current_layer_index = layer_specifier.index_in_gamepad.unwrap();
     }
+
     fn visit_layer(&mut self, trigger_switch: Switch, layer_specifier: LayerSpecifier) {
-                self.layer_visits.push(LayerVisit {
-                    trigger_switch,
-                    to_index: layer_specifier.index_in_gamepad.unwrap(),
-                    from_index: self.current_layer_index,
-                });
-                self.current_layer_index = layer_specifier.index_in_gamepad.unwrap();
+        self.layer_visits.push(LayerVisit {
+            trigger_switch,
+            to_index: layer_specifier.index_in_gamepad.unwrap(),
+            from_index: self.current_layer_index,
+        });
+        self.current_layer_index = layer_specifier.index_in_gamepad.unwrap();
     }
+
     fn move_to_or_visit_layer(&mut self, trigger_switch: Switch, layer_specifier: LayerSpecifier) {
-                self.potential_layer_visit = Some(LayerVisit {
-                    trigger_switch,
-                    to_index: layer_specifier.index_in_gamepad.unwrap(),
-                    from_index: self.current_layer_index,
-                });
-                self.current_layer_index = layer_specifier.index_in_gamepad.unwrap();
+        self.potential_layer_visit = Some(LayerVisit {
+            trigger_switch,
+            to_index: layer_specifier.index_in_gamepad.unwrap(),
+            from_index: self.current_layer_index,
+        });
+        self.current_layer_index = layer_specifier.index_in_gamepad.unwrap();
     }
     
     fn get_current_layer_index(&self) -> usize {
@@ -154,10 +161,10 @@ impl LayersNavigatorTrait for LayersNavigator {
                 .iter()
                 .enumerate()
                 .filter_map(|(layer_visit_index, layer_visit)|
-                    self.layer_visits_specified_for_each_layer
+                    self.layers_and_their_available_layer_visits
                         .iter()
                         .find_map(|layer|{ 
-                            if layer.0 
+                            if layer.index_in_gamepad 
                                 != (if layer_visit_index == 0 {
                                         start_from_index
                                     } else {
@@ -166,10 +173,10 @@ impl LayersNavigatorTrait for LayersNavigator {
                                 return None; 
                             }
 
-                            layer.1.iter().find(|l| l.trigger_switch == layer_visit.trigger_switch.clone())
+                            layer.layer_visits.iter().find(|l| l.trigger_switch == layer_visit.trigger_switch.clone())
                                 .map(|layer_visit|LayerVisit{
                                     trigger_switch: layer_visit.trigger_switch.clone(),
-                                    from_index: layer.0, // this is the outer-scope from_index
+                                    from_index: layer.index_in_gamepad, // this is the outer-scope from_index
                                     to_index: layer_visit.to_index.clone(),
                                 })
                     })
@@ -186,4 +193,9 @@ struct LayerVisit {
     trigger_switch: Switch,
     to_index: usize,
     from_index: usize,
+}
+
+struct AvailableLayerVisitsFromLayer {
+    index_in_gamepad: usize,
+    layer_visits: Vec<LayerVisit>,
 }
