@@ -2,7 +2,7 @@ use gilrs::Button;
 
 use crate::settings_data::{LayerSpecifier, SwitchEventAndReaction, Layer, SwitchOnClickReaction};
 
-use super::{Switch, switch_click_pattern_detector::SwitchClickPattern};
+use super::{Switch, switch_click_pattern_detector::SwitchClickPattern, gilrs_events::stick_switch_interpreter::StickSwitchButton};
 
 #[cfg(test)]
 use mockall::{automock, predicate::*};
@@ -40,7 +40,6 @@ impl LayersNavigator {
         }
     }
 
-    // fn build_layer_visits(layers: Vec<Layer>) -> Vec<(usize,Vec<LayerVisit>)> {
     fn build_layer_visits(layers: Vec<Layer>) -> Vec<AvailableLayerVisitsFromLayer> {
         layers
             .iter()
@@ -49,22 +48,36 @@ impl LayersNavigator {
                 if let Some(switches) = &layer.switches {
                     let layer_visits: Vec<LayerVisit> = [
                             (Switch::Button(Button::South),&switches.south),
+                            (Switch::Button(Button::East),&switches.east),
+                            (Switch::Button(Button::North),&switches.north),
+                            (Switch::Button(Button::West),&switches.west),
+                            (Switch::Button(Button::DPadUp),&switches.d_pad_up),
+                            (Switch::Button(Button::DPadDown),&switches.d_pad_down),
+                            (Switch::Button(Button::DPadLeft),&switches.d_pad_left),
+                            (Switch::Button(Button::DPadRight),&switches.d_pad_right),
+                            (Switch::StickSwitchButton(StickSwitchButton::LeftStickUp),&switches.left_stick_up),
+                            (Switch::StickSwitchButton(StickSwitchButton::LeftStickDown),&switches.left_stick_down),
+                            (Switch::StickSwitchButton(StickSwitchButton::LeftStickLeft),&switches.left_stick_left),
+                            (Switch::StickSwitchButton(StickSwitchButton::LeftStickRight),&switches.left_stick_right),
+                            (Switch::StickSwitchButton(StickSwitchButton::RightStickUp),&switches.right_stick_up),
+                            (Switch::StickSwitchButton(StickSwitchButton::RightStickDown),&switches.right_stick_down),
+                            (Switch::StickSwitchButton(StickSwitchButton::RightStickLeft),&switches.right_stick_left),
+                            (Switch::StickSwitchButton(StickSwitchButton::RightStickRight),&switches.right_stick_right),
+                            (Switch::Button(Button::RightTrigger),&switches.right_trigger),
+                            (Switch::Button(Button::LeftTrigger),&switches.left_trigger),
                         ]
                         .iter()
                         .filter_map(|(switch,event_and_reaction_opt)|
                             if let Some(SwitchEventAndReaction { on_click, on_double_click }) = event_and_reaction_opt {
-                                     
-                    
-                                     if let Some(SwitchOnClickReaction::VisitLayer(layer_specifier)) 
-                                         = on_click.clone().or(on_double_click.clone()) {
-                                            Some(LayerVisit {
-                                                trigger_switch: switch.clone(),
-                                                from_index: layer_specifier.index_in_gamepad.unwrap(),
-                                                to_index: layer_specifier.index_in_gamepad.unwrap(),
-                                            })
-                                     }
-                                     else { None }
-
+                                 if let Some(SwitchOnClickReaction::VisitLayer(layer_specifier)) 
+                                     = on_click.clone().or(on_double_click.clone()) {
+                                        Some(LayerVisit {
+                                            trigger_switch: switch.clone(),
+                                            from_index: index,
+                                            to_index: layer_specifier.index_in_gamepad.unwrap(),
+                                        })
+                                 }
+                                 else { None }
                             }
                             else { None }
                         )
@@ -183,7 +196,12 @@ impl LayersNavigatorTrait for LayersNavigator {
                 )
                 .collect();
 
-
+                if self.layer_visits.is_empty() {
+                    self.current_layer_index = 0;
+                }
+                else {
+                    self.current_layer_index = self.layer_visits.last().unwrap().to_index;
+                }
         }
     }
 }
