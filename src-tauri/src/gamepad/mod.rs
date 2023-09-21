@@ -39,11 +39,16 @@ impl Gamepad {
 
 
     pub fn tick(&mut self) -> Option<InputEvent> {
-        match self.switch_click_pattern_detector.tick() {
-            Some(SwitchClickPattern::Click(switch)) => {
-                self.layers_navigator.process_current_potential_visit(
-                    SwitchClickPattern::Click(switch.clone()));
+        let next_event_opt = self.switch_click_pattern_detector.tick();
 
+        if let Some(next_event) = next_event_opt.clone() {
+            self.layers_navigator
+                .process_current_potential_visit(
+                next_event);
+        }
+
+        match next_event_opt {
+            Some(SwitchClickPattern::Click(switch)) => {
                 match self.get_switch_event_and_reaction(switch.clone())
                             .and_then(|s_e_a_r| s_e_a_r.on_click) {
                     Some(SwitchOnClickReaction::Keyboard(keyboard_input)) 
@@ -59,9 +64,6 @@ impl Gamepad {
 
             },
             Some(SwitchClickPattern::ClickAndHold(switch)) => {
-                self.layers_navigator.process_current_potential_visit(
-                    SwitchClickPattern::ClickAndHold(switch.clone()));
-
                 if let Some(s_e_a_r)
                 = self.get_switch_event_and_reaction(switch.clone()) {
                     // if on_click is set to
@@ -73,9 +75,6 @@ impl Gamepad {
                 };
             },
             Some(SwitchClickPattern::DoubleClick(switch)) => {
-                self.layers_navigator.process_current_potential_visit(
-                    SwitchClickPattern::DoubleClick(switch.clone()));
-
                 match self.get_switch_event_and_reaction(switch.clone())
                             .and_then(
                                 // use on_double_click or on_click if it isn't set
@@ -93,9 +92,6 @@ impl Gamepad {
                 }
             },
             Some(SwitchClickPattern::DoubleClickAndHold(switch)) => {
-                self.layers_navigator.process_current_potential_visit(
-                    SwitchClickPattern::DoubleClickAndHold(switch.clone()));
-
                 if let Some(s_e_a_r)
                 = self.get_switch_event_and_reaction(switch.clone()) {
                     // if on_double_click (or fallback to on_click) is set to
@@ -113,9 +109,6 @@ impl Gamepad {
 
             },
             Some(SwitchClickPattern::ClickEnd(switch)) => {
-                self.layers_navigator.process_current_potential_visit(
-                    SwitchClickPattern::ClickEnd(switch.clone()));
-
                 self.layers_navigator.undo_last_layer_visit_with_switch(switch);
                 return Some(InputEvent::KeyUp);
             }

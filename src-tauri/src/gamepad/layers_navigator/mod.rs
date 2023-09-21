@@ -102,10 +102,12 @@ impl LayersNavigator {
 
 impl LayersNavigatorTrait for LayersNavigator {
     fn move_to_layer(&mut self, layer_specifier: LayerSpecifier) {
+        println!(">>>>> from {}, move_to_layer: {:?}",self.current_layer_index ,layer_specifier);
         self.current_layer_index = layer_specifier.index_in_gamepad.unwrap();
     }
 
     fn visit_layer(&mut self, trigger_switch: Switch, layer_specifier: LayerSpecifier) {
+        println!(">>>>> from {}, visit_layer: {:?}",self.current_layer_index ,layer_specifier);
         self.layer_visits.push(LayerVisit {
             trigger_switch,
             to_index: layer_specifier.index_in_gamepad.unwrap(),
@@ -115,6 +117,7 @@ impl LayersNavigatorTrait for LayersNavigator {
     }
 
     fn move_to_or_visit_layer(&mut self, trigger_switch: Switch, layer_specifier: LayerSpecifier) {
+        println!(">>>>> from {}, move_to_or_visit_layer: {:?}",self.current_layer_index,layer_specifier);
         self.potential_layer_visit = Some(LayerVisit {
             trigger_switch,
             to_index: layer_specifier.index_in_gamepad.unwrap(),
@@ -234,7 +237,7 @@ struct LayerVisit {
 }
 
 #[derive(Debug,PartialEq)]
-struct AvailableLayerVisitsFromLayer {
+pub struct AvailableLayerVisitsFromLayer {
     index_in_gamepad: usize,
     layer_visits: Vec<LayerVisit>,
 }
