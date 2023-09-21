@@ -82,11 +82,16 @@ impl LayersNavigator {
                             else { None }
                         )
                         .collect();
-                    // Some((index,layer_visits))
-                    Some(AvailableLayerVisitsFromLayer{
-                        index_in_gamepad: index,
-                        layer_visits,
-                    })
+
+                    if layer_visits.is_empty() {
+                        None
+                    }
+                    else {
+                        Some(AvailableLayerVisitsFromLayer{
+                            index_in_gamepad: index,
+                            layer_visits,
+                        })
+                    }
                 }
                 else { None }
             )
@@ -228,6 +233,7 @@ struct LayerVisit {
     from_index: usize,
 }
 
+#[derive(Debug,PartialEq)]
 struct AvailableLayerVisitsFromLayer {
     index_in_gamepad: usize,
     layer_visits: Vec<LayerVisit>,
