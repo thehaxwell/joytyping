@@ -21,19 +21,26 @@ pub trait LayersNavigatorTrait {
 }
 
 pub struct LayersNavigator {
-   current_layer_index: usize,
+    current_layer_index: usize,
     // recording when to go back on layer visits
     layer_visits: Vec<LayerVisit>,
     // any interruption cause an emptying
     potential_layer_visit: Option<LayerVisit>,
 
     layers_and_their_available_layer_visits: Vec<AvailableLayerVisitsFromLayer>,
+    // this keeps track of the latest index that
+    // was moved to, it doesn't count a MoveToOrVisit destination
+    // until the -Visit is discarded, making it a definate
+    // "MoveTo-"
+    latest_move_to_index: usize,
+
 }
 
 impl LayersNavigator {
     pub fn new(layers: Vec<Layer>) -> Self {
         Self {
             current_layer_index: 0,
+            latest_move_to_index: 0,
             layer_visits: Vec::new(),
             potential_layer_visit: None,
             layers_and_their_available_layer_visits: LayersNavigator::build_layer_visits(layers),
@@ -104,6 +111,7 @@ impl LayersNavigatorTrait for LayersNavigator {
     fn move_to_layer(&mut self, layer_specifier: LayerSpecifier) {
         println!(">>>>> from {}, move_to_layer: {:?}",self.current_layer_index ,layer_specifier);
         self.current_layer_index = layer_specifier.index_in_gamepad.unwrap();
+        self.latest_move_to_index = self.current_layer_index;
     }
 
     fn visit_layer(&mut self, trigger_switch: Switch, layer_specifier: LayerSpecifier) {
@@ -157,6 +165,11 @@ impl LayersNavigatorTrait for LayersNavigator {
             if should_commit {
                 self.layer_visits.push(potential_layer_visit.clone());
             }
+            else {
+                // the move now cannot be undone as a visit
+                self.latest_move_to_index = self.current_layer_index;
+            }
+
             self.potential_layer_visit = None;
         }
     }
@@ -198,7 +211,7 @@ impl LayersNavigatorTrait for LayersNavigator {
                                 = if let Some(new_layer_visits_last) = new_layer_visits.last() {
                                 new_layer_visits_last.to_index
                             } else {
-                                0
+                                self.latest_move_to_index
                             };
 
                             layer.layer_visits
@@ -223,7 +236,7 @@ impl LayersNavigatorTrait for LayersNavigator {
                 self.current_layer_index = layer_visit.to_index;
             }
             else {
-                self.current_layer_index = 0;
+                self.current_layer_index = self.latest_move_to_index;
             }
         }
     }
