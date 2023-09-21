@@ -274,6 +274,180 @@ fn undo_last_layer_visit_with_switch_works() {
 
 }
 
+fn setup_layers_navigator_with_potential_layer_visit(
+    potential_layer_visit_init_opt: Option<LayerVisit>,
+    process_current_potential_visit_arg: SwitchClickPattern) -> LayersNavigator {
+    let mut layers_navigator = LayersNavigator {
+       current_layer_index: 0,
+       layer_visits: Vec::new(),
+       potential_layer_visit: 
+           potential_layer_visit_init_opt.clone(),
+       layers_and_their_available_layer_visits: Vec::new(),
+    };
+
+    layers_navigator.process_current_potential_visit(
+        process_current_potential_visit_arg.clone());
+
+    // all else remains the same
+    assert!(layers_navigator.potential_layer_visit.is_none());
+    assert_eq!(layers_navigator.current_layer_index,0);
+
+    layers_navigator
+}
+
+#[test]
+fn process_current_potential_visit_works() {
+    // Cases where the potential visit is not commited
+
+    // 1. If a the same Switch is clicked
+    //
+    let layers_navigator = setup_layers_navigator_with_potential_layer_visit(
+        // potential_layer_visit_init_opt
+        Some(LayerVisit{
+           trigger_switch: Switch::Button(Button::RightTrigger),
+           from_index: 0,
+           to_index: 1,
+       }),
+       // process_current_potential_visit_arg
+       SwitchClickPattern::Click(Switch::Button(Button::RightTrigger)));
+
+    assert!(layers_navigator.layer_visits.is_empty());
+
+    // 2. If the same Switch is double-clicked
+    //
+    let layers_navigator = setup_layers_navigator_with_potential_layer_visit(
+        // potential_layer_visit_init_opt
+        Some(LayerVisit{
+           trigger_switch: Switch::Button(Button::DPadLeft),
+           from_index: 0,
+           to_index: 10,
+       }),
+       // process_current_potential_visit_arg
+       SwitchClickPattern::DoubleClick(Switch::Button(Button::DPadLeft)));
+
+    assert!(layers_navigator.layer_visits.is_empty());
+
+    // 3. If a different Switch is held (ClickAndHold)
+    //
+    let layers_navigator = setup_layers_navigator_with_potential_layer_visit(
+        // potential_layer_visit_init_opt
+        Some(LayerVisit{
+           trigger_switch: Switch::Button(Button::DPadLeft),
+           from_index: 0,
+           to_index: 10,
+       }),
+       // process_current_potential_visit_arg
+       SwitchClickPattern::ClickAndHold(Switch::Button(Button::DPadRight)));
+
+    assert!(layers_navigator.layer_visits.is_empty());
+
+    // 4. If a different Switch is held (DoubleClickAndHold)
+    //
+    let layers_navigator = setup_layers_navigator_with_potential_layer_visit(
+        // potential_layer_visit_init_opt
+        Some(LayerVisit{
+           trigger_switch: Switch::StickSwitchButton(StickSwitchButton::LeftStickLeft),
+           from_index: 0,
+           to_index: 10,
+       }),
+       // process_current_potential_visit_arg
+       SwitchClickPattern::DoubleClickAndHold(Switch::StickSwitchButton(StickSwitchButton::LeftStickDown)));
+
+    assert!(layers_navigator.layer_visits.is_empty());
+
+    // 5. If any Switch is released (ClickEnd)
+    //
+    let layers_navigator = setup_layers_navigator_with_potential_layer_visit(
+        // potential_layer_visit_init_opt
+        Some(LayerVisit{
+           trigger_switch: Switch::Button(Button::DPadDown),
+           from_index: 0,
+           to_index: 10,
+       }),
+       // process_current_potential_visit_arg
+       SwitchClickPattern::ClickEnd(Switch::StickSwitchButton(StickSwitchButton::LeftStickLeft)));
+
+    assert!(layers_navigator.layer_visits.is_empty());
+
+
+
+
+
+
+
+    // Cases where the potential visit is commited
+
+    // 1. If a different Switch is clicked
+    //
+    let potential_layer_visit_init = LayerVisit{
+           trigger_switch: Switch::Button(Button::RightTrigger),
+           from_index: 3,
+           to_index: 11,
+       };
+
+    let layers_navigator = setup_layers_navigator_with_potential_layer_visit(
+        // potential_layer_visit_init_opt
+        Some(potential_layer_visit_init.clone()),
+       // process_current_potential_visit_arg
+       SwitchClickPattern::Click(Switch::Button(Button::South)));
+
+    assert_eq!(layers_navigator.layer_visits.len(), 1);
+    assert_eq!(layers_navigator.layer_visits[0], potential_layer_visit_init);
+
+    // 2. If a different Switch is double-clicked
+    //
+    let potential_layer_visit_init = LayerVisit{
+           trigger_switch: Switch::Button(Button::DPadDown),
+           from_index: 3,
+           to_index: 11,
+       };
+
+    let layers_navigator = setup_layers_navigator_with_potential_layer_visit(
+        // potential_layer_visit_init_opt
+        Some(potential_layer_visit_init.clone()),
+       // process_current_potential_visit_arg
+       SwitchClickPattern::DoubleClick(Switch::Button(Button::RightTrigger)));
+
+    assert_eq!(layers_navigator.layer_visits.len(), 1);
+    assert_eq!(layers_navigator.layer_visits[0], potential_layer_visit_init);
+
+    // 3. If the same switch is held (ClickAndHold)
+    //
+    let potential_layer_visit_init = LayerVisit{
+           trigger_switch: Switch::Button(Button::RightTrigger),
+           from_index: 3,
+           to_index: 11,
+       };
+
+    let layers_navigator = setup_layers_navigator_with_potential_layer_visit(
+        // potential_layer_visit_init_opt
+        Some(potential_layer_visit_init.clone()),
+       // process_current_potential_visit_arg
+       SwitchClickPattern::ClickAndHold(Switch::Button(Button::RightTrigger)));
+
+    assert_eq!(layers_navigator.layer_visits.len(), 1);
+    assert_eq!(layers_navigator.layer_visits[0], potential_layer_visit_init);
+
+    // 4. If the same switch is held (DoubleClickAndHold)
+    //
+    let potential_layer_visit_init = LayerVisit{
+           trigger_switch: Switch::Button(Button::DPadLeft),
+           from_index: 3,
+           to_index: 1,
+       };
+
+    let layers_navigator = setup_layers_navigator_with_potential_layer_visit(
+        // potential_layer_visit_init_opt
+        Some(potential_layer_visit_init.clone()),
+       // process_current_potential_visit_arg
+       SwitchClickPattern::ClickAndHold(Switch::Button(Button::DPadLeft)));
+
+    assert_eq!(layers_navigator.layer_visits.len(), 1);
+    assert_eq!(layers_navigator.layer_visits[0], potential_layer_visit_init);
+}
+
+
+
 
 
 // OLD TESTS START HERE
