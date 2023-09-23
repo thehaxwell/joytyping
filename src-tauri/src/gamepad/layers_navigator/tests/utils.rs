@@ -1,6 +1,7 @@
 use gilrs::Button;
 
-use crate::{settings_data::{Layer, Switches, SwitchEventAndReaction, SwitchOnClickReaction, LayerSpecifier}, gamepad::{layers_navigator::{AvailableLayerVisitsFromLayer, LayerVisit}, Switch}};
+use crate::settings::data::{Layer, Switches, SwitchEventAndReaction, SwitchOnClickReaction, LayerSpecifier};
+use crate::gamepad::{layers_navigator::{AvailableLayerVisitsFromLayer, LayerVisit}, Switch};
 
 pub fn setup_haxwell_layout_layers_with_only_visits() -> Vec<Layer> {
 vec![

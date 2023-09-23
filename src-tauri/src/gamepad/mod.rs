@@ -1,6 +1,6 @@
 use gilrs::Button;
 
-use crate::settings_data::{self, Layer, SwitchOnClickReaction, KeyboardInput, SwitchEventAndReaction, Switches};
+use crate::settings::{self,data::{Layer, SwitchOnClickReaction, KeyboardInput, SwitchEventAndReaction, Switches}};
 
 use self::{gilrs_events::{gilrs_wrapper::GilrsEventType, GilrsEventsTrait,stick_switch_interpreter::{StickSwitchButton,StickSwitchEvent}}, layers_navigator::LayersNavigatorTrait};
 
@@ -24,7 +24,7 @@ pub struct Gamepad {
 impl Gamepad {
     pub fn new(
        gilrs_events: Box<dyn GilrsEventsTrait>,
-       layers_source: Vec<settings_data::Layer>,
+       layers_source: Vec<settings::data::Layer>,
        switch_click_pattern_detector: Box<dyn SwitchClickPatternDetectorTrait>,
        layers_navigator: Box<dyn LayersNavigatorTrait>,
     ) -> Self {
@@ -214,11 +214,11 @@ pub enum InputEvent {
     KeyUp,
 }
 
-#[derive(Debug, PartialEq)]
-pub struct LayerNodeRef{
-    pub id: String,
-    pub index: usize,
-}
+// #[derive(Debug, PartialEq)]
+// pub struct LayerNodeRef{
+//     pub id: String,
+//     pub index: usize,
+// }
 
 #[derive(Debug,Clone,PartialEq)]
 pub enum Switch {

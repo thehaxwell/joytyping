@@ -1,4 +1,4 @@
-use crate::settings_data::*;
+use crate::settings::data::*;
 
 pub fn setup_settings_data_example() -> SettingsData {
     let ps4_controller_profile = Profile{

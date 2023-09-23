@@ -1,5 +1,5 @@
 use crate::LeftOrRight;
-use crate::settings_data;
+use crate::settings;
 
 #[cfg(test)]
 use mockall::{automock, predicate::*};
@@ -114,7 +114,7 @@ pub struct AxisClickThresholds {
 
 impl AxisClickThresholds {
     pub fn get_from_setting(
-        thresholds: settings_data::StickSwitchesClickThresholds, alignment: LeftOrRight
+        thresholds: settings::data::StickSwitchesClickThresholds, alignment: LeftOrRight
         ) -> Self {
         if alignment == LeftOrRight::Left {
             Self {

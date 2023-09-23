@@ -3,7 +3,7 @@ use gilrs::Button;
 use mockall::{predicate::*, Sequence};
 mod layers_examples; 
 
-use crate::{gamepad::{switch_click_pattern_detector::{MockSwitchClickPatternDetectorTrait, SwitchClickPattern}, gilrs_events::MockGilrsEventsTrait, Gamepad, Switch, Handle, InputEvent, LayerVisit}, settings_data::{SwitchOnClickReaction, KeyboardInput, LayerSpecifier}};
+use crate::{gamepad::{switch_click_pattern_detector::{MockSwitchClickPatternDetectorTrait, SwitchClickPattern}, gilrs_events::MockGilrsEventsTrait, Gamepad, Switch, Handle, InputEvent, LayerVisit}, settings::data::{SwitchOnClickReaction, KeyboardInput, LayerSpecifier}};
 use self::layers_examples::setup_layers_examples;
 
 use super::{gilrs_events::stick_switch_interpreter::StickSwitchButton, DynamicSwitchEventReaction, EventReactionOrNesting};

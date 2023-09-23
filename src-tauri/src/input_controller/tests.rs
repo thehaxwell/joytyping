@@ -1,6 +1,6 @@
 use mockall::{predicate::eq, Sequence};
 
-use crate::{input_controller::{enigo_wrapper::MockEnigoTrait, KeyboardInputController, DELAY_DURATION}, settings_data::KeyboardInput};
+use crate::{input_controller::{enigo_wrapper::MockEnigoTrait, KeyboardInputController, DELAY_DURATION}, settings::data::KeyboardInput};
 
 use super::{KeyboardInputControllerTrait,MouseInputControllerTrait, MouseInputController};
 

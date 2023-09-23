@@ -3,12 +3,27 @@ use serde::Deserialize;
 use std::fmt;
 use serde::de::{self, Deserializer, Visitor, MapAccess};
 
-use crate::gamepad::LayerNodeRef;
+use crate::settings::LayerNodeRef;
+
+#[cfg(test)]
+mod tests;
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct SettingsData {
 	pub profiles: Vec<Profile>,
     pub global: Global,
+}
+
+impl SettingsData {
+    pub fn clone_and_set_layer_pointers(&self) -> Result<Self,String> {
+        Ok(SettingsData { 
+            profiles: self.profiles
+                .iter()
+                .map(|profile|profile.clone_and_set_layer_pointers())
+                .collect::<Result<Vec<_>,_>>()?,
+            global: self.global.clone()
+        })    
+    }
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
@@ -22,6 +37,35 @@ pub struct Profile {
     pub quick_lookup_window: QuickLookupWindow,
     pub layers: Vec<Layer>,
     pub stick_switches_click_thresholds: StickSwitchesClickThresholds,
+}
+
+impl Profile {
+    fn clone_and_set_layer_pointers(&self) -> Result<Self,String> {
+        let pointers: Vec<LayerNodeRef> = self.layers
+            .iter()
+            .enumerate()
+            .map(|(idx,layer)|{
+                let res = LayerNodeRef{
+                    id: layer.id.to_string(),
+                    index: idx.try_into().unwrap(),
+                };
+                res
+            })
+            .collect();
+
+        Ok(Profile {
+            name: self.name.clone(),
+            quick_lookup_window: self.quick_lookup_window.clone(),
+            layers: self.layers
+                .iter()
+                .map(|layer| 
+                    layer.clone_and_set_layer_pointers(
+                        &pointers,
+                        format!("Error in profile \"{}\" > ",self.name)))
+                .collect::<Result<Vec<_>,_>>()?,
+            stick_switches_click_thresholds: self.stick_switches_click_thresholds
+        })
+    }
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
@@ -55,13 +99,18 @@ pub struct Layer {
 }
 
 impl Layer {
-    pub fn clone_and_set_layer_pointers(&self,pointers: &Vec<LayerNodeRef>) -> Self {
-        Self {
+    pub fn clone_and_set_layer_pointers(
+        &self,
+        pointers: &Vec<LayerNodeRef>,
+        err_prefix: String) -> Result<Self,String> {
+        Ok(Self {
             id: self.id.clone(),
             switches: if let Some(key) = &self.switches { 
-				Some(key.clone_and_set_layer_pointers(pointers)) } else { None },
+				Some(key.clone_and_set_layer_pointers(
+                        pointers,
+                        format!("{}layer with id, \"{}\" > ",err_prefix,self.id.clone()))?) } else { None },
             cardinal_levers: self.cardinal_levers.clone(),
-        }
+        })
     }
 }
 
@@ -145,45 +194,84 @@ impl Switches {
             .collect()
     }
 
-    pub fn clone_and_set_layer_pointers(&self,pointers: &Vec<LayerNodeRef>) -> Self {
-        Switches {
+    pub fn clone_and_set_layer_pointers(
+        &self,
+        pointers: &Vec<LayerNodeRef>,
+        err_prefix: String) -> Result<Self,String> {
+        Ok(Switches {
             south: if let Some(key) = &self.south { 
-				Some(key.clone_and_set_layer_pointers(pointers)) } else { None },
+				Some(key.clone_and_set_layer_pointers(
+                    pointers,
+                    format!("{}south > ",err_prefix))?) } else { None },
             east: if let Some(key) = &self.east { 
-				Some(key.clone_and_set_layer_pointers(pointers)) } else { None },
+				Some(key.clone_and_set_layer_pointers(
+					pointers,
+					format!("{}east > ",err_prefix))?) } else { None },
             north: if let Some(key) = &self.north { 
-				Some(key.clone_and_set_layer_pointers(pointers)) } else { None },
+				Some(key.clone_and_set_layer_pointers(
+					pointers,
+					format!("{}north > ",err_prefix))?) } else { None },
             west: if let Some(key) = &self.west { 
-				Some(key.clone_and_set_layer_pointers(pointers)) } else { None },
+				Some(key.clone_and_set_layer_pointers(
+					pointers,
+					format!("{}west > ",err_prefix))?) } else { None },
             d_pad_up: if let Some(key) = &self.d_pad_up { 
-				Some(key.clone_and_set_layer_pointers(pointers)) } else { None },
+				Some(key.clone_and_set_layer_pointers(
+					pointers,
+					format!("{}d_pad_up > ",err_prefix))?) } else { None },
             d_pad_down: if let Some(key) = &self.d_pad_down { 
-				Some(key.clone_and_set_layer_pointers(pointers)) } else { None },
+				Some(key.clone_and_set_layer_pointers(
+					pointers,
+					format!("{}d_pad_down > ",err_prefix))?) } else { None },
             d_pad_left: if let Some(key) = &self.d_pad_left { 
-				Some(key.clone_and_set_layer_pointers(pointers)) } else { None },
+				Some(key.clone_and_set_layer_pointers(
+					pointers,
+					format!("{}d_pad_left > ",err_prefix))?) } else { None },
             d_pad_right: if let Some(key) = &self.d_pad_right { 
-				Some(key.clone_and_set_layer_pointers(pointers)) } else { None },
+				Some(key.clone_and_set_layer_pointers(
+					pointers,
+					format!("{}d_pad_right > ",err_prefix))?) } else { None },
             left_stick_up: if let Some(key) = &self.left_stick_up { 
-				Some(key.clone_and_set_layer_pointers(pointers)) } else { None },
+				Some(key.clone_and_set_layer_pointers(
+					pointers,
+					format!("{}left_stick_up > ",err_prefix))?) } else { None },
             left_stick_down: if let Some(key) = &self.left_stick_down { 
-				Some(key.clone_and_set_layer_pointers(pointers)) } else { None },
+				Some(key.clone_and_set_layer_pointers(
+					pointers,
+					format!("{}left_stick_down > ",err_prefix))?) } else { None },
             left_stick_left: if let Some(key) = &self.left_stick_left { 
-				Some(key.clone_and_set_layer_pointers(pointers)) } else { None },
+				Some(key.clone_and_set_layer_pointers(
+					pointers,
+					format!("{}left_stick_left > ",err_prefix))?) } else { None },
             left_stick_right: if let Some(key) = &self.left_stick_right { 
-				Some(key.clone_and_set_layer_pointers(pointers)) } else { None },
+				Some(key.clone_and_set_layer_pointers(
+					pointers,
+					format!("{}left_stick_right > ",err_prefix))?) } else { None },
             right_stick_up: if let Some(key) = &self.right_stick_up { 
-				Some(key.clone_and_set_layer_pointers(pointers)) } else { None },
+				Some(key.clone_and_set_layer_pointers(
+					pointers,
+					format!("{}right_stick_up > ",err_prefix))?) } else { None },
             right_stick_down: if let Some(key) = &self.right_stick_down { 
-				Some(key.clone_and_set_layer_pointers(pointers)) } else { None },
+				Some(key.clone_and_set_layer_pointers(
+					pointers,
+					format!("{}right_stick_down > ",err_prefix))?) } else { None },
             right_stick_left: if let Some(key) = &self.right_stick_left { 
-				Some(key.clone_and_set_layer_pointers(pointers)) } else { None },
+				Some(key.clone_and_set_layer_pointers(
+					pointers,
+					format!("{}right_stick_left > ",err_prefix))?) } else { None },
             right_stick_right: if let Some(key) = &self.right_stick_right { 
-				Some(key.clone_and_set_layer_pointers(pointers)) } else { None },
+				Some(key.clone_and_set_layer_pointers(
+					pointers,
+					format!("{}right_stick_right > ",err_prefix))?) } else { None },
             right_trigger: if let Some(key) = &self.right_trigger { 
-				Some(key.clone_and_set_layer_pointers(pointers)) } else { None },
+				Some(key.clone_and_set_layer_pointers(
+					pointers,
+					format!("{}right_trigger > ",err_prefix))?) } else { None },
             left_trigger: if let Some(key) = &self.left_trigger { 
-				Some(key.clone_and_set_layer_pointers(pointers)) } else { None },
-        }
+				Some(key.clone_and_set_layer_pointers(
+					pointers,
+					format!("{}left_trigger > ",err_prefix))?) } else { None },
+        })
     }
 }
 
@@ -212,30 +300,42 @@ impl SwitchEventAndReaction {
             .collect()
     }
 
-    pub fn clone_and_set_layer_pointers(&self, pointers: &Vec<LayerNodeRef>) -> Self{
-        SwitchEventAndReaction {
+    pub fn clone_and_set_layer_pointers(
+        &self, pointers: &Vec<LayerNodeRef>, err_prefix: String) -> Result<Self,String>{
+        Ok(SwitchEventAndReaction {
             on_click: SwitchEventAndReaction
-                ::clone_event_with_layer_pointers_possibly_set(&self.on_click,pointers),
+                ::clone_event_with_layer_pointers_possibly_set(
+                    &self.on_click,pointers,
+                    format!("{}on_click > ",err_prefix))?,
             on_double_click: SwitchEventAndReaction
-                ::clone_event_with_layer_pointers_possibly_set(&self.on_double_click,pointers),
-        }
+                ::clone_event_with_layer_pointers_possibly_set(
+                    &self.on_double_click,pointers,
+                    format!("{}on_double_click > ",err_prefix))?,
+        })
 
     }
 
     fn clone_event_with_layer_pointers_possibly_set(
         event: &Option<SwitchOnClickReaction>,
-        pointers: &Vec<LayerNodeRef>) -> Option<SwitchOnClickReaction>{
+        pointers: &Vec<LayerNodeRef>,
+        err_prefix: String) -> Result<Option<SwitchOnClickReaction>,String>{
         match event {
             Some(SwitchOnClickReaction::VisitLayer(layer_specifier))
-                => Some(SwitchOnClickReaction::VisitLayer(
-                    layer_specifier.clone_and_set_layer_pointer(pointers))),
+                => Ok(Some(SwitchOnClickReaction::VisitLayer(
+                    layer_specifier.clone_and_set_layer_pointer(
+                        pointers,
+                        format!("{}visit_layer: ",err_prefix))?))),
             Some(SwitchOnClickReaction::MoveToLayer(layer_specifier))
-                => Some(SwitchOnClickReaction::MoveToLayer(
-                    layer_specifier.clone_and_set_layer_pointer(pointers))),
+                => Ok(Some(SwitchOnClickReaction::MoveToLayer(
+                    layer_specifier.clone_and_set_layer_pointer(
+                        pointers,
+                        format!("{}move_to_layer: ",err_prefix))?))),
             Some(SwitchOnClickReaction::MoveToOrVisitLayer(layer_specifier))
-                => Some(SwitchOnClickReaction::MoveToOrVisitLayer(
-                    layer_specifier.clone_and_set_layer_pointer(pointers))),
-            other => other.clone(),
+                => Ok(Some(SwitchOnClickReaction::MoveToOrVisitLayer(
+                    layer_specifier.clone_and_set_layer_pointer(
+                        pointers,
+                        format!("{}move_to_or_visit_layer: ",err_prefix))?))),
+            other => Ok(other.clone()),
         }
     }
 }
@@ -271,18 +371,18 @@ impl LayerSpecifier {
         }
     }
 
-    pub fn clone_and_set_layer_pointer(&self, pointers: &Vec<LayerNodeRef>) -> Self{
+    pub fn clone_and_set_layer_pointer(&self, pointers: &Vec<LayerNodeRef>, err_prefix: String) -> Result<Self,String> {
         let ptr = pointers
             .iter()
             .find(|pointer| pointer.id == self.id);
         if let Some(ptr) = ptr {
-            LayerSpecifier {
+            Ok(LayerSpecifier {
                 id: self.id.clone(),
                 index_in_gamepad: Some(ptr.index),
-            }
+            })           
         }
         else {
-            self.clone()
+            Err(format!("{}No layer found having the id \"{}\"",err_prefix,self.id))
         }
     }
 }

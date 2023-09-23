@@ -1,4 +1,4 @@
-use crate::settings_data::SettingsData;
+use crate::settings::data::{SettingsData, Layer};
 use thiserror::Error;
 
 #[cfg(test)]
@@ -6,6 +6,8 @@ use mockall::{automock, predicate::*};
 
 // #[cfg(test)]
 // mod tests;
+
+pub mod data;
 
 pub mod error_display_window;
 
@@ -42,40 +44,75 @@ impl Settings {
     /// Load settings from the specified file.
     /// If reading or parsing the file fails, load the default settings.
     pub fn load(&mut self) -> Result<(), SettingsLoadError> {
-        match self.dependencies.read_to_string(&self.file_path) {
-            Err(e) => {
+match self.dependencies.read_to_string(&self.file_path)
+    .map_err(|e|{
                 self.load_default();
                 match e.kind() {
                     std::io::ErrorKind::NotFound => {
-                        Err(SettingsLoadError::FileNotFound)
+                        SettingsLoadError::FileNotFound
                     },
                     std::io::ErrorKind::PermissionDenied => {
-                        Err(SettingsLoadError::PermissionDenied)
+                        SettingsLoadError::PermissionDenied
                     },
                     _ => {
-                        Err(SettingsLoadError::FileNotReadable)
+                        SettingsLoadError::FileNotReadable
                     },
                 }
-            },
-            Ok(settings_str) => {
-                match self.dependencies.from_str(&settings_str){
-                    Err(e) => {
-                        self.load_default();
-                        Err(SettingsLoadError::FileNotParsable(e.to_string()))
-                    },
-                    Ok(deserialized) => {
-                        if let Err(e) = Settings::validate_settings_data(&deserialized) {
-                            self.load_default();
-                            return Err(e);
-                        }
-                        else {
-                            self.data = Some(deserialized);
+            
+    })
+.and_then(|settings_str| self.dependencies.from_str(&settings_str)
+                    .map_err(|e|SettingsLoadError::FileNotParsable(e.to_string())))
+.and_then(|deserialized|{
+                        Settings::validate_settings_data(&deserialized)
+                            .map(|()| deserialized)
+                    })
+        .and_then(|data:SettingsData|data.clone_and_set_layer_pointers()
+                    .map_err(|e:String|SettingsLoadError::FileNotParsable(e)))
+    {
+                        Ok(data) => {
+                            self.data = Some(data);
                             Ok(())
                         }
+                        Err(e) => {
+                            self.load_default();
+                            Err(e)
+                        }
                     }
-                }
-            },
-        }
+        // match self.dependencies.read_to_string(&self.file_path) {
+        //     Err(e) => {
+        //         self.load_default();
+        //         match e.kind() {
+        //             std::io::ErrorKind::NotFound => {
+        //                 Err(SettingsLoadError::FileNotFound)
+        //             },
+        //             std::io::ErrorKind::PermissionDenied => {
+        //                 Err(SettingsLoadError::PermissionDenied)
+        //             },
+        //             _ => {
+        //                 Err(SettingsLoadError::FileNotReadable)
+        //             },
+        //         }
+        //     },
+        //     Ok(settings_str) => {
+        //         match self.dependencies.from_str(&settings_str)
+        //             .map_err(|e|SettingsLoadError::FileNotParsable(e.to_string()))
+        //             .and_then(|deserialized|{
+        //                 Settings::validate_settings_data(&deserialized)
+        //                     .map(|()| deserialized)
+        //             }) 
+        //         {
+        //                 Ok(data) => {
+        //                     self.data = Some(data);
+        //                     Ok(())
+        //                 }
+        //                 Err(e) => {
+        //                     self.load_default();
+        //                     Err(e)
+        //                 }
+        //             }
+        //
+        //     },
+        // }
     }
 
     pub fn load_default(&mut self) {
@@ -148,4 +185,12 @@ pub enum SettingsLoadError {
 
     #[error("OS denied access to settings file")]
     PermissionDenied
+}
+
+
+// a utility for settings_data::Layer
+#[derive(Debug, PartialEq)]
+pub struct LayerNodeRef{
+    pub id: String,
+    pub index: usize,
 }

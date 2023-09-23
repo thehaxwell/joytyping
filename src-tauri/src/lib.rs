@@ -13,7 +13,6 @@ use crate::gamepad::switch_click_pattern_detector::SwitchClickPatternDetector;
 use crate::input_controller::{MouseInputController, MouseInputControllerTrait};
 
 pub mod settings;
-pub mod settings_data;
 pub mod gamepad;
 pub mod input_controller;
 
@@ -69,25 +68,6 @@ pub fn start_main_loop(
         //         settings_data::ControlMouseScrollwheelFunction{
         //             center_at_y: 0.0}));
 
-
-        let pointers: Vec<gamepad::LayerNodeRef> = active_profile.layers
-            .iter()
-            .enumerate()
-            .map(|(idx,layer)|{
-                let res = gamepad::LayerNodeRef{
-                    id: layer.id.to_string(),
-                    index: idx.try_into().unwrap(),
-                };
-                res
-            })
-            .collect();
-
-        let settings_layers: Vec<settings_data::Layer> = active_profile.layers
-            .iter()
-            .map(|layer|
-                layer.clone_and_set_layer_pointers(&pointers)
-            )
-            .collect();
         let mut gamepad = gamepad::Gamepad::new(
             Box::new(GilrsEvents::new(
                 Box::new(GilrsWrapper::new()),
@@ -114,9 +94,9 @@ pub fn start_main_loop(
                     }
                 )),
             )),
-            settings_layers.clone(),
+            active_profile.layers.clone(),
             Box::new(SwitchClickPatternDetector::new()),
-            Box::new(LayersNavigator::new(settings_layers)),
+            Box::new(LayersNavigator::new(active_profile.layers)),
         );
 
         let mut keyboard_input_controller = KeyboardInputController::new(Box::new(EnigoWrapper::new()));

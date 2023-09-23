@@ -2,11 +2,11 @@ use std::time::Instant;
 
 use gilrs::Button;
 
-// use crate::settings_data::KeyboardInput;
-// use crate::settings_data::LayerSpecifier;
-// use crate::settings_data::MouseInput;
-// use crate::settings_data::SwitchEventAndReaction;
-// use crate::settings_data::SwitchOnClickReaction;
+// use crate::settings::data::KeyboardInput;
+// use crate::settings::data::LayerSpecifier;
+// use crate::settings::data::MouseInput;
+// use crate::settings::data::SwitchEventAndReaction;
+// use crate::settings::data::SwitchOnClickReaction;
 
 use super::SwitchClickPatternDetector;
 use super::SwitchClickPatternDetectorTrait;

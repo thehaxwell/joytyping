@@ -1,5 +1,5 @@
 use std::time::Duration;
-use crate::settings_data::KeyboardInput;
+use crate::settings::data::KeyboardInput;
 
 use self::enigo_wrapper::EnigoTrait;
 
