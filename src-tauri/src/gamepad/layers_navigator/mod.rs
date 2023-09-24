@@ -72,6 +72,8 @@ impl LayersNavigator {
                             (Switch::StickSwitchButton(StickSwitchButton::RightStickRight),&switches.right_stick_right),
                             (Switch::Button(Button::RightTrigger),&switches.right_trigger),
                             (Switch::Button(Button::LeftTrigger),&switches.left_trigger),
+                            (Switch::Button(Button::RightTrigger2),&switches.right_trigger_2),
+                            (Switch::Button(Button::LeftTrigger2),&switches.left_trigger_2),
                         ]
                         .iter()
                         .filter_map(|(switch,event_and_reaction_opt)|

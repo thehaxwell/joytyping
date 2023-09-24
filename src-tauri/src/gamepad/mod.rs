@@ -180,6 +180,8 @@ impl Gamepad {
                 Button::DPadLeft => switches.d_pad_left.clone(),
                 Button::LeftTrigger => switches.left_trigger.clone(),
                 Button::RightTrigger => switches.right_trigger.clone(),
+                Button::LeftTrigger2 => switches.left_trigger_2.clone(),
+                Button::RightTrigger2 => switches.right_trigger_2.clone(),
                 _ => None
             },
             Switch::StickSwitchButton(button) => match button {

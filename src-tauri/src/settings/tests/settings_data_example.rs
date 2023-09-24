@@ -274,6 +274,8 @@ pub fn setup_settings_data_example() -> SettingsData {
                 mouse_button: None,
               })
             }),
+            left_trigger_2: None,
+            right_trigger_2: None,
           })
         },
         Layer {
@@ -502,6 +504,8 @@ pub fn setup_settings_data_example() -> SettingsData {
                 mouse_button: None,
               })
             }),
+            left_trigger_2: None,
+            right_trigger_2: None,
           }),
         },
         Layer {
@@ -730,6 +734,8 @@ pub fn setup_settings_data_example() -> SettingsData {
                 mouse_button: None,
               })
             }),
+            left_trigger_2: None,
+            right_trigger_2: None,
           })
         },
         Layer {
@@ -746,6 +752,8 @@ pub fn setup_settings_data_example() -> SettingsData {
               west: None,
               left_trigger: None,
               right_trigger: None,
+            left_trigger_2: None,
+            right_trigger_2: None,
             east: Some(SwitchEventAndReaction{
               on_click_and_hold: None,
               on_double_click: None,
@@ -1118,6 +1126,8 @@ pub fn setup_settings_data_example() -> SettingsData {
                 mouse_button: None,
               })
             }),
+            left_trigger_2: None,
+            right_trigger_2: None,
           }),
         },
         Layer {
@@ -1346,6 +1356,8 @@ pub fn setup_settings_data_example() -> SettingsData {
                 mouse_button: None,
               })
             }),
+            left_trigger_2: None,
+            right_trigger_2: None,
           }),
         },
         Layer {
@@ -1528,6 +1540,8 @@ pub fn setup_settings_data_example() -> SettingsData {
                 move_to_layer: None,
               })
             }),
+            left_trigger_2: None,
+            right_trigger_2: None,
           }),
         },
         Layer {
@@ -1549,6 +1563,8 @@ pub fn setup_settings_data_example() -> SettingsData {
 	        right_stick_right: None,
 	        right_trigger: None,
 	        left_trigger: None,
+            left_trigger_2: None,
+            right_trigger_2: None,
             south: Some(SwitchEventAndReaction{
               on_click_and_hold: None,
               on_double_click: None,

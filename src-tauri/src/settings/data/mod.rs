@@ -163,7 +163,8 @@ pub struct Switches {
 	pub right_stick_right: Option<SwitchEventAndReaction>,
 	pub right_trigger: Option<SwitchEventAndReaction>,
 	pub left_trigger: Option<SwitchEventAndReaction>,
-
+	pub right_trigger_2: Option<SwitchEventAndReaction>,
+	pub left_trigger_2: Option<SwitchEventAndReaction>,
 }
 
 impl Switches {
@@ -187,6 +188,8 @@ impl Switches {
             &self.right_stick_right,
             &self.right_trigger,
             &self.left_trigger,
+            &self.right_trigger_2,
+            &self.left_trigger_2,
         ]
             .iter()
             .filter_map(|key_opt| if let Some(key) = key_opt {Some(key.get_ids_pointing_to_layers())} else { None })
@@ -271,6 +274,14 @@ impl Switches {
 				Some(key.clone_and_set_layer_pointers(
 					pointers,
 					format!("{}left_trigger > ",err_prefix))?) } else { None },
+            right_trigger_2: if let Some(key) = &self.right_trigger_2 { 
+				Some(key.clone_and_set_layer_pointers(
+					pointers,
+					format!("{}right_trigger_2 > ",err_prefix))?) } else { None },
+            left_trigger_2: if let Some(key) = &self.left_trigger_2 { 
+				Some(key.clone_and_set_layer_pointers(
+					pointers,
+					format!("{}left_trigger_2 > ",err_prefix))?) } else { None },
         })
     }
 }

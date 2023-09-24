@@ -31,8 +31,10 @@ fn visit_layer_works() {
         (Switch::StickSwitchButton(StickSwitchButton::RightStickDown),40),
         (Switch::StickSwitchButton(StickSwitchButton::RightStickLeft),30),
         (Switch::StickSwitchButton(StickSwitchButton::RightStickRight),25),
-        (Switch::Button(Button::RightTrigger),2),
-        (Switch::Button(Button::LeftTrigger),1),
+        (Switch::Button(Button::RightTrigger),4),
+        (Switch::Button(Button::LeftTrigger),3),
+        (Switch::Button(Button::RightTrigger2),2),
+        (Switch::Button(Button::LeftTrigger2),1),
     ]
     .iter()
     .enumerate()

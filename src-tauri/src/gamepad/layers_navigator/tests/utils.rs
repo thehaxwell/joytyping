@@ -24,6 +24,8 @@ vec![
                         right_stick_down: None,
                         right_stick_left: None,
                         right_stick_right: None,
+                        left_trigger_2: None,
+                        right_trigger_2: None,
                     right_trigger: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::VisitLayer(LayerSpecifier {
                             id: "first-layer-step-2".to_string(),
@@ -66,6 +68,8 @@ vec![
                         right_stick_down: None,
                         right_stick_left: None,
                         right_stick_right: None,
+                        left_trigger_2: None,
+                        right_trigger_2: None,
                     right_trigger: None,
                     left_trigger: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::VisitLayer(LayerSpecifier {
@@ -96,6 +100,8 @@ vec![
                         right_stick_down: None,
                         right_stick_left: None,
                         right_stick_right: None,
+                        left_trigger_2: None,
+                        right_trigger_2: None,
                     right_trigger: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::VisitLayer(LayerSpecifier { 
                             id: "first-layer-step-4".to_string(),
@@ -126,8 +132,10 @@ vec![
                         right_stick_down: None,
                         right_stick_left: None,
                         right_stick_right: None,
-                    right_trigger: None,
-                    left_trigger: None,
+                        right_trigger: None,
+                        left_trigger: None,
+                        left_trigger_2: None,
+                        right_trigger_2: None,
                 }),
                 cardinal_levers: None,
             },
@@ -150,6 +158,8 @@ vec![
                         right_stick_down: None,
                         right_stick_left: None,
                         right_stick_right: None,
+                        left_trigger_2: None,
+                        right_trigger_2: None,
                     right_trigger: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::VisitLayer(LayerSpecifier {
                             id: "second-layer-step-2".to_string(),
@@ -192,6 +202,8 @@ vec![
                         right_stick_down: None,
                         right_stick_left: None,
                         right_stick_right: None,
+                        left_trigger_2: None,
+                        right_trigger_2: None,
                     right_trigger: None,
                     left_trigger: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::VisitLayer(LayerSpecifier {
@@ -221,6 +233,8 @@ vec![
                         right_stick_down: None,
                         right_stick_left: None,
                         right_stick_right: None,
+                        left_trigger_2: None,
+                        right_trigger_2: None,
                     right_trigger: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::VisitLayer(LayerSpecifier{
                         id: "second-layer-step-4".to_string(),
@@ -253,6 +267,8 @@ vec![
                     right_stick_right: None,
                     right_trigger: None,
                     left_trigger: None,
+                    left_trigger_2: None,
+                    right_trigger_2: None,
                 }),
                 cardinal_levers: None,
             },
