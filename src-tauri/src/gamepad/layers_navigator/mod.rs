@@ -18,10 +18,17 @@ pub trait LayersNavigatorTrait {
     fn get_current_layer_index(&self) -> usize;
     fn undo_last_layer_visit_with_switch(&mut self, switch: Switch);
     fn process_current_potential_visit(&mut self,pattern: SwitchClickPattern);
+    fn consumable_get_current_layer_index(&mut self) -> Option<usize>;
 }
 
 pub struct LayersNavigator {
     current_layer_index: usize,
+
+    // will be used to only send updates to
+    // the quick_lookup_window when the
+    // current_layer_index has been changed
+    consumable_current_layer_index: Option<usize>,
+
     // recording when to go back on layer visits
     layer_visits: Vec<LayerVisit>,
     // any interruption cause an emptying
@@ -40,6 +47,7 @@ impl LayersNavigator {
     pub fn new(layers: Vec<Layer>) -> Self {
         Self {
             current_layer_index: 0,
+            consumable_current_layer_index: None,
             latest_move_to_index: 0,
             layer_visits: Vec::new(),
             potential_layer_visit: None,
@@ -107,12 +115,16 @@ impl LayersNavigator {
             .collect()
     }
 
+    fn set_current_layer_index(&mut self, index: usize) {
+        self.current_layer_index = index;
+        self.consumable_current_layer_index = Some(index);
+    }
 }
 
 impl LayersNavigatorTrait for LayersNavigator {
     fn move_to_layer(&mut self, layer_specifier: LayerSpecifier) {
         println!(">>>>> from {}, move_to_layer: {:?}",self.current_layer_index ,layer_specifier);
-        self.current_layer_index = layer_specifier.index_in_gamepad.unwrap();
+        self.set_current_layer_index(layer_specifier.index_in_gamepad.unwrap());
         self.latest_move_to_index = self.current_layer_index;
     }
 
@@ -123,7 +135,7 @@ impl LayersNavigatorTrait for LayersNavigator {
             to_index: layer_specifier.index_in_gamepad.unwrap(),
             from_index: self.current_layer_index,
         });
-        self.current_layer_index = layer_specifier.index_in_gamepad.unwrap();
+        self.set_current_layer_index(layer_specifier.index_in_gamepad.unwrap());
     }
 
     fn move_to_or_visit_layer(&mut self, trigger_switch: Switch, layer_specifier: LayerSpecifier) {
@@ -133,7 +145,7 @@ impl LayersNavigatorTrait for LayersNavigator {
             to_index: layer_specifier.index_in_gamepad.unwrap(),
             from_index: self.current_layer_index,
         });
-        self.current_layer_index = layer_specifier.index_in_gamepad.unwrap();
+        self.set_current_layer_index(layer_specifier.index_in_gamepad.unwrap());
     }
     
     fn get_current_layer_index(&self) -> usize {
@@ -235,12 +247,18 @@ impl LayersNavigatorTrait for LayersNavigator {
             self.layer_visits = new_layer_visits;
 
             if let Some(layer_visit) = self.layer_visits.last() {
-                self.current_layer_index = layer_visit.to_index;
+                self.set_current_layer_index(layer_visit.to_index);
             }
             else {
-                self.current_layer_index = self.latest_move_to_index;
+                self.set_current_layer_index(self.latest_move_to_index);
             }
         }
+    }
+
+    fn consumable_get_current_layer_index(&mut self) -> Option<usize> {
+        let index = self.consumable_current_layer_index;
+        self.consumable_current_layer_index = None;
+        index
     }
 }
 

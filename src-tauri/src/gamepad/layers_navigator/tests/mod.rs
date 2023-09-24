@@ -4,10 +4,12 @@ use crate::{gamepad::{layers_navigator::{LayersNavigator,LayersNavigatorTrait, L
 
 mod utils;
 
+//TODO: write tests for consumable_current_layer_index
 #[test]
 fn visit_layer_works() {
     let mut layers_navigator = LayersNavigator {
        current_layer_index: 0,
+       consumable_current_layer_index: None,
        latest_move_to_index: 0,
        layer_visits: Vec::new(),
        potential_layer_visit: None,
@@ -67,6 +69,7 @@ fn visit_layer_works() {
 fn move_to_layer_works() {
     let mut layers_navigator = LayersNavigator {
        current_layer_index: 0,
+       consumable_current_layer_index: None,
        latest_move_to_index: 0,
        layer_visits: Vec::new(),
        potential_layer_visit: None,
@@ -95,6 +98,7 @@ fn move_to_layer_works() {
 fn visit_or_move_to_layer_works() {
     let mut layers_navigator = LayersNavigator {
        current_layer_index: 0,
+       consumable_current_layer_index: None,
        latest_move_to_index: 0,
        layer_visits: Vec::new(),
        potential_layer_visit: None,
@@ -178,6 +182,7 @@ fn undo_last_layer_visit_with_switch_works() {
 
     let mut layers_navigator = LayersNavigator {
        current_layer_index: 6,
+       consumable_current_layer_index: None,
        latest_move_to_index: 0,
        layer_visits: layer_visits.clone(),
        potential_layer_visit: None,
@@ -290,6 +295,7 @@ fn setup_layers_navigator_with_potential_layer_visit(
     process_current_potential_visit_arg: SwitchClickPattern) -> LayersNavigator {
     let mut layers_navigator = LayersNavigator {
        current_layer_index: 0,
+       consumable_current_layer_index: None,
        latest_move_to_index: 0,
        layer_visits: Vec::new(),
        potential_layer_visit: 
@@ -547,6 +553,7 @@ impl LayersNavigatorDriver {
 fn scenario_double_click_to_go_from_layer_0_to_4() {
     let mut layers_navigator_driver = LayersNavigatorDriver::new(LayersNavigator {
        current_layer_index: 0,
+       consumable_current_layer_index: None,
        latest_move_to_index: 0,
        layer_visits: Vec::new(),
        potential_layer_visit: None,
@@ -617,6 +624,7 @@ fn scenario_double_click_to_go_from_layer_0_to_4() {
 fn scenario_double_click_to_go_from_layer_4_to_0() {
     let mut layers_navigator_driver = LayersNavigatorDriver::new(LayersNavigator {
        current_layer_index: 4,
+       consumable_current_layer_index: None,
        latest_move_to_index: 4,
        layer_visits: Vec::new(),
        potential_layer_visit: None,

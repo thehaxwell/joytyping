@@ -1,6 +1,6 @@
 use gilrs::Button;
 
-use crate::settings::{self,data::{Layer, SwitchOnClickReaction, KeyboardInput, SwitchEventAndReaction, Switches}};
+use crate::{settings::{self,data::{Layer, SwitchOnClickReaction, KeyboardInput, SwitchEventAndReaction, Switches}}, quick_lookup_window::QuickLookupWindowTrait};
 
 use self::{gilrs_events::{gilrs_wrapper::GilrsEventType, GilrsEventsTrait,stick_switch_interpreter::{StickSwitchButton,StickSwitchEvent}}, layers_navigator::LayersNavigatorTrait};
 
@@ -19,6 +19,7 @@ pub struct Gamepad {
    layers: Vec<Layer>,
    switch_click_pattern_detector: Box<dyn SwitchClickPatternDetectorTrait>,
    layers_navigator: Box<dyn LayersNavigatorTrait>,
+   quick_lookup_window: Box<dyn QuickLookupWindowTrait>,
 }
 
 impl Gamepad {
@@ -27,6 +28,7 @@ impl Gamepad {
        layers_source: Vec<settings::data::Layer>,
        switch_click_pattern_detector: Box<dyn SwitchClickPatternDetectorTrait>,
        layers_navigator: Box<dyn LayersNavigatorTrait>,
+       quick_lookup_window: Box<dyn QuickLookupWindowTrait>,
     ) -> Self {
         Gamepad{
             gilrs_events,
@@ -34,6 +36,7 @@ impl Gamepad {
             switch_click_pattern_detector,
 
             layers_navigator,
+            quick_lookup_window,
         }
     }
 
@@ -47,7 +50,7 @@ impl Gamepad {
                 next_event);
         }
 
-        match next_event_opt {
+        match next_event_opt.clone() {
             Some(SwitchClickPattern::Click(switch)) => {
                 match self.get_switch_event_and_reaction(switch.clone())
                             .and_then(|s_e_a_r| s_e_a_r.on_click) {
@@ -59,6 +62,8 @@ impl Gamepad {
                     => self.layers_navigator.visit_layer(switch,layer_specifier),
                     Some(SwitchOnClickReaction::MoveToOrVisitLayer(layer_specifier))
                     => self.layers_navigator.move_to_or_visit_layer(switch,layer_specifier),
+                    Some(SwitchOnClickReaction::ShowQuickLookupWindow)
+                    => {let _ = self.quick_lookup_window.show_or_open(switch);}
                     _ => ()
                 }
 
@@ -88,6 +93,8 @@ impl Gamepad {
                     => self.layers_navigator.visit_layer(switch,layer_specifier),
                     Some(SwitchOnClickReaction::MoveToOrVisitLayer(layer_specifier))
                     => self.layers_navigator.move_to_or_visit_layer(switch,layer_specifier),
+                    Some(SwitchOnClickReaction::ShowQuickLookupWindow)
+                    => {let _ = self.quick_lookup_window.show_or_open(switch);}
                     _ => ()
                 }
             },
@@ -109,11 +116,19 @@ impl Gamepad {
 
             },
             Some(SwitchClickPattern::ClickEnd(switch)) => {
-                self.layers_navigator.undo_last_layer_visit_with_switch(switch);
+                self.layers_navigator.undo_last_layer_visit_with_switch(switch.clone());
+                let _ = self.quick_lookup_window.hide(switch);
                 return Some(InputEvent::KeyUp);
             }
             None => (),
         };
+
+        if let Some(new_layer_index) 
+            = self.layers_navigator.consumable_get_current_layer_index() {
+            let _ = self
+                .quick_lookup_window
+                .update(new_layer_index);
+        }
 
         None
     }

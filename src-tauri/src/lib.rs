@@ -11,16 +11,19 @@ use settings::{Settings,SettingsDependenciesImpl};
 
 use crate::gamepad::switch_click_pattern_detector::SwitchClickPatternDetector;
 use crate::input_controller::{MouseInputController, MouseInputControllerTrait};
+use quick_lookup_window::{QuickLookupWindow, QuickLookupWindowDependenciesImpl};
 
 pub mod settings;
 pub mod gamepad;
 pub mod input_controller;
+pub mod quick_lookup_window;
 
 pub fn start_main_loop(
     end_signal_mpsc_receiver: mpsc::Receiver<MainLoopInterruption>,
     handle: tauri::AppHandle
     ){
-    let mut settings_error_display_window = ErrorDisplayWindow::new(handle);
+    let mut settings_error_display_window = ErrorDisplayWindow::new(handle.clone());
+
 
     'main_loop_initializer_loop: loop {
         // close any open window first while there's time
@@ -68,6 +71,24 @@ pub fn start_main_loop(
         //         settings_data::ControlMouseScrollwheelFunction{
         //             center_at_y: 0.0}));
 
+        let mut quick_lookup_window = QuickLookupWindow::new(
+            handle.clone(),
+            Box::new(QuickLookupWindowDependenciesImpl),
+        );
+        quick_lookup_window.set_window_settings(active_profile.quick_lookup_window);
+        match quick_lookup_window.load_startup_script() {
+            Err(e) => {
+                match e {
+                    _ => {
+                        println!("Error!");
+                    }
+                }
+            },
+            Ok(_) => {
+                println!("quick lookup window external script");
+            }
+        }
+
         let mut gamepad = gamepad::Gamepad::new(
             Box::new(GilrsEvents::new(
                 Box::new(GilrsWrapper::new()),
@@ -97,10 +118,12 @@ pub fn start_main_loop(
             active_profile.layers.clone(),
             Box::new(SwitchClickPatternDetector::new()),
             Box::new(LayersNavigator::new(active_profile.layers)),
+            Box::new(quick_lookup_window),
         );
 
         let mut keyboard_input_controller = KeyboardInputController::new(Box::new(EnigoWrapper::new()));
         // let mut mouse_input_controller = MouseInputController::new(Box::new(EnigoWrapper::new()));
+
 
         'main_loop: loop {
             //TODO: check if this actually eases the load on the CPU
