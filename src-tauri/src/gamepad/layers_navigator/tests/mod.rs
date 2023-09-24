@@ -4,7 +4,29 @@ use crate::{gamepad::{layers_navigator::{LayersNavigator,LayersNavigatorTrait, L
 
 mod utils;
 
-//TODO: write tests for consumable_current_layer_index
+#[test]
+fn consumable_get_current_layer_index_works() {
+    let mut layers_navigator = LayersNavigator {
+       current_layer_index: 0,
+       consumable_current_layer_index: Some(6),
+       latest_move_to_index: 0,
+       layer_visits: Vec::new(),
+       potential_layer_visit: None,
+       layers_and_their_available_layer_visits: Vec::new(),
+    };
+    assert_eq!(layers_navigator.consumable_get_current_layer_index().unwrap(),6);
+    assert!(layers_navigator.consumable_get_current_layer_index().is_none());
+
+    let mut layers_navigator = LayersNavigator {
+       current_layer_index: 0,
+       consumable_current_layer_index: None,
+       latest_move_to_index: 0,
+       layer_visits: Vec::new(),
+       potential_layer_visit: None,
+       layers_and_their_available_layer_visits: Vec::new(),
+    };
+    assert!(layers_navigator.consumable_get_current_layer_index().is_none());
+}
 
 #[test]
 fn visit_layer_works() {
@@ -47,6 +69,7 @@ fn visit_layer_works() {
             switch.clone(),
             LayerSpecifier { id: String::new(), index_in_gamepad: Some(layer_index) });
         assert_eq!(layers_navigator.current_layer_index,layer_index);
+        assert_eq!(layers_navigator.consumable_current_layer_index.unwrap(),layer_index);
 
         assert_eq!(layers_navigator.layer_visits.len(),idx+1);
 
@@ -87,6 +110,7 @@ fn move_to_layer_works() {
                      index_in_gamepad: Some(index_in_gamepad) });
 
             assert_eq!(layers_navigator.current_layer_index,index_in_gamepad);
+            assert_eq!(layers_navigator.consumable_current_layer_index.unwrap(),index_in_gamepad);
             assert_eq!(layers_navigator.latest_move_to_index,index_in_gamepad);
 
             // all other things remain the same
@@ -135,6 +159,7 @@ fn visit_or_move_to_layer_works() {
             switch.clone(),
             LayerSpecifier { id: String::new(), index_in_gamepad: Some(layer_index) });
         assert_eq!(layers_navigator.current_layer_index,layer_index);
+        assert_eq!(layers_navigator.consumable_current_layer_index.unwrap(),layer_index);
 
         assert_eq!(
             layers_navigator.potential_layer_visit.as_ref().unwrap().to_index,
@@ -256,6 +281,7 @@ fn undo_last_layer_visit_with_switch_works() {
         layer_visits[4].trigger_switch.clone());
 
     assert_eq!(layers_navigator.current_layer_index,6);
+    assert_eq!(layers_navigator.consumable_current_layer_index.unwrap(),6);
 
     assert_eq!(layers_navigator.layer_visits.len(),4);
     assert_eq!(layers_navigator.layer_visits[0],layer_visits[0]);
@@ -270,6 +296,7 @@ fn undo_last_layer_visit_with_switch_works() {
         layer_visits[2].trigger_switch.clone());
 
     assert_eq!(layers_navigator.current_layer_index,3);
+    assert_eq!(layers_navigator.consumable_current_layer_index.unwrap(),3);
 
     assert_eq!(layers_navigator.layer_visits.len(),2);
     assert_eq!(layers_navigator.layer_visits[0],layer_visits[0]);
@@ -282,6 +309,7 @@ fn undo_last_layer_visit_with_switch_works() {
         layer_visits[0].trigger_switch.clone());
 
     assert_eq!(layers_navigator.current_layer_index,3);
+    assert_eq!(layers_navigator.consumable_current_layer_index.unwrap(),3);
 
     assert_eq!(layers_navigator.layer_visits.len(),1);
     assert_eq!(layers_navigator.layer_visits[0],LayerVisit{
@@ -310,6 +338,7 @@ fn setup_layers_navigator_with_potential_layer_visit(
     // all else remains the same
     assert!(layers_navigator.potential_layer_visit.is_none());
     assert_eq!(layers_navigator.current_layer_index,0);
+    assert!(layers_navigator.consumable_current_layer_index.is_none());
     assert_eq!(layers_navigator.latest_move_to_index,0);
 
     layers_navigator
@@ -582,6 +611,7 @@ fn scenario_double_click_to_go_from_layer_0_to_4() {
            to_index: 1,
        });
     assert_eq!(layers_navigator_driver.layers_navigator.current_layer_index,1);
+    assert_eq!(layers_navigator_driver.layers_navigator.consumable_current_layer_index.unwrap(),1);
     assert_eq!(layers_navigator_driver.layers_navigator.latest_move_to_index,0);
 
     // ClickEnd
@@ -590,6 +620,7 @@ fn scenario_double_click_to_go_from_layer_0_to_4() {
     
     assert_eq!(layers_navigator_driver.layers_navigator.layer_visits.len(),0);
     assert_eq!(layers_navigator_driver.layers_navigator.current_layer_index,0);
+    assert_eq!(layers_navigator_driver.layers_navigator.consumable_current_layer_index.unwrap(),0);
     assert_eq!(layers_navigator_driver.layers_navigator.latest_move_to_index,0);
     
     // DoubleClick
@@ -610,6 +641,7 @@ fn scenario_double_click_to_go_from_layer_0_to_4() {
     
     assert_eq!(layers_navigator_driver.layers_navigator.layer_visits.len(),0);
     assert_eq!(layers_navigator_driver.layers_navigator.current_layer_index,4);
+    assert_eq!(layers_navigator_driver.layers_navigator.consumable_current_layer_index.unwrap(),4);
     assert_eq!(layers_navigator_driver.layers_navigator.latest_move_to_index,0);
     
     // ClickEnd
@@ -618,6 +650,7 @@ fn scenario_double_click_to_go_from_layer_0_to_4() {
     
     assert_eq!(layers_navigator_driver.layers_navigator.layer_visits.len(),0);
     assert_eq!(layers_navigator_driver.layers_navigator.current_layer_index,4);
+    assert_eq!(layers_navigator_driver.layers_navigator.consumable_current_layer_index.unwrap(),4);
 
 }
 
@@ -653,6 +686,7 @@ fn scenario_double_click_to_go_from_layer_4_to_0() {
            to_index: 5,
        });
     assert_eq!(layers_navigator_driver.layers_navigator.current_layer_index,5);
+    assert_eq!(layers_navigator_driver.layers_navigator.consumable_current_layer_index.unwrap(),5);
     assert_eq!(layers_navigator_driver.layers_navigator.latest_move_to_index,4);
 
     // ClickEnd
@@ -661,6 +695,7 @@ fn scenario_double_click_to_go_from_layer_4_to_0() {
     
     assert_eq!(layers_navigator_driver.layers_navigator.layer_visits.len(),0);
     assert_eq!(layers_navigator_driver.layers_navigator.current_layer_index,4);
+    assert_eq!(layers_navigator_driver.layers_navigator.consumable_current_layer_index.unwrap(),4);
     assert_eq!(layers_navigator_driver.layers_navigator.latest_move_to_index,4);
     
     // DoubleClick
@@ -681,6 +716,7 @@ fn scenario_double_click_to_go_from_layer_4_to_0() {
     
     assert_eq!(layers_navigator_driver.layers_navigator.layer_visits.len(),0);
     assert_eq!(layers_navigator_driver.layers_navigator.current_layer_index,0);
+    assert_eq!(layers_navigator_driver.layers_navigator.consumable_current_layer_index.unwrap(),0);
     assert_eq!(layers_navigator_driver.layers_navigator.latest_move_to_index,4);
     
     // ClickEnd
@@ -689,6 +725,7 @@ fn scenario_double_click_to_go_from_layer_4_to_0() {
     
     assert_eq!(layers_navigator_driver.layers_navigator.layer_visits.len(),0);
     assert_eq!(layers_navigator_driver.layers_navigator.current_layer_index,0);
+    assert_eq!(layers_navigator_driver.layers_navigator.consumable_current_layer_index.unwrap(),0);
     assert_eq!(layers_navigator_driver.layers_navigator.latest_move_to_index,0);
 
 }
