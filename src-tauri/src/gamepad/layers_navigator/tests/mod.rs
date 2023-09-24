@@ -5,6 +5,7 @@ use crate::{gamepad::{layers_navigator::{LayersNavigator,LayersNavigatorTrait, L
 mod utils;
 
 //TODO: write tests for consumable_current_layer_index
+
 #[test]
 fn visit_layer_works() {
     let mut layers_navigator = LayersNavigator {
