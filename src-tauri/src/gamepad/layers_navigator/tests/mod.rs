@@ -2,6 +2,8 @@ use gilrs::Button;
 
 use crate::{gamepad::{layers_navigator::{LayersNavigator,LayersNavigatorTrait, LayerVisit, AvailableLayerVisitsFromLayer, tests::utils::{setup_haxwell_layout_layers_with_only_visits, setup_haxwell_layout_layers_and_their_available_layer_visits}}, Switch, switch_click_pattern_detector::SwitchClickPattern, gilrs_events::stick_switch_interpreter::StickSwitchButton}, settings::data::{LayerSpecifier, SwitchOnClickReaction}};
 
+use super::LayerVisitTrigger;
+
 mod utils;
 
 #[test]
@@ -40,26 +42,26 @@ fn visit_layer_works() {
     };
 
     [
-        (Switch::Button(Button::South),1),
-        (Switch::Button(Button::East),2),
-        (Switch::Button(Button::North),3),
-        (Switch::Button(Button::West),4),
-        (Switch::Button(Button::DPadUp),6),
-        (Switch::Button(Button::DPadDown),8),
-        (Switch::Button(Button::DPadLeft),10),
-        (Switch::Button(Button::DPadRight),15),
-        (Switch::StickSwitchButton(StickSwitchButton::LeftStickUp),20),
-        (Switch::StickSwitchButton(StickSwitchButton::LeftStickDown),25),
-        (Switch::StickSwitchButton(StickSwitchButton::LeftStickLeft),30),
-        (Switch::StickSwitchButton(StickSwitchButton::LeftStickRight),40),
-        (Switch::StickSwitchButton(StickSwitchButton::RightStickUp),50),
-        (Switch::StickSwitchButton(StickSwitchButton::RightStickDown),40),
-        (Switch::StickSwitchButton(StickSwitchButton::RightStickLeft),30),
-        (Switch::StickSwitchButton(StickSwitchButton::RightStickRight),25),
-        (Switch::Button(Button::RightTrigger),4),
-        (Switch::Button(Button::LeftTrigger),3),
-        (Switch::Button(Button::RightTrigger2),2),
-        (Switch::Button(Button::LeftTrigger2),1),
+        (LayerVisitTrigger::Click(Switch::Button(Button::South)),1),
+        (LayerVisitTrigger::DoubleClick(Switch::Button(Button::East)),2),
+        (LayerVisitTrigger::Click(Switch::Button(Button::North)),3),
+        (LayerVisitTrigger::DoubleClick(Switch::Button(Button::West)),4),
+        (LayerVisitTrigger::Click(Switch::Button(Button::DPadUp)),6),
+        (LayerVisitTrigger::DoubleClick(Switch::Button(Button::DPadDown)),8),
+        (LayerVisitTrigger::Click(Switch::Button(Button::DPadLeft)),10),
+        (LayerVisitTrigger::DoubleClick(Switch::Button(Button::DPadRight)),15),
+        (LayerVisitTrigger::Click(Switch::StickSwitchButton(StickSwitchButton::LeftStickUp)),20),
+        (LayerVisitTrigger::DoubleClick(Switch::StickSwitchButton(StickSwitchButton::LeftStickDown)),25),
+        (LayerVisitTrigger::Click(Switch::StickSwitchButton(StickSwitchButton::LeftStickLeft)),30),
+        (LayerVisitTrigger::Click(Switch::StickSwitchButton(StickSwitchButton::LeftStickRight)),40),
+        (LayerVisitTrigger::DoubleClick(Switch::StickSwitchButton(StickSwitchButton::RightStickUp)),50),
+        (LayerVisitTrigger::DoubleClick(Switch::StickSwitchButton(StickSwitchButton::RightStickDown)),40),
+        (LayerVisitTrigger::Click(Switch::StickSwitchButton(StickSwitchButton::RightStickLeft)),30),
+        (LayerVisitTrigger::Click(Switch::StickSwitchButton(StickSwitchButton::RightStickRight)),25),
+        (LayerVisitTrigger::Click(Switch::Button(Button::RightTrigger)),4),
+        (LayerVisitTrigger::DoubleClick(Switch::Button(Button::LeftTrigger)),3),
+        (LayerVisitTrigger::DoubleClick(Switch::Button(Button::RightTrigger2)),2),
+        (LayerVisitTrigger::DoubleClick(Switch::Button(Button::LeftTrigger2)),1),
     ]
     .iter()
     .enumerate()
@@ -73,7 +75,7 @@ fn visit_layer_works() {
 
         assert_eq!(layers_navigator.layer_visits.len(),idx+1);
 
-        assert_eq!(layers_navigator.layer_visits[idx].trigger_switch,switch.clone());
+        assert_eq!(layers_navigator.layer_visits[idx].trigger,switch.clone());
         assert_eq!(layers_navigator.layer_visits[idx].to_index,layer_index);
         if idx == 0 {
             assert_eq!(layers_navigator.layer_visits[idx].from_index,0);
@@ -133,30 +135,30 @@ fn visit_or_move_to_layer_works() {
 
     let mut prev_current_layer_index = 0;
     [
-        (Switch::Button(Button::South),1),
-        (Switch::Button(Button::East),2),
-        (Switch::Button(Button::North),3),
-        (Switch::Button(Button::West),4),
-        (Switch::Button(Button::DPadUp),6),
-        (Switch::Button(Button::DPadDown),8),
-        (Switch::Button(Button::DPadLeft),10),
-        (Switch::Button(Button::DPadRight),15),
-        (Switch::StickSwitchButton(StickSwitchButton::LeftStickUp),20),
-        (Switch::StickSwitchButton(StickSwitchButton::LeftStickDown),25),
-        (Switch::StickSwitchButton(StickSwitchButton::LeftStickLeft),30),
-        (Switch::StickSwitchButton(StickSwitchButton::LeftStickRight),40),
-        (Switch::StickSwitchButton(StickSwitchButton::RightStickUp),50),
-        (Switch::StickSwitchButton(StickSwitchButton::RightStickDown),40),
-        (Switch::StickSwitchButton(StickSwitchButton::RightStickLeft),30),
-        (Switch::StickSwitchButton(StickSwitchButton::RightStickRight),25),
-        (Switch::Button(Button::RightTrigger),2),
-        (Switch::Button(Button::LeftTrigger),1),
+        (LayerVisitTrigger::DoubleClick(Switch::Button(Button::South)),1),
+        (LayerVisitTrigger::Click(Switch::Button(Button::East)),2),
+        (LayerVisitTrigger::DoubleClick(Switch::Button(Button::North)),3),
+        (LayerVisitTrigger::Click(Switch::Button(Button::West)),4),
+        (LayerVisitTrigger::Click(Switch::Button(Button::DPadUp)),6),
+        (LayerVisitTrigger::DoubleClick(Switch::Button(Button::DPadDown)),8),
+        (LayerVisitTrigger::Click(Switch::Button(Button::DPadLeft)),10),
+        (LayerVisitTrigger::Click(Switch::Button(Button::DPadRight)),15),
+        (LayerVisitTrigger::Click(Switch::StickSwitchButton(StickSwitchButton::LeftStickUp)),20),
+        (LayerVisitTrigger::DoubleClick(Switch::StickSwitchButton(StickSwitchButton::LeftStickDown)),25),
+        (LayerVisitTrigger::Click(Switch::StickSwitchButton(StickSwitchButton::LeftStickLeft)),30),
+        (LayerVisitTrigger::Click(Switch::StickSwitchButton(StickSwitchButton::LeftStickRight)),40),
+        (LayerVisitTrigger::Click(Switch::StickSwitchButton(StickSwitchButton::RightStickUp)),50),
+        (LayerVisitTrigger::Click(Switch::StickSwitchButton(StickSwitchButton::RightStickDown)),40),
+        (LayerVisitTrigger::DoubleClick(Switch::StickSwitchButton(StickSwitchButton::RightStickLeft)),30),
+        (LayerVisitTrigger::Click(Switch::StickSwitchButton(StickSwitchButton::RightStickRight)),25),
+        (LayerVisitTrigger::Click(Switch::Button(Button::RightTrigger)),2),
+        (LayerVisitTrigger::Click(Switch::Button(Button::LeftTrigger)),1),
     ]
     .iter()
-    .for_each(|(switch,layer_index)|{
+    .for_each(|(trigger,layer_index)|{
         let layer_index: usize = (*layer_index).try_into().unwrap();
         layers_navigator.move_to_or_visit_layer(
-            switch.clone(),
+            trigger.clone(),
             LayerSpecifier { id: String::new(), index_in_gamepad: Some(layer_index) });
         assert_eq!(layers_navigator.current_layer_index,layer_index);
         assert_eq!(layers_navigator.consumable_current_layer_index.unwrap(),layer_index);
@@ -180,27 +182,27 @@ fn visit_or_move_to_layer_works() {
 fn undo_last_layer_visit_with_switch_works() {
     let layer_visits = vec![
        LayerVisit{
-            trigger_switch: Switch::Button(Button::RightTrigger),
+            trigger: LayerVisitTrigger::Click(Switch::Button(Button::RightTrigger)),
             from_index: 0,
             to_index: 1,
        },
        LayerVisit{
-            trigger_switch: Switch::Button(Button::South),
+            trigger: LayerVisitTrigger::DoubleClick(Switch::Button(Button::South)),
             from_index: 1,
             to_index: 3,
        },
        LayerVisit{
-            trigger_switch: Switch::Button(Button::LeftTrigger),
+            trigger: LayerVisitTrigger::Click(Switch::Button(Button::LeftTrigger)),
             from_index: 3,
             to_index: 4,
        },
        LayerVisit{
-            trigger_switch: Switch::StickSwitchButton(StickSwitchButton::LeftStickUp),
+            trigger: LayerVisitTrigger::DoubleClick(Switch::StickSwitchButton(StickSwitchButton::LeftStickUp)),
             from_index: 4,
             to_index: 6,
        },
        LayerVisit{
-            trigger_switch: Switch::StickSwitchButton(StickSwitchButton::RightStickRight),
+            trigger: LayerVisitTrigger::Click(Switch::StickSwitchButton(StickSwitchButton::RightStickRight)),
             from_index: 6,
             to_index: 7,
        },
@@ -220,14 +222,14 @@ fn undo_last_layer_visit_with_switch_works() {
                 index_in_gamepad: 0,
                 layer_visits: vec![
                    LayerVisit{
-                       trigger_switch: Switch::Button(Button::RightTrigger),
+                       trigger: LayerVisitTrigger::Click(Switch::Button(Button::RightTrigger)),
                        from_index: 0,
                        to_index: 1,
                    },
                    // SPECIAL CASE, allows the use of layer_visits[1]
                    // to go from 0 to 3 (as opposed to the original 1 to 3)
                    LayerVisit{
-                       trigger_switch: Switch::Button(Button::South),
+                       trigger: LayerVisitTrigger::DoubleClick(Switch::Button(Button::South)),
                        from_index: 0,
                        to_index: 3,
                    },
@@ -237,7 +239,7 @@ fn undo_last_layer_visit_with_switch_works() {
                 index_in_gamepad: 1,
                 layer_visits: vec![
                    LayerVisit{
-                       trigger_switch: Switch::Button(Button::South),
+                       trigger: LayerVisitTrigger::DoubleClick(Switch::Button(Button::South)),
                        from_index: 1,
                        to_index: 3,
                    },
@@ -247,7 +249,7 @@ fn undo_last_layer_visit_with_switch_works() {
                 index_in_gamepad: 3,
                 layer_visits: vec![
                    LayerVisit{
-                       trigger_switch: Switch::Button(Button::LeftTrigger),
+                       trigger: LayerVisitTrigger::Click(Switch::Button(Button::LeftTrigger)),
                        from_index: 3,
                        to_index: 4,
                    },
@@ -257,7 +259,7 @@ fn undo_last_layer_visit_with_switch_works() {
                 index_in_gamepad: 4,
                 layer_visits: vec![
                    LayerVisit{
-                       trigger_switch: Switch::StickSwitchButton(StickSwitchButton::LeftStickUp),
+                       trigger: LayerVisitTrigger::DoubleClick(Switch::StickSwitchButton(StickSwitchButton::LeftStickUp)),
                        from_index: 4,
                        to_index: 6,
                    },
@@ -267,7 +269,7 @@ fn undo_last_layer_visit_with_switch_works() {
                 index_in_gamepad: 6,
                 layer_visits: vec![
                    LayerVisit{
-                       trigger_switch: Switch::StickSwitchButton(StickSwitchButton::RightStickRight),
+                       trigger: LayerVisitTrigger::Click(Switch::StickSwitchButton(StickSwitchButton::RightStickRight)),
                        from_index: 6,
                        to_index: 7,
                    },
@@ -278,7 +280,7 @@ fn undo_last_layer_visit_with_switch_works() {
 
     // undo the last visit (the 5th)
     layers_navigator.undo_last_layer_visit_with_switch(
-        layer_visits[4].trigger_switch.clone());
+        Switch::StickSwitchButton(StickSwitchButton::RightStickRight));
 
     assert_eq!(layers_navigator.current_layer_index,6);
     assert_eq!(layers_navigator.consumable_current_layer_index.unwrap(),6);
@@ -293,11 +295,11 @@ fn undo_last_layer_visit_with_switch_works() {
     // undo the third visit, which cuts off the fourth(4th)
     // since it's no longer reachable, leaving only 2 visits
     layers_navigator.undo_last_layer_visit_with_switch(
-        layer_visits[2].trigger_switch.clone());
-
+        Switch::Button(Button::LeftTrigger));
+    
     assert_eq!(layers_navigator.current_layer_index,3);
     assert_eq!(layers_navigator.consumable_current_layer_index.unwrap(),3);
-
+    
     assert_eq!(layers_navigator.layer_visits.len(),2);
     assert_eq!(layers_navigator.layer_visits[0],layer_visits[0]);
     assert_eq!(layers_navigator.layer_visits[1],layer_visits[1]);
@@ -306,14 +308,14 @@ fn undo_last_layer_visit_with_switch_works() {
     // Undo the first visit but still go to the second visit
     // via a different path, leaving the second visit still there
     layers_navigator.undo_last_layer_visit_with_switch(
-        layer_visits[0].trigger_switch.clone());
-
+        Switch::Button(Button::RightTrigger));
+    
     assert_eq!(layers_navigator.current_layer_index,3);
     assert_eq!(layers_navigator.consumable_current_layer_index.unwrap(),3);
-
+    
     assert_eq!(layers_navigator.layer_visits.len(),1);
     assert_eq!(layers_navigator.layer_visits[0],LayerVisit{
-        trigger_switch: layer_visits[1].trigger_switch.clone(),
+        trigger: layer_visits[1].trigger.clone(),
         from_index: 0,
         to_index: layer_visits[1].to_index});
 
@@ -353,7 +355,7 @@ fn process_current_potential_visit_works() {
     let layers_navigator = setup_layers_navigator_with_potential_layer_visit(
         // potential_layer_visit_init_opt
         Some(LayerVisit{
-           trigger_switch: Switch::Button(Button::RightTrigger),
+           trigger: LayerVisitTrigger::Click(Switch::Button(Button::RightTrigger)),
            from_index: 0,
            to_index: 1,
        }),
@@ -369,7 +371,7 @@ fn process_current_potential_visit_works() {
     let layers_navigator = setup_layers_navigator_with_potential_layer_visit(
         // potential_layer_visit_init_opt
         Some(LayerVisit{
-           trigger_switch: Switch::Button(Button::DPadLeft),
+           trigger: LayerVisitTrigger::Click(Switch::Button(Button::DPadLeft)),
            from_index: 0,
            to_index: 10,
        }),
@@ -385,7 +387,7 @@ fn process_current_potential_visit_works() {
     let layers_navigator = setup_layers_navigator_with_potential_layer_visit(
         // potential_layer_visit_init_opt
         Some(LayerVisit{
-           trigger_switch: Switch::Button(Button::DPadLeft),
+           trigger: LayerVisitTrigger::Click(Switch::Button(Button::DPadLeft)),
            from_index: 0,
            to_index: 10,
        }),
@@ -401,7 +403,7 @@ fn process_current_potential_visit_works() {
     let layers_navigator = setup_layers_navigator_with_potential_layer_visit(
         // potential_layer_visit_init_opt
         Some(LayerVisit{
-           trigger_switch: Switch::StickSwitchButton(StickSwitchButton::LeftStickLeft),
+           trigger: LayerVisitTrigger::Click(Switch::StickSwitchButton(StickSwitchButton::LeftStickLeft)),
            from_index: 0,
            to_index: 10,
        }),
@@ -417,7 +419,7 @@ fn process_current_potential_visit_works() {
     let layers_navigator = setup_layers_navigator_with_potential_layer_visit(
         // potential_layer_visit_init_opt
         Some(LayerVisit{
-           trigger_switch: Switch::Button(Button::DPadDown),
+           trigger: LayerVisitTrigger::Click(Switch::Button(Button::DPadDown)),
            from_index: 0,
            to_index: 10,
        }),
@@ -438,7 +440,7 @@ fn process_current_potential_visit_works() {
     // 1. If a different Switch is clicked
     //
     let potential_layer_visit_init = LayerVisit{
-           trigger_switch: Switch::Button(Button::RightTrigger),
+           trigger: LayerVisitTrigger::Click(Switch::Button(Button::RightTrigger)),
            from_index: 3,
            to_index: 11,
        };
@@ -457,7 +459,7 @@ fn process_current_potential_visit_works() {
     // 2. If a different Switch is double-clicked
     //
     let potential_layer_visit_init = LayerVisit{
-           trigger_switch: Switch::Button(Button::DPadDown),
+           trigger: LayerVisitTrigger::Click(Switch::Button(Button::DPadDown)),
            from_index: 3,
            to_index: 11,
        };
@@ -476,7 +478,7 @@ fn process_current_potential_visit_works() {
     // 3. If the same switch is held (ClickAndHold)
     //
     let potential_layer_visit_init = LayerVisit{
-           trigger_switch: Switch::Button(Button::RightTrigger),
+           trigger: LayerVisitTrigger::Click(Switch::Button(Button::RightTrigger)),
            from_index: 3,
            to_index: 11,
        };
@@ -495,7 +497,7 @@ fn process_current_potential_visit_works() {
     // 4. If the same switch is held (DoubleClickAndHold)
     //
     let potential_layer_visit_init = LayerVisit{
-           trigger_switch: Switch::Button(Button::DPadLeft),
+           trigger: LayerVisitTrigger::Click(Switch::Button(Button::DPadLeft)),
            from_index: 3,
            to_index: 1,
        };
@@ -555,9 +557,9 @@ impl LayersNavigatorDriver {
                     Some(SwitchOnClickReaction::MoveToLayer(layer_specifier))
                     => self.layers_navigator.move_to_layer(layer_specifier),
                     Some(SwitchOnClickReaction::VisitLayer(layer_specifier))
-                    => self.layers_navigator.visit_layer(switch,layer_specifier),
+                    => self.layers_navigator.visit_layer(LayerVisitTrigger::Click(switch),layer_specifier),
                     Some(SwitchOnClickReaction::MoveToOrVisitLayer(layer_specifier))
-                    => self.layers_navigator.move_to_or_visit_layer(switch,layer_specifier),
+                    => self.layers_navigator.move_to_or_visit_layer(LayerVisitTrigger::Click(switch),layer_specifier),
                     _ => ()
                 }
             SwitchClickPattern::DoubleClick(switch) => 
@@ -565,9 +567,9 @@ impl LayersNavigatorDriver {
                     Some(SwitchOnClickReaction::MoveToLayer(layer_specifier))
                     => self.layers_navigator.move_to_layer(layer_specifier),
                     Some(SwitchOnClickReaction::VisitLayer(layer_specifier))
-                    => self.layers_navigator.visit_layer(switch,layer_specifier),
+                    => self.layers_navigator.visit_layer(LayerVisitTrigger::DoubleClick(switch),layer_specifier),
                     Some(SwitchOnClickReaction::MoveToOrVisitLayer(layer_specifier))
-                    => self.layers_navigator.move_to_or_visit_layer(switch,layer_specifier),
+                    => self.layers_navigator.move_to_or_visit_layer(LayerVisitTrigger::DoubleClick(switch),layer_specifier),
                     _ => ()
                 }
             SwitchClickPattern::ClickAndHold(_switch)
@@ -606,7 +608,7 @@ fn scenario_double_click_to_go_from_layer_0_to_4() {
     assert_eq!(layers_navigator_driver.layers_navigator.layer_visits.len(),1);
     assert_eq!(layers_navigator_driver.layers_navigator.layer_visits[0],
        LayerVisit{
-           trigger_switch: Switch::Button(Button::RightTrigger),
+           trigger: LayerVisitTrigger::Click(Switch::Button(Button::RightTrigger)),
            from_index: 0,
            to_index: 1,
        });
@@ -617,12 +619,12 @@ fn scenario_double_click_to_go_from_layer_0_to_4() {
     // ClickEnd
     layers_navigator_driver.process_event(
         SwitchClickPattern::ClickEnd(switch.clone()),None);
-    
+   
     assert_eq!(layers_navigator_driver.layers_navigator.layer_visits.len(),0);
     assert_eq!(layers_navigator_driver.layers_navigator.current_layer_index,0);
     assert_eq!(layers_navigator_driver.layers_navigator.consumable_current_layer_index.unwrap(),0);
     assert_eq!(layers_navigator_driver.layers_navigator.latest_move_to_index,0);
-    
+   
     // DoubleClick
     layers_navigator_driver.process_event(
         SwitchClickPattern::DoubleClick(switch.clone()),
@@ -630,24 +632,24 @@ fn scenario_double_click_to_go_from_layer_0_to_4() {
             id: "second-layer-step-1".to_string(),
             index_in_gamepad: Some(4),
         })));
-    
+   
     assert_eq!(
        layers_navigator_driver.layers_navigator.potential_layer_visit.clone().unwrap(),
        LayerVisit{
-           trigger_switch: Switch::Button(Button::RightTrigger),
+           trigger: LayerVisitTrigger::DoubleClick(Switch::Button(Button::RightTrigger)),
            from_index: 0,
            to_index: 4,
        });
-    
+   
     assert_eq!(layers_navigator_driver.layers_navigator.layer_visits.len(),0);
     assert_eq!(layers_navigator_driver.layers_navigator.current_layer_index,4);
     assert_eq!(layers_navigator_driver.layers_navigator.consumable_current_layer_index.unwrap(),4);
     assert_eq!(layers_navigator_driver.layers_navigator.latest_move_to_index,0);
-    
+   
     // ClickEnd
     layers_navigator_driver.process_event(
         SwitchClickPattern::ClickEnd(switch.clone()), None);
-    
+   
     assert_eq!(layers_navigator_driver.layers_navigator.layer_visits.len(),0);
     assert_eq!(layers_navigator_driver.layers_navigator.current_layer_index,4);
     assert_eq!(layers_navigator_driver.layers_navigator.consumable_current_layer_index.unwrap(),4);
@@ -681,7 +683,7 @@ fn scenario_double_click_to_go_from_layer_4_to_0() {
     assert_eq!(layers_navigator_driver.layers_navigator.layer_visits.len(),1);
     assert_eq!(layers_navigator_driver.layers_navigator.layer_visits[0],
        LayerVisit{
-           trigger_switch: Switch::Button(Button::RightTrigger),
+           trigger: LayerVisitTrigger::Click(Switch::Button(Button::RightTrigger)),
            from_index: 4,
            to_index: 5,
        });
@@ -692,12 +694,12 @@ fn scenario_double_click_to_go_from_layer_4_to_0() {
     // ClickEnd
     layers_navigator_driver.process_event(
         SwitchClickPattern::ClickEnd(switch.clone()),None);
-    
+   
     assert_eq!(layers_navigator_driver.layers_navigator.layer_visits.len(),0);
     assert_eq!(layers_navigator_driver.layers_navigator.current_layer_index,4);
     assert_eq!(layers_navigator_driver.layers_navigator.consumable_current_layer_index.unwrap(),4);
     assert_eq!(layers_navigator_driver.layers_navigator.latest_move_to_index,4);
-    
+   
     // DoubleClick
     layers_navigator_driver.process_event(
         SwitchClickPattern::DoubleClick(switch.clone()),
@@ -705,24 +707,24 @@ fn scenario_double_click_to_go_from_layer_4_to_0() {
             id: "first-layer-step-1".to_string(),
             index_in_gamepad: Some(0),
         })));
-    
+   
     assert_eq!(
        layers_navigator_driver.layers_navigator.potential_layer_visit.clone().unwrap(),
        LayerVisit{
-           trigger_switch: Switch::Button(Button::RightTrigger),
+           trigger: LayerVisitTrigger::DoubleClick(Switch::Button(Button::RightTrigger)),
            from_index: 4,
            to_index: 0,
        });
-    
+   
     assert_eq!(layers_navigator_driver.layers_navigator.layer_visits.len(),0);
     assert_eq!(layers_navigator_driver.layers_navigator.current_layer_index,0);
     assert_eq!(layers_navigator_driver.layers_navigator.consumable_current_layer_index.unwrap(),0);
     assert_eq!(layers_navigator_driver.layers_navigator.latest_move_to_index,4);
-    
+   
     // ClickEnd
     layers_navigator_driver.process_event(
         SwitchClickPattern::ClickEnd(switch.clone()), None);
-    
+   
     assert_eq!(layers_navigator_driver.layers_navigator.layer_visits.len(),0);
     assert_eq!(layers_navigator_driver.layers_navigator.current_layer_index,0);
     assert_eq!(layers_navigator_driver.layers_navigator.consumable_current_layer_index.unwrap(),0);

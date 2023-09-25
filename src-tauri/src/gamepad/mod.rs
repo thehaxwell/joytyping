@@ -2,7 +2,7 @@ use gilrs::Button;
 
 use crate::{settings::{self,data::{Layer, SwitchOnClickReaction, KeyboardInput, SwitchEventAndReaction, Switches}}, quick_lookup_window::QuickLookupWindowTrait};
 
-use self::{gilrs_events::{gilrs_wrapper::GilrsEventType, GilrsEventsTrait,stick_switch_interpreter::{StickSwitchButton,StickSwitchEvent}}, layers_navigator::LayersNavigatorTrait};
+use self::{gilrs_events::{gilrs_wrapper::GilrsEventType, GilrsEventsTrait,stick_switch_interpreter::{StickSwitchButton,StickSwitchEvent}}, layers_navigator::{LayersNavigatorTrait, LayerVisitTrigger}};
 
 use self::switch_click_pattern_detector::{SwitchClickPatternDetectorTrait, SwitchClickPattern};
 
@@ -59,9 +59,9 @@ impl Gamepad {
                     Some(SwitchOnClickReaction::MoveToLayer(layer_specifier))
                     => self.layers_navigator.move_to_layer(layer_specifier),
                     Some(SwitchOnClickReaction::VisitLayer(layer_specifier))
-                    => self.layers_navigator.visit_layer(switch,layer_specifier),
+                    => self.layers_navigator.visit_layer(LayerVisitTrigger::Click(switch),layer_specifier),
                     Some(SwitchOnClickReaction::MoveToOrVisitLayer(layer_specifier))
-                    => self.layers_navigator.move_to_or_visit_layer(switch,layer_specifier),
+                    => self.layers_navigator.move_to_or_visit_layer(LayerVisitTrigger::Click(switch),layer_specifier),
                     Some(SwitchOnClickReaction::ShowQuickLookupWindow)
                     => {let _ = self.quick_lookup_window.show_or_open(switch);}
                     _ => ()
@@ -90,9 +90,9 @@ impl Gamepad {
                     Some(SwitchOnClickReaction::MoveToLayer(layer_specifier))
                     => self.layers_navigator.move_to_layer(layer_specifier),
                     Some(SwitchOnClickReaction::VisitLayer(layer_specifier))
-                    => self.layers_navigator.visit_layer(switch,layer_specifier),
+                    => self.layers_navigator.visit_layer(LayerVisitTrigger::DoubleClick(switch),layer_specifier),
                     Some(SwitchOnClickReaction::MoveToOrVisitLayer(layer_specifier))
-                    => self.layers_navigator.move_to_or_visit_layer(switch,layer_specifier),
+                    => self.layers_navigator.move_to_or_visit_layer(LayerVisitTrigger::DoubleClick(switch),layer_specifier),
                     Some(SwitchOnClickReaction::ShowQuickLookupWindow)
                     => {let _ = self.quick_lookup_window.show_or_open(switch);}
                     _ => ()

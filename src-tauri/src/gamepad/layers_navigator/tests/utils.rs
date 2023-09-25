@@ -1,5 +1,6 @@
 use gilrs::Button;
 
+use crate::gamepad::layers_navigator::LayerVisitTrigger;
 use crate::settings::data::{Layer, Switches, SwitchEventAndReaction, SwitchOnClickReaction, LayerSpecifier};
 use crate::gamepad::{layers_navigator::{AvailableLayerVisitsFromLayer, LayerVisit}, Switch};
 
@@ -281,14 +282,24 @@ pub fn setup_haxwell_layout_layers_and_their_available_layer_visits() -> Vec<Ava
             index_in_gamepad: 0,
             layer_visits: vec![
                LayerVisit{
-                   trigger_switch: Switch::Button(Button::RightTrigger),
+                   trigger: LayerVisitTrigger::Click(Switch::Button(Button::RightTrigger)),
                    from_index: 0,
                    to_index: 1,
                },
                LayerVisit{
-                   trigger_switch: Switch::Button(Button::LeftTrigger),
+                   trigger: LayerVisitTrigger::DoubleClick(Switch::Button(Button::RightTrigger)),
+                   from_index: 0,
+                   to_index: 4,
+               },
+               LayerVisit{
+                   trigger: LayerVisitTrigger::Click(Switch::Button(Button::LeftTrigger)),
                    from_index: 0,
                    to_index: 2,
+               },
+               LayerVisit{
+                   trigger: LayerVisitTrigger::DoubleClick(Switch::Button(Button::LeftTrigger)),
+                   from_index: 0,
+                   to_index: 4,
                },
            ]
         },
@@ -296,7 +307,7 @@ pub fn setup_haxwell_layout_layers_and_their_available_layer_visits() -> Vec<Ava
             index_in_gamepad: 1,
             layer_visits: vec![
                LayerVisit{
-                   trigger_switch: Switch::Button(Button::LeftTrigger),
+                   trigger: LayerVisitTrigger::Click(Switch::Button(Button::LeftTrigger)),
                    from_index: 1,
                    to_index: 3,
                },
@@ -306,7 +317,7 @@ pub fn setup_haxwell_layout_layers_and_their_available_layer_visits() -> Vec<Ava
             index_in_gamepad: 2,
             layer_visits: vec![
                LayerVisit{
-                   trigger_switch: Switch::Button(Button::RightTrigger),
+                   trigger: LayerVisitTrigger::Click(Switch::Button(Button::RightTrigger)),
                    from_index: 2,
                    to_index: 3,
                },
@@ -316,14 +327,24 @@ pub fn setup_haxwell_layout_layers_and_their_available_layer_visits() -> Vec<Ava
             index_in_gamepad: 4,
             layer_visits: vec![
                LayerVisit{
-                   trigger_switch: Switch::Button(Button::RightTrigger),
+                   trigger: LayerVisitTrigger::Click(Switch::Button(Button::RightTrigger)),
                    from_index: 4,
                    to_index: 5,
                },
                LayerVisit{
-                   trigger_switch: Switch::Button(Button::LeftTrigger),
+                   trigger: LayerVisitTrigger::DoubleClick(Switch::Button(Button::RightTrigger)),
+                   from_index: 4,
+                   to_index: 0,
+               },
+               LayerVisit{
+                   trigger: LayerVisitTrigger::Click(Switch::Button(Button::LeftTrigger)),
                    from_index: 4,
                    to_index: 6,
+               },
+               LayerVisit{
+                   trigger: LayerVisitTrigger::DoubleClick(Switch::Button(Button::LeftTrigger)),
+                   from_index: 4,
+                   to_index: 0,
                },
            ]
         },
@@ -331,7 +352,7 @@ pub fn setup_haxwell_layout_layers_and_their_available_layer_visits() -> Vec<Ava
             index_in_gamepad: 5,
             layer_visits: vec![
                LayerVisit{
-                   trigger_switch: Switch::Button(Button::LeftTrigger),
+                   trigger: LayerVisitTrigger::Click(Switch::Button(Button::LeftTrigger)),
                    from_index: 5,
                    to_index: 7,
                },
@@ -341,7 +362,7 @@ pub fn setup_haxwell_layout_layers_and_their_available_layer_visits() -> Vec<Ava
             index_in_gamepad: 6,
             layer_visits: vec![
                LayerVisit{
-                   trigger_switch: Switch::Button(Button::RightTrigger),
+                   trigger: LayerVisitTrigger::Click(Switch::Button(Button::RightTrigger)),
                    from_index: 6,
                    to_index: 7,
                },

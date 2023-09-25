@@ -13,8 +13,8 @@ mod tests;
 #[cfg_attr(test, automock)]
 pub trait LayersNavigatorTrait {
     fn move_to_layer(&mut self, layer_specifier: LayerSpecifier);
-    fn visit_layer(&mut self, trigger_switch: Switch, layer_specifier: LayerSpecifier);
-    fn move_to_or_visit_layer(&mut self, trigger_switch: Switch, layer_specifier: LayerSpecifier);
+    fn visit_layer(&mut self, trigger: LayerVisitTrigger, layer_specifier: LayerSpecifier);
+    fn move_to_or_visit_layer(&mut self, trigger: LayerVisitTrigger, layer_specifier: LayerSpecifier);
     fn get_current_layer_index(&self) -> usize;
     fn undo_last_layer_visit_with_switch(&mut self, switch: Switch);
     fn process_current_potential_visit(&mut self,pattern: SwitchClickPattern);
@@ -86,18 +86,61 @@ impl LayersNavigator {
                         .iter()
                         .filter_map(|(switch,event_and_reaction_opt)|
                             if let Some(SwitchEventAndReaction { on_click, on_double_click }) = event_and_reaction_opt {
-                                 if let Some(SwitchOnClickReaction::VisitLayer(layer_specifier)) 
-                                     = on_click.clone().or(on_double_click.clone()) {
-                                        Some(LayerVisit {
-                                            trigger_switch: switch.clone(),
-                                            from_index: index,
-                                            to_index: layer_specifier.index_in_gamepad.unwrap(),
-                                        })
+                                 // if let Some(SwitchOnClickReaction::VisitLayer(layer_specifier)) 
+                                 //     = on_click.clone().or(on_double_click.clone()) {
+                                 //        Some(LayerVisit {
+                                 //            trigger_switch: switch.clone(),
+                                 //            from_index: index,
+                                 //            to_index: layer_specifier.index_in_gamepad.unwrap(),
+                                 //        })
+                                 // }
+                                 // else { None }
+
+                                let mut layer_visits: Vec<LayerVisit> = Vec::new();
+
+                                // get layer_visits from on_click
+                                 let to_index_opt = match on_click.clone() {
+                                    Some(SwitchOnClickReaction::VisitLayer(layer_specifier))
+                                        => Some(layer_specifier.index_in_gamepad.unwrap()),
+                                    Some(SwitchOnClickReaction::MoveToOrVisitLayer(layer_specifier))
+                                        => Some(layer_specifier.index_in_gamepad.unwrap()),
+                                    _ => None,
+                                 };
+
+                                 if let Some(to_index) = to_index_opt {
+                                    layer_visits.push(LayerVisit {
+                                        trigger: LayerVisitTrigger::Click(switch.clone()),
+                                        from_index: index,
+                                        to_index,
+                                    })
                                  }
-                                 else { None }
+
+                                // get layer_visits from on_double_click
+                                 let to_index_opt = match on_double_click.clone() {
+                                    Some(SwitchOnClickReaction::VisitLayer(layer_specifier))
+                                        => Some(layer_specifier.index_in_gamepad.unwrap()),
+                                    Some(SwitchOnClickReaction::MoveToOrVisitLayer(layer_specifier))
+                                        => Some(layer_specifier.index_in_gamepad.unwrap()),
+                                    _ => None,
+                                 };
+
+                                 if let Some(to_index) = to_index_opt {
+                                    layer_visits.push(LayerVisit {
+                                        trigger: LayerVisitTrigger::DoubleClick(switch.clone()),
+                                        from_index: index,
+                                        to_index,
+                                    })
+                                 }
+
+
+                                 if layer_visits.is_empty() {
+                                     None
+                                 }
+                                 else { Some(layer_visits) }
                             }
                             else { None }
                         )
+                        .flatten()
                         .collect();
 
                     if layer_visits.is_empty() {
@@ -128,20 +171,20 @@ impl LayersNavigatorTrait for LayersNavigator {
         self.latest_move_to_index = self.current_layer_index;
     }
 
-    fn visit_layer(&mut self, trigger_switch: Switch, layer_specifier: LayerSpecifier) {
+    fn visit_layer(&mut self, trigger: LayerVisitTrigger, layer_specifier: LayerSpecifier) {
         println!(">>>>> from {}, visit_layer: {:?}",self.current_layer_index ,layer_specifier);
         self.layer_visits.push(LayerVisit {
-            trigger_switch,
+            trigger,
             to_index: layer_specifier.index_in_gamepad.unwrap(),
             from_index: self.current_layer_index,
         });
         self.set_current_layer_index(layer_specifier.index_in_gamepad.unwrap());
     }
 
-    fn move_to_or_visit_layer(&mut self, trigger_switch: Switch, layer_specifier: LayerSpecifier) {
+    fn move_to_or_visit_layer(&mut self, trigger: LayerVisitTrigger, layer_specifier: LayerSpecifier) {
         println!(">>>>> from {}, move_to_or_visit_layer: {:?}",self.current_layer_index,layer_specifier);
         self.potential_layer_visit = Some(LayerVisit {
-            trigger_switch,
+            trigger,
             to_index: layer_specifier.index_in_gamepad.unwrap(),
             from_index: self.current_layer_index,
         });
@@ -163,17 +206,33 @@ impl LayersNavigatorTrait for LayersNavigator {
         //   click(MoveOrVisit) -> end-click = Move
         //   double-click(MoveOrVisit) -> end-click = Move
         if let Some(potential_layer_visit) = &self.potential_layer_visit {
-            let should_commit = match pattern {
-                SwitchClickPattern::Click(switch)
-                    => potential_layer_visit.trigger_switch != switch,
-                SwitchClickPattern::ClickAndHold(switch)
-                    => potential_layer_visit.trigger_switch == switch,
-                SwitchClickPattern::DoubleClick(switch)
-                    => potential_layer_visit.trigger_switch != switch,
-                SwitchClickPattern::DoubleClickAndHold(switch)
-                    => potential_layer_visit.trigger_switch == switch,
-                SwitchClickPattern::ClickEnd(_switch)
-                    => false
+            let should_commit = match &potential_layer_visit.trigger {
+                LayerVisitTrigger::Click(trigger_switch)
+                    => match pattern {
+                        SwitchClickPattern::Click(switch)
+                            => *trigger_switch != switch,
+                        SwitchClickPattern::ClickAndHold(switch)
+                            => *trigger_switch == switch,
+                        SwitchClickPattern::DoubleClick(switch)
+                            => *trigger_switch != switch,
+                        SwitchClickPattern::DoubleClickAndHold(switch)
+                            => *trigger_switch == switch,
+                        SwitchClickPattern::ClickEnd(_switch)
+                            => false
+                    },
+                LayerVisitTrigger::DoubleClick(trigger_switch)
+                    => match pattern {
+                        SwitchClickPattern::Click(switch)
+                            => *trigger_switch != switch,
+                        SwitchClickPattern::ClickAndHold(switch)
+                            => *trigger_switch == switch,
+                        SwitchClickPattern::DoubleClick(switch)
+                            => *trigger_switch != switch,
+                        SwitchClickPattern::DoubleClickAndHold(switch)
+                            => *trigger_switch == switch,
+                        SwitchClickPattern::ClickEnd(_switch)
+                            => false
+                    },
             };
 
             if should_commit {
@@ -193,10 +252,18 @@ impl LayersNavigatorTrait for LayersNavigator {
             .iter()
             .enumerate()
             .rev()
-            .find_map(|(index,vector)| 
-                if vector.trigger_switch == switch.clone() {
-                    Some(index) 
-                } else {
+            .find_map(|(index,vector)|{
+                    let trigger_switch = match &vector.trigger {
+                        LayerVisitTrigger::Click(trigger_switch) 
+                            => trigger_switch,
+                        LayerVisitTrigger::DoubleClick(trigger_switch) 
+                            => trigger_switch,
+                    };
+
+                    if *trigger_switch == switch.clone() {
+                        return Some(index);
+                    }
+
                     None 
                 });
 
@@ -230,10 +297,24 @@ impl LayersNavigatorTrait for LayersNavigator {
 
                             layer.layer_visits
                                 .iter()
-                                .find(|l| l.trigger_switch == layer_visit.trigger_switch.clone()
-                                          && l.from_index == index_to_go_from)
+                                .find(|l|{
+                                    let from_indexes_match = l.from_index == index_to_go_from;
+                                    if let LayerVisitTrigger::Click(switch) = &l.trigger {
+                                        if let LayerVisitTrigger::Click(switch2) = &layer_visit.trigger {
+                                           return *switch == *switch2
+                                              && from_indexes_match;
+                                        }
+                                    }
+                                    if let LayerVisitTrigger::DoubleClick(switch) = &l.trigger {
+                                        if let LayerVisitTrigger::DoubleClick(switch2) = &layer_visit.trigger {
+                                           return *switch == *switch2
+                                              && from_indexes_match;
+                                        }
+                                    }
+                                    false
+                                })
                                 .map(|layer_visit|LayerVisit{
-                                    trigger_switch: layer_visit.trigger_switch.clone(),
+                                    trigger: layer_visit.trigger.clone(),
                                     from_index: layer.index_in_gamepad, // this is the outer-scope from_index
                                     to_index: layer_visit.to_index.clone(),
                                 })
@@ -264,9 +345,15 @@ impl LayersNavigatorTrait for LayersNavigator {
 
 #[derive(Debug,Clone,PartialEq)]
 struct LayerVisit {
-    trigger_switch: Switch,
+    trigger: LayerVisitTrigger,
     to_index: usize,
     from_index: usize,
+}
+
+#[derive(Debug,Clone,PartialEq)]
+pub enum LayerVisitTrigger {
+    Click(Switch),
+    DoubleClick(Switch),
 }
 
 #[derive(Debug,PartialEq)]
