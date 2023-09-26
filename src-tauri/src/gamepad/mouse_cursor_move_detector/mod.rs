@@ -44,8 +44,8 @@ impl MouseCursorMoveDetectorTrait for MouseCursorMoveDetector {
                     => self.current_left_stick_x 
                         = match left_stick.clone() {
                            Some(SingleCardinalLever::ControlMouseCursor(
-                               ControlMouseCursorFunction{center_at}))
-                            // => Some((value - center_at.x).round() as i32 + SCALE_FACTOR),
+                               ControlMouseCursorFunction{deadzone_upper_limit}))
+                            // => Some((value - deadzone_upper_limit.x).round() as i32 + SCALE_FACTOR),
                             // => Some(value.round() as i32),
                             => Some((value * SCALE_FACTOR).round() as i32),
                             _ => None
@@ -54,8 +54,8 @@ impl MouseCursorMoveDetectorTrait for MouseCursorMoveDetector {
                     => self.current_left_stick_y 
                         = match left_stick.clone() {
                            Some(SingleCardinalLever::ControlMouseCursor(
-                               ControlMouseCursorFunction{center_at}))
-                            // => Some((value - center_at.y).round() as i32 + SCALE_FACTOR),
+                               ControlMouseCursorFunction{deadzone_upper_limit}))
+                            // => Some((value - deadzone_upper_limit.y).round() as i32 + SCALE_FACTOR),
                             // => Some(-value.round() as i32),
                             => Some(-(value * SCALE_FACTOR).round() as i32),
                             _ => None
@@ -64,8 +64,8 @@ impl MouseCursorMoveDetectorTrait for MouseCursorMoveDetector {
                     => self.current_right_stick_x 
                         = match right_stick.clone() {
                            Some(SingleCardinalLever::ControlMouseCursor(
-                               ControlMouseCursorFunction{center_at}))
-                            // => Some((value - center_at.x).round() as i32 + SCALE_FACTOR),
+                               ControlMouseCursorFunction{deadzone_upper_limit}))
+                            // => Some((value - deadzone_upper_limit.x).round() as i32 + SCALE_FACTOR),
                             // => Some(value.round() as i32),
                             => Some((value * SCALE_FACTOR).round() as i32),
                             _ => None
@@ -74,7 +74,7 @@ impl MouseCursorMoveDetectorTrait for MouseCursorMoveDetector {
                     => self.current_right_stick_y 
                         = match right_stick.clone() {
                            Some(SingleCardinalLever::ControlMouseCursor(
-                               ControlMouseCursorFunction{center_at}))
+                               ControlMouseCursorFunction{deadzone_upper_limit}))
                             // => Some((value - center_at.y).round() as i32 + SCALE_FACTOR),
                             // => Some(-value.round() as i32),
                             => Some(-(value * SCALE_FACTOR).round() as i32),

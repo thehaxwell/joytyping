@@ -911,10 +911,9 @@ pub fn setup_settings_data_example(config: SetupConfig) -> SettingsData {
                 cardinal_levers: Some(CardinalLevers{
                     left_stick: Some(SingleCardinalLever::ControlMouseCursor(
                         ControlMouseCursorFunction {
-                            center_at: ControlMouseCursorCenterCoordinates{
-                                x: 0.0, y: 0.0}})),
+                            deadzone_upper_limit: 0.0})),
                     right_stick: Some(SingleCardinalLever::ControlMouseScrollwheel(
-                        ControlMouseScrollwheelFunction { center_at_y: 0.0 })),
+                        ControlMouseScrollwheelFunction { deadzone_upper_limit: 0.0 })),
                 })
             },
 

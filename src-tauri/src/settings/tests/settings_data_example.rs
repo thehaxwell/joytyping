@@ -1595,16 +1595,13 @@ pub fn setup_settings_data_example() -> SettingsData {
           cardinal_levers: Some(CardinalLevers {
             left_stick: CardinalLeverFunction{
               control_mouse_cursor: Some(ControlMouseCursorFunction{
-                center_at: ControlMouseCursorCenterCoordinates{
-                  x: 0.0,
-                  y: 0.0
-                }
+                deadzone_upper_limit: 0.0,
               }),
               control_mouse_scrollwheel: None,
             },
             right_stick: CardinalLeverFunction{
               control_mouse_scrollwheel: Some(ControlMouseScrollwheelFunction{
-                center_at_y: 0.0
+                deadzone_upper_limit: 0.0,
               }),
               control_mouse_cursor: None,
             },

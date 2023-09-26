@@ -129,18 +129,12 @@ pub enum SingleCardinalLever {
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct ControlMouseCursorFunction {
-    pub center_at: ControlMouseCursorCenterCoordinates,
-}
-
-#[derive(Deserialize, Debug, Clone, PartialEq)]
-pub struct ControlMouseCursorCenterCoordinates {
-    pub x: f32,
-    pub y: f32,
+    pub deadzone_upper_limit: f32,
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct ControlMouseScrollwheelFunction {
-    pub center_at_y: f32,
+    pub deadzone_upper_limit: f32,
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
