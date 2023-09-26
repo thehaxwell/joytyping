@@ -1,14 +1,15 @@
 use gilrs::Button;
 
-use crate::{settings::{self,data::{Layer, SwitchOnClickReaction, KeyboardInput, SwitchEventAndReaction, Switches}}, quick_lookup_window::QuickLookupWindowTrait};
+use crate::{settings::{self,data::{Layer, SwitchOnClickReaction, KeyboardInput, SwitchEventAndReaction, Switches, CardinalLevers, SingleCardinalLever}}, quick_lookup_window::QuickLookupWindowTrait};
 
-use self::{gilrs_events::{gilrs_wrapper::GilrsEventType, GilrsEventsTrait,stick_switch_interpreter::{StickSwitchButton,StickSwitchEvent}}, layers_navigator::{LayersNavigatorTrait, LayerVisitTrigger}};
+use self::{gilrs_events::{gilrs_wrapper::GilrsEventType, GilrsEventsTrait,stick_switch_interpreter::{StickSwitchButton,StickSwitchEvent}}, layers_navigator::{LayersNavigatorTrait, LayerVisitTrigger}, mouse_cursor_move_detector::MouseCursorMoveDetectorTrait};
 
 use self::switch_click_pattern_detector::{SwitchClickPatternDetectorTrait, SwitchClickPattern};
 
 pub mod gilrs_events;
 pub mod switch_click_pattern_detector;
 pub mod layers_navigator;
+pub mod mouse_cursor_move_detector;
 
 // #[cfg(test)]
 // mod tests;
@@ -20,6 +21,7 @@ pub struct Gamepad {
    switch_click_pattern_detector: Box<dyn SwitchClickPatternDetectorTrait>,
    layers_navigator: Box<dyn LayersNavigatorTrait>,
    quick_lookup_window: Box<dyn QuickLookupWindowTrait>,
+   mouse_cursor_move_detector: Box<dyn MouseCursorMoveDetectorTrait>,
 }
 
 impl Gamepad {
@@ -29,6 +31,7 @@ impl Gamepad {
        switch_click_pattern_detector: Box<dyn SwitchClickPatternDetectorTrait>,
        layers_navigator: Box<dyn LayersNavigatorTrait>,
        quick_lookup_window: Box<dyn QuickLookupWindowTrait>,
+       mouse_cursor_move_detector: Box<dyn MouseCursorMoveDetectorTrait>,
     ) -> Self {
         Gamepad{
             gilrs_events,
@@ -37,11 +40,13 @@ impl Gamepad {
 
             layers_navigator,
             quick_lookup_window,
+            mouse_cursor_move_detector,
         }
     }
 
 
     pub fn tick(&mut self) -> Option<InputEvent> {
+
         let next_event_opt = self.switch_click_pattern_detector.tick();
 
         if let Some(next_event) = next_event_opt.clone() {
@@ -128,6 +133,13 @@ impl Gamepad {
             let _ = self
                 .quick_lookup_window
                 .update(new_layer_index);
+
+            self.mouse_cursor_move_detector.set_cardinal_levers(
+                self.layers[new_layer_index].cardinal_levers.clone());
+        }
+
+        if let Some((x,y)) = self.mouse_cursor_move_detector.tick() {
+            return Some(InputEvent::MoveMouseCursor(x,y))
         }
 
         None
@@ -155,6 +167,7 @@ impl Gamepad {
                 },
                 GilrsEventType::AxisChanged(axis, value, switch_stick_event) => {
                     print!("AxisChanged: {:?}: {:?}\n",axis,value);
+                    self.mouse_cursor_move_detector.axis_changed(axis,value);
                     if let Some(event) = switch_stick_event {
                         match event {
                             StickSwitchEvent::ButtonPressed(button)
@@ -228,6 +241,7 @@ impl Gamepad {
 pub enum InputEvent {
     KeyClick(KeyboardInput),
     KeyDown(KeyboardInput),
+    MoveMouseCursor(i32,i32),
     KeyUp,
 }
 

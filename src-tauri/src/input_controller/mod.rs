@@ -82,15 +82,15 @@ pub trait MouseInputControllerTrait {
     fn key_down(&mut self, key_to_click: enigo::MouseButton);
     fn key_up(&mut self);
     fn trigger_input(&mut self);
-    fn set_mouse_cursor_x_axis(&mut self, value: Option<i32>);
-    fn set_mouse_cursor_y_axis(&mut self, value: Option<i32>);
+    fn set_mouse_cursor_x_axis(&mut self, value: i32);
+    fn set_mouse_cursor_y_axis(&mut self, value: i32);
 }
 
 pub struct MouseInputController {
     enigo: Box<dyn EnigoTrait>,
     active_key: Option<enigo::MouseButton>,
-    mouse_cursor_x_move: Option<i32>,
-    mouse_cursor_y_move: Option<i32>,
+    mouse_cursor_x_move: i32,
+    mouse_cursor_y_move: i32,
 }
 
 impl MouseInputController {
@@ -100,8 +100,8 @@ impl MouseInputController {
         Self{
             enigo,
             active_key: None,
-            mouse_cursor_x_move: None,
-            mouse_cursor_y_move: None,
+            mouse_cursor_x_move: 0,
+            mouse_cursor_y_move: 0,
         }
     }
 }
@@ -120,20 +120,20 @@ impl MouseInputControllerTrait for MouseInputController {
     }
 
     fn trigger_input(&mut self) {
-        if self.mouse_cursor_x_move.is_some()
-            || self.mouse_cursor_y_move.is_some(){
+        if self.mouse_cursor_x_move != 0
+            || self.mouse_cursor_y_move != 0 {
             self.enigo.mouse_move_relative(
-                self.mouse_cursor_x_move.unwrap_or(0),
-                self.mouse_cursor_y_move.unwrap_or(0)
+                self.mouse_cursor_x_move,
+                self.mouse_cursor_y_move,
             );
         }
     }
 
-    fn set_mouse_cursor_x_axis(&mut self, value: Option<i32>){
+    fn set_mouse_cursor_x_axis(&mut self, value: i32){
         self.mouse_cursor_x_move = value;
     }
    
-    fn set_mouse_cursor_y_axis(&mut self, value: Option<i32>){
+    fn set_mouse_cursor_y_axis(&mut self, value: i32){
         self.mouse_cursor_y_move = value;
     }
 }
