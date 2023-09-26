@@ -1,14 +1,14 @@
 use crate::settings::data::{CardinalLevers, ControlMouseCursorFunction, SingleCardinalLever};
 
 pub trait MouseCursorMoveDetectorTrait {
-    fn set_cardinal_levers(&mut self, cardinal_levers: Option<CardinalLevers>);
+    fn load_cardinal_levers(&mut self, cardinal_levers: Option<CardinalLevers>);
     fn tick(&mut self) -> Option<(i32,i32)>;
     fn axis_changed(&mut self, axis: gilrs::ev::Axis, value: f32);
 }
 
 pub struct MouseCursorMoveDetector {
-    cardinal_levers_settings: Option<CardinalLevers>,
-    // latest_event: Option<(i32,i32)>,
+    left_deadzone_upper_limit: Option<f32>,
+    right_deadzone_upper_limit: Option<f32>,
 
     current_left_stick_x: Option<i32>,
     current_left_stick_y: Option<i32>,
@@ -20,8 +20,8 @@ impl MouseCursorMoveDetector {
     pub fn new(
     ) -> Self {
         Self {
-            cardinal_levers_settings: None,
-            // latest_event: None,
+            left_deadzone_upper_limit: None,
+            right_deadzone_upper_limit: None,
             current_left_stick_x: None,
             current_left_stick_y: None,
             current_right_stick_x: None,
@@ -32,57 +32,57 @@ impl MouseCursorMoveDetector {
 
 const SCALE_FACTOR: f32 = 10.0;
 impl MouseCursorMoveDetectorTrait for MouseCursorMoveDetector {
-    fn set_cardinal_levers(&mut self, cardinal_levers: Option<CardinalLevers>) {
-        self.cardinal_levers_settings = cardinal_levers;
+    fn load_cardinal_levers(&mut self, cardinal_levers: Option<CardinalLevers>) {
+        if let Some(CardinalLevers { left_stick, right_stick }) 
+            = cardinal_levers {
+            self.left_deadzone_upper_limit = match left_stick {
+                Some(SingleCardinalLever::ControlMouseCursor(
+                   ControlMouseCursorFunction{deadzone_upper_limit})) 
+                => Some(deadzone_upper_limit),
+                _ => None,
+            };
+
+            self.right_deadzone_upper_limit = match right_stick {
+                Some(SingleCardinalLever::ControlMouseCursor(
+                   ControlMouseCursorFunction{deadzone_upper_limit})) 
+                => Some(deadzone_upper_limit),
+                _ => None,
+            };
+        }
     }
 
     fn axis_changed(&mut self, axis: gilrs::ev::Axis, value: f32){
-        if let Some(CardinalLevers { left_stick, right_stick }) 
-            = &self.cardinal_levers_settings {
+        let new_move_abs_opt = match axis {
+            gilrs::ev::Axis::LeftStickX | gilrs::ev::Axis::LeftStickY 
+               => if let Some(limit) = self.left_deadzone_upper_limit {
+                       Some(if value.abs() >= limit.abs() {
+                          (value * SCALE_FACTOR).round() as i32
+                       } else { 0 })
+                   }
+                   else { None },
+            gilrs::ev::Axis::RightStickX | gilrs::ev::Axis::RightStickY 
+               => if let Some(limit) = self.right_deadzone_upper_limit {
+                       Some(if value.abs() >= limit.abs() {
+                          (value * SCALE_FACTOR).round() as i32
+                       } else { 0 })
+                   }
+                   else { None },
+            _ => None,
+        };
+
+        if let Some(new_move_abs) = new_move_abs_opt {
             match axis {
                 gilrs::ev::Axis::LeftStickX 
-                    => self.current_left_stick_x 
-                        = match left_stick.clone() {
-                           Some(SingleCardinalLever::ControlMouseCursor(
-                               ControlMouseCursorFunction{deadzone_upper_limit}))
-                            // => Some((value - deadzone_upper_limit.x).round() as i32 + SCALE_FACTOR),
-                            // => Some(value.round() as i32),
-                            => Some((value * SCALE_FACTOR).round() as i32),
-                            _ => None
-                        },
-                gilrs::ev::Axis::LeftStickY
-                    => self.current_left_stick_y 
-                        = match left_stick.clone() {
-                           Some(SingleCardinalLever::ControlMouseCursor(
-                               ControlMouseCursorFunction{deadzone_upper_limit}))
-                            // => Some((value - deadzone_upper_limit.y).round() as i32 + SCALE_FACTOR),
-                            // => Some(-value.round() as i32),
-                            => Some(-(value * SCALE_FACTOR).round() as i32),
-                            _ => None
-                        },
+                => self.current_left_stick_x = Some(new_move_abs),
+                gilrs::ev::Axis::LeftStickY 
+                => self.current_left_stick_y = Some(-new_move_abs),
                 gilrs::ev::Axis::RightStickX 
-                    => self.current_right_stick_x 
-                        = match right_stick.clone() {
-                           Some(SingleCardinalLever::ControlMouseCursor(
-                               ControlMouseCursorFunction{deadzone_upper_limit}))
-                            // => Some((value - deadzone_upper_limit.x).round() as i32 + SCALE_FACTOR),
-                            // => Some(value.round() as i32),
-                            => Some((value * SCALE_FACTOR).round() as i32),
-                            _ => None
-                        },
-                gilrs::ev::Axis::RightStickY
-                    => self.current_right_stick_y 
-                        = match right_stick.clone() {
-                           Some(SingleCardinalLever::ControlMouseCursor(
-                               ControlMouseCursorFunction{deadzone_upper_limit}))
-                            // => Some((value - center_at.y).round() as i32 + SCALE_FACTOR),
-                            // => Some(-value.round() as i32),
-                            => Some(-(value * SCALE_FACTOR).round() as i32),
-                            _ => None
-                        },
+                => self.current_right_stick_x = Some(new_move_abs),
+                gilrs::ev::Axis::RightStickY 
+                => self.current_right_stick_y = Some(-new_move_abs),
                 _ => (),
             }
-        }
+        };
     }
 
     fn tick(&mut self) -> Option<(i32,i32)> {

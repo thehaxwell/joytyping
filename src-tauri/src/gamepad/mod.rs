@@ -134,7 +134,7 @@ impl Gamepad {
                 .quick_lookup_window
                 .update(new_layer_index);
 
-            self.mouse_cursor_move_detector.set_cardinal_levers(
+            self.mouse_cursor_move_detector.load_cardinal_levers(
                 self.layers[new_layer_index].cardinal_levers.clone());
         }
 
