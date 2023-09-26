@@ -49,40 +49,82 @@ impl MouseCursorMoveDetectorTrait for MouseCursorMoveDetector {
                 _ => None,
             };
         }
+        else {
+            self.left_deadzone_upper_limit = None;
+            self.right_deadzone_upper_limit = None;
+        }
     }
 
     fn axis_changed(&mut self, axis: gilrs::ev::Axis, value: f32){
-        let new_move_abs_opt = match axis {
-            gilrs::ev::Axis::LeftStickX | gilrs::ev::Axis::LeftStickY 
-               => if let Some(limit) = self.left_deadzone_upper_limit {
-                       Some(if value.abs() >= limit.abs() {
-                          (value * SCALE_FACTOR).round() as i32
-                       } else { 0 })
-                   }
-                   else { None },
-            gilrs::ev::Axis::RightStickX | gilrs::ev::Axis::RightStickY 
-               => if let Some(limit) = self.right_deadzone_upper_limit {
-                       Some(if value.abs() >= limit.abs() {
-                          (value * SCALE_FACTOR).round() as i32
-                       } else { 0 })
-                   }
-                   else { None },
-            _ => None,
-        };
+        // let new_move_abs_opt = match axis {
+        //     gilrs::ev::Axis::LeftStickX | gilrs::ev::Axis::LeftStickY 
+        //        => if let Some(limit) = self.left_deadzone_upper_limit {
+        //                Some(if value.abs() >= limit.abs() {
+        //                   (value * SCALE_FACTOR).round() as i32
+        //                } else { 0 })
+        //            }
+        //            else { None },
+        //     gilrs::ev::Axis::RightStickX | gilrs::ev::Axis::RightStickY 
+        //        => if let Some(limit) = self.right_deadzone_upper_limit {
+        //                Some(if value.abs() >= limit.abs() {
+        //                   (value * SCALE_FACTOR).round() as i32
+        //                } else { 0 })
+        //            }
+        //            else { None },
+        //     _ => None,
+        // };
+        //
+        // if let Some(new_move_abs) = new_move_abs_opt {
+        //     match axis {
+        //         gilrs::ev::Axis::LeftStickX 
+        //         => self.current_left_stick_x = Some(new_move_abs),
+        //         gilrs::ev::Axis::LeftStickY 
+        //         => self.current_left_stick_y = Some(-new_move_abs),
+        //         gilrs::ev::Axis::RightStickX 
+        //         => self.current_right_stick_x = Some(new_move_abs),
+        //         gilrs::ev::Axis::RightStickY 
+        //         => self.current_right_stick_y = Some(-new_move_abs),
+        //         _ => (),
+        //     }
+        // };
 
-        if let Some(new_move_abs) = new_move_abs_opt {
-            match axis {
-                gilrs::ev::Axis::LeftStickX 
-                => self.current_left_stick_x = Some(new_move_abs),
-                gilrs::ev::Axis::LeftStickY 
-                => self.current_left_stick_y = Some(-new_move_abs),
-                gilrs::ev::Axis::RightStickX 
-                => self.current_right_stick_x = Some(new_move_abs),
-                gilrs::ev::Axis::RightStickY 
-                => self.current_right_stick_y = Some(-new_move_abs),
-                _ => (),
-            }
-        };
+        match axis {
+            gilrs::ev::Axis::LeftStickX
+               => self.current_left_stick_x
+                  =if let Some(limit) = self.left_deadzone_upper_limit {
+                       Some(if value.abs() >= limit.abs() {
+                          (value * SCALE_FACTOR).round() as i32
+                       } else { 0 })
+                   }
+                   else { None },
+            gilrs::ev::Axis::LeftStickY 
+               => self.current_left_stick_y
+                  =if let Some(limit) = self.left_deadzone_upper_limit {
+                       Some(if value.abs() >= limit.abs() {
+                          -(value * SCALE_FACTOR).round() as i32
+                       } else { 0 })
+                   }
+                   else { None },
+            gilrs::ev::Axis::RightStickX
+               => self.current_right_stick_x
+                  =if let Some(limit) = self.right_deadzone_upper_limit {
+                       Some(if value.abs() >= limit.abs() {
+                          (value * SCALE_FACTOR).round() as i32
+                       } else { 0 })
+                   }
+                   else { None },
+            gilrs::ev::Axis::RightStickY 
+               => self.current_right_stick_y
+                  =if let Some(limit) = self.right_deadzone_upper_limit {
+                       Some(if value.abs() >= limit.abs() {
+                          -(value * SCALE_FACTOR).round() as i32
+                       } else { 0 })
+                   }
+                   else { None },
+            _ => (),
+        }
+        println!(">>>>> {:?}",self.current_left_stick_x);
+        println!(">>>>> {:?}",self.current_right_stick_x);
     }
 
     fn tick(&mut self) -> Option<(i32,i32)> {
