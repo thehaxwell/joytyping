@@ -1,10 +1,10 @@
 use std::sync::mpsc;
 
+use gamepad::cardinal_levers_move_detector::CardinalLeversMoveDetector;
 use gamepad::gilrs_events::GilrsEvents;
 use gamepad::gilrs_events::gilrs_wrapper::GilrsWrapper;
 use gamepad::gilrs_events::stick_switch_interpreter::{CardinalCustomButtons, StickSwitchInterpreter, AxisClickThresholds, self};
 use gamepad::layers_navigator::LayersNavigator;
-use gamepad::mouse_cursor_move_detector::MouseCursorMoveDetector;
 use input_controller::{KeyboardInputController,KeyboardInputControllerTrait};
 use input_controller::enigo_wrapper::{EnigoWrapper, EnigoTrait};
 use settings::error_display_window::ErrorDisplayWindow;
@@ -120,7 +120,7 @@ pub fn start_main_loop(
             Box::new(SwitchClickPatternDetector::new()),
             Box::new(LayersNavigator::new(active_profile.layers)),
             Box::new(quick_lookup_window),
-            Box::new(MouseCursorMoveDetector::new()),
+            Box::new(CardinalLeversMoveDetector::new()),
         );
 
         let mut keyboard_input_controller = KeyboardInputController::new(Box::new(EnigoWrapper::new()));

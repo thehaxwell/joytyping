@@ -1,15 +1,15 @@
 use gilrs::Button;
 
-use crate::{settings::{self,data::{Layer, SwitchOnClickReaction, KeyboardInput, SwitchEventAndReaction, Switches, CardinalLevers, SingleCardinalLever}}, quick_lookup_window::QuickLookupWindowTrait};
+use crate::{settings::{self,data::{Layer, SwitchOnClickReaction, KeyboardInput, SwitchEventAndReaction, Switches, CardinalLevers, SingleCardinalLever, ControlMouseCursorFunction}}, quick_lookup_window::QuickLookupWindowTrait};
 
-use self::{gilrs_events::{gilrs_wrapper::GilrsEventType, GilrsEventsTrait,stick_switch_interpreter::{StickSwitchButton,StickSwitchEvent}}, layers_navigator::{LayersNavigatorTrait, LayerVisitTrigger}, mouse_cursor_move_detector::MouseCursorMoveDetectorTrait};
+use self::{gilrs_events::{gilrs_wrapper::GilrsEventType, GilrsEventsTrait,stick_switch_interpreter::{StickSwitchButton,StickSwitchEvent}}, layers_navigator::{LayersNavigatorTrait, LayerVisitTrigger}, cardinal_levers_move_detector::CardinalLeversMoveDetectorTrait};
 
 use self::switch_click_pattern_detector::{SwitchClickPatternDetectorTrait, SwitchClickPattern};
 
 pub mod gilrs_events;
 pub mod switch_click_pattern_detector;
 pub mod layers_navigator;
-pub mod mouse_cursor_move_detector;
+pub mod cardinal_levers_move_detector;
 
 // #[cfg(test)]
 // mod tests;
@@ -21,7 +21,7 @@ pub struct Gamepad {
    switch_click_pattern_detector: Box<dyn SwitchClickPatternDetectorTrait>,
    layers_navigator: Box<dyn LayersNavigatorTrait>,
    quick_lookup_window: Box<dyn QuickLookupWindowTrait>,
-   mouse_cursor_move_detector: Box<dyn MouseCursorMoveDetectorTrait>,
+   mouse_cursor_move_detector: Box<dyn CardinalLeversMoveDetectorTrait>,
 }
 
 impl Gamepad {
@@ -31,7 +31,7 @@ impl Gamepad {
        switch_click_pattern_detector: Box<dyn SwitchClickPatternDetectorTrait>,
        layers_navigator: Box<dyn LayersNavigatorTrait>,
        quick_lookup_window: Box<dyn QuickLookupWindowTrait>,
-       mouse_cursor_move_detector: Box<dyn MouseCursorMoveDetectorTrait>,
+       mouse_cursor_move_detector: Box<dyn CardinalLeversMoveDetectorTrait>,
     ) -> Self {
         Gamepad{
             gilrs_events,
@@ -134,8 +134,30 @@ impl Gamepad {
                 .quick_lookup_window
                 .update(new_layer_index);
 
-            self.mouse_cursor_move_detector.load_cardinal_levers(
-                self.layers[new_layer_index].cardinal_levers.clone());
+            // self.mouse_cursor_move_detector.load_cardinal_levers(
+            //     self.layers[new_layer_index].cardinal_levers.clone());
+
+
+            if let Some(CardinalLevers { left_stick, right_stick }) 
+                = self.layers[new_layer_index].cardinal_levers.clone() {
+                self.mouse_cursor_move_detector.set_deadzone_upper_limits(
+                    match left_stick {
+                        Some(SingleCardinalLever::ControlMouseCursor(
+                           ControlMouseCursorFunction{deadzone_upper_limit})) 
+                        => Some(deadzone_upper_limit),
+                        _ => None,
+                    },
+                    match right_stick {
+                        Some(SingleCardinalLever::ControlMouseCursor(
+                           ControlMouseCursorFunction{deadzone_upper_limit})) 
+                        => Some(deadzone_upper_limit),
+                        _ => None,
+                    });
+            }
+            else {
+                self.mouse_cursor_move_detector.set_deadzone_upper_limits(None,None);
+            }
+
         }
 
         if let Some((x,y)) = self.mouse_cursor_move_detector.tick() {
