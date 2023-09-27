@@ -123,18 +123,14 @@ pub struct CardinalLevers {
 #[derive(Deserialize, Debug, Clone, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum SingleCardinalLever {
-    ControlMouseCursor(ControlMouseCursorFunction),
-    ControlMouseScrollwheel(ControlMouseScrollwheelFunction),
+    ControlMouseCursor(MouseControl),
+    ControlMouseScrollwheel(MouseControl),
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
-pub struct ControlMouseCursorFunction {
+pub struct MouseControl {
     pub deadzone_upper_limit: f32,
-}
-
-#[derive(Deserialize, Debug, Clone, PartialEq)]
-pub struct ControlMouseScrollwheelFunction {
-    pub deadzone_upper_limit: f32,
+    pub scale_factor: f32,
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]

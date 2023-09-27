@@ -910,10 +910,15 @@ pub fn setup_settings_data_example(config: SetupConfig) -> SettingsData {
                 }),
                 cardinal_levers: Some(CardinalLevers{
                     left_stick: Some(SingleCardinalLever::ControlMouseCursor(
-                        ControlMouseCursorFunction {
-                            deadzone_upper_limit: 0.0})),
+                        MouseControl {
+                            deadzone_upper_limit: 0.0,
+                            scale_factor: 10.0,
+                        })),
                     right_stick: Some(SingleCardinalLever::ControlMouseScrollwheel(
-                        ControlMouseScrollwheelFunction { deadzone_upper_limit: 0.0 })),
+                        MouseControl {
+                            deadzone_upper_limit: 0.0,
+                            scale_factor: 10.0,
+                        })),
                 })
             },
 

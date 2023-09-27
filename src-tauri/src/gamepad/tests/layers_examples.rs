@@ -858,11 +858,15 @@ vec![
         }),
         cardinal_levers: Some(CardinalLevers{
             left_stick: Some(SingleCardinalLever::ControlMouseCursor(
-                ControlMouseCursorFunction {
-                    center_at: ControlMouseCursorCenterCoordinates{
-                        x: 0.0, y: 0.0}})),
+                MouseControl{
+                deadzone_upper_limit: 0.0,
+                scale_factor: 10.0,
+              })),
             right_stick: Some(SingleCardinalLever::ControlMouseScrollwheel(
-                ControlMouseScrollwheelFunction { center_at_y: 0.0 })),
+                MouseControl{
+                deadzone_upper_limit: 0.0,
+                scale_factor: 10.0,
+              })),
         })
     },
 ]

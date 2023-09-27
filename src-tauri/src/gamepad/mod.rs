@@ -1,6 +1,6 @@
 use gilrs::Button;
 
-use crate::{settings::{self,data::{Layer, SwitchOnClickReaction, KeyboardInput, SwitchEventAndReaction, Switches, CardinalLevers, SingleCardinalLever, ControlMouseCursorFunction}}, quick_lookup_window::QuickLookupWindowTrait};
+use crate::{settings::{self,data::{Layer, SwitchOnClickReaction, KeyboardInput, SwitchEventAndReaction, Switches, CardinalLevers, SingleCardinalLever, MouseControl}}, quick_lookup_window::QuickLookupWindowTrait};
 
 use self::{gilrs_events::{gilrs_wrapper::GilrsEventType, GilrsEventsTrait,stick_switch_interpreter::{StickSwitchButton,StickSwitchEvent}}, layers_navigator::{LayersNavigatorTrait, LayerVisitTrigger}, cardinal_levers_move_detector::CardinalLeversMoveDetectorTrait};
 
@@ -143,13 +143,19 @@ impl Gamepad {
                 self.mouse_cursor_move_detector.set_deadzone_upper_limits(
                     match left_stick {
                         Some(SingleCardinalLever::ControlMouseCursor(
-                           ControlMouseCursorFunction{deadzone_upper_limit})) 
+                           MouseControl{
+                               deadzone_upper_limit,
+                               scale_factor
+                           })) 
                         => Some(deadzone_upper_limit),
                         _ => None,
                     },
                     match right_stick {
                         Some(SingleCardinalLever::ControlMouseCursor(
-                           ControlMouseCursorFunction{deadzone_upper_limit})) 
+                           MouseControl{
+                               deadzone_upper_limit,
+                               scale_factor
+                           })) 
                         => Some(deadzone_upper_limit),
                         _ => None,
                     });
