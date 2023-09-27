@@ -134,34 +134,24 @@ impl Gamepad {
                 .quick_lookup_window
                 .update(new_layer_index);
 
-            // self.mouse_cursor_move_detector.load_cardinal_levers(
-            //     self.layers[new_layer_index].cardinal_levers.clone());
-
-
             if let Some(CardinalLevers { left_stick, right_stick }) 
-                = self.layers[new_layer_index].cardinal_levers.clone() {
-                self.mouse_cursor_move_detector.set_deadzone_upper_limits(
+                = &self.layers[new_layer_index].cardinal_levers {
+                self.mouse_cursor_move_detector.set_mouse_controls(
                     match left_stick {
                         Some(SingleCardinalLever::ControlMouseCursor(
-                           MouseControl{
-                               deadzone_upper_limit,
-                               scale_factor
-                           })) 
-                        => Some(deadzone_upper_limit),
+                           mouse_control)) 
+                        => Some(mouse_control.clone()),
                         _ => None,
                     },
                     match right_stick {
                         Some(SingleCardinalLever::ControlMouseCursor(
-                           MouseControl{
-                               deadzone_upper_limit,
-                               scale_factor
-                           })) 
-                        => Some(deadzone_upper_limit),
+                           mouse_control)) 
+                        => Some(mouse_control.clone()),
                         _ => None,
                     });
             }
             else {
-                self.mouse_cursor_move_detector.set_deadzone_upper_limits(None,None);
+                self.mouse_cursor_move_detector.set_mouse_controls(None,None);
             }
 
         }
