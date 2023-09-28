@@ -11,6 +11,8 @@ pub trait EnigoTrait {
     fn mouse_move_relative(&mut self, x: i32, y: i32);
     fn mouse_down(&mut self, button: MouseButton);
     fn mouse_up(&mut self, button: MouseButton);
+    fn mouse_scroll_x(&mut self, length: i32);
+    fn mouse_scroll_y(&mut self, length: i32);
 }
 
 pub struct EnigoWrapper {
@@ -48,5 +50,13 @@ impl EnigoTrait for EnigoWrapper {
 
     fn mouse_up(&mut self, button: MouseButton){
         self.enigo.mouse_up(button);
+    }
+
+    fn mouse_scroll_x(&mut self, length: i32){
+        self.enigo.mouse_scroll_x(length);
+    }
+
+    fn mouse_scroll_y(&mut self, length: i32){
+        self.enigo.mouse_scroll_y(length);
     }
 }

@@ -84,6 +84,8 @@ pub trait MouseInputControllerTrait {
     fn trigger_input(&mut self);
     fn set_mouse_cursor_x_axis(&mut self, value: i32);
     fn set_mouse_cursor_y_axis(&mut self, value: i32);
+    fn set_mouse_scroll_x_axis(&mut self, value: i32);
+    fn set_mouse_scroll_y_axis(&mut self, value: i32);
 }
 
 pub struct MouseInputController {
@@ -91,6 +93,8 @@ pub struct MouseInputController {
     active_key: Option<enigo::MouseButton>,
     mouse_cursor_x_move: i32,
     mouse_cursor_y_move: i32,
+    mouse_scroll_x_move: i32,
+    mouse_scroll_y_move: i32,
 }
 
 impl MouseInputController {
@@ -102,6 +106,8 @@ impl MouseInputController {
             active_key: None,
             mouse_cursor_x_move: 0,
             mouse_cursor_y_move: 0,
+            mouse_scroll_x_move: 0,
+            mouse_scroll_y_move: 0,
         }
     }
 }
@@ -127,6 +133,17 @@ impl MouseInputControllerTrait for MouseInputController {
                 self.mouse_cursor_y_move,
             );
         }
+
+        if self.mouse_scroll_x_move != 0 {
+            self.enigo.mouse_scroll_x(
+                self.mouse_scroll_x_move,
+            );
+        }
+        if self.mouse_scroll_y_move != 0 {
+            self.enigo.mouse_scroll_y(
+                self.mouse_scroll_y_move,
+            );
+        }
     }
 
     fn set_mouse_cursor_x_axis(&mut self, value: i32){
@@ -135,5 +152,13 @@ impl MouseInputControllerTrait for MouseInputController {
    
     fn set_mouse_cursor_y_axis(&mut self, value: i32){
         self.mouse_cursor_y_move = value;
+    }
+
+    fn set_mouse_scroll_x_axis(&mut self, value: i32){
+        self.mouse_scroll_x_move = value;
+    }
+   
+    fn set_mouse_scroll_y_axis(&mut self, value: i32){
+        self.mouse_scroll_y_move = value;
     }
 }

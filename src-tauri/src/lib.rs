@@ -121,6 +121,7 @@ pub fn start_main_loop(
             Box::new(LayersNavigator::new(active_profile.layers)),
             Box::new(quick_lookup_window),
             Box::new(CardinalLeversMoveDetector::new()),
+            Box::new(CardinalLeversMoveDetector::new()),
         );
 
         let mut keyboard_input_controller = KeyboardInputController::new(Box::new(EnigoWrapper::new()));
@@ -128,8 +129,9 @@ pub fn start_main_loop(
 
 
         'main_loop: loop {
-            //TODO: check if this actually eases the load on the CPU
+            // slow this loop down a little
             std::thread::sleep(std::time::Duration::from_millis(10));
+
             match end_signal_mpsc_receiver.try_recv() {
                 Ok(MainLoopInterruption::ReInitiailze) => {
                     println!("Restarting");
@@ -148,7 +150,6 @@ pub fn start_main_loop(
             match gamepad.tick() {
                 Some(gamepad::InputEvent::KeyClick(key))
                 => {
-                    // mouse_input_controller.set_mouse_cursor_y_axis(-10);
                     keyboard_input_controller.key_up();
                     keyboard_input_controller.key_click(key);
                 }
@@ -159,13 +160,17 @@ pub fn start_main_loop(
                 }
                 Some(gamepad::InputEvent::KeyUp)
                 => {
-                    // mouse_input_controller.set_mouse_cursor_y_axis(0);
                     keyboard_input_controller.key_up();
                 }
                 Some(gamepad::InputEvent::MoveMouseCursor(x,y))
                 => {
                     mouse_input_controller.set_mouse_cursor_x_axis(x);
                     mouse_input_controller.set_mouse_cursor_y_axis(y);
+                }
+                Some(gamepad::InputEvent::MouseScroll(x,y))
+                => {
+                    mouse_input_controller.set_mouse_scroll_x_axis(x);
+                    mouse_input_controller.set_mouse_scroll_y_axis(y);
                 }
                 None => (),
             };
