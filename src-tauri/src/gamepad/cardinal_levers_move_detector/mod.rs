@@ -1,5 +1,8 @@
 use crate::settings::data::MouseControl;
 
+#[cfg(test)]
+mod tests;
+
 pub trait CardinalLeversMoveDetectorTrait {
     fn set_mouse_controls(&mut self,
         left_mouse_control: Option<MouseControl>,
@@ -17,8 +20,8 @@ pub struct CardinalLeversMoveDetector {
     current_right_stick_x: Option<i32>,
     current_right_stick_y: Option<i32>,
 
-left_stick_at_rest_counter: u8,
-right_stick_at_rest_counter: u8,
+    left_stick_at_rest_counter: u8,
+    right_stick_at_rest_counter: u8,
 }
 
 impl CardinalLeversMoveDetector {
@@ -99,7 +102,7 @@ impl CardinalLeversMoveDetectorTrait for CardinalLeversMoveDetector {
                 if x == 0 && y == 0 {
                     if self.left_stick_at_rest_counter 
                         < EMIT_RESTING_POSITION_EVENT_LIMIT {
-                        self.left_stick_at_rest_counter += 1;
+                        self.left_stick_at_rest_counter +=  1;
                     }
                 }
                 else {
