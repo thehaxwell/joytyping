@@ -30,7 +30,7 @@ impl QuickLookupWindowDependencies for QuickLookupWindowDependenciesImpl {
 pub trait QuickLookupWindowTrait {
     fn show_or_open(&mut self, trigger_switch: Switch) -> Result<(), tauri::Error>;
     fn hide(&mut self, trigger_switch: Switch) -> Result<(), tauri::Error>;
-    fn update(&self, layer: usize) -> Result<(), tauri::Error>;
+    fn update(&mut self, layer: usize) -> Result<(), tauri::Error>;
 }
 
 const WINDOW_LABEL: &str = "quick-lookup";
@@ -40,6 +40,7 @@ pub struct QuickLookupWindow {
     initialization_script: String,
     quick_lookup_window_settings: Option<settings::data::QuickLookupWindow>,
     current_state: QuickLookupWindowState,
+    current_layer: usize,
 }
 
 impl QuickLookupWindow {
@@ -51,6 +52,7 @@ impl QuickLookupWindow {
             initialization_script: DEFAULT_QUICK_LOOKUP_INIT_SCRIPT.to_string(),
             quick_lookup_window_settings: None,
             current_state: QuickLookupWindowState::Hidden,
+            current_layer: 0,
         }
     }
     pub fn set_window_settings(&mut self, settings: settings::data::QuickLookupWindow) {
@@ -99,7 +101,11 @@ impl QuickLookupWindowTrait for QuickLookupWindow {
                 WINDOW_LABEL, /* the unique window label */
                 tauri::WindowUrl::App("quick-lookup.html".into())
             )
-            .initialization_script(&self.initialization_script)
+            // start by injecting the current_layer
+            // in-case it was set while the window didn't exist
+            .initialization_script(format!("window.__START_LAYER__= {};{}", 
+                                           self.current_layer,
+                                           self.initialization_script).as_str())
             .title("Joytyping Quick Lookup");
 
             // TODO: consider using https://lib.rs/crates/tap
@@ -144,7 +150,8 @@ impl QuickLookupWindowTrait for QuickLookupWindow {
         }
     }
 
-    fn update(&self, layer: usize) -> Result<(), tauri::Error> {
+    fn update(&mut self, layer: usize) -> Result<(), tauri::Error> {
+        self.current_layer = layer;
         match self.tauri_app_handle.get_window(WINDOW_LABEL) {
             Some(docs_window) => docs_window.emit("update-keyboard",
                 UpdateKeyboardEventPayload{
