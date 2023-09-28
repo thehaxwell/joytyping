@@ -86,6 +86,15 @@ impl QuickLookupWindow {
                 Ok(())
             },
         }
+        .and_then(|()|{
+            if let Some(win) 
+                = self.tauri_app_handle.get_window(WINDOW_LABEL) {
+                    if let Ok(()) = win.close() {
+                        self.current_state = QuickLookupWindowState::Hidden;
+                    }
+                }
+            Ok(())
+        })
     }
 }
 
