@@ -38,25 +38,25 @@ pub struct QuickLookupWindow {
     tauri_app_handle: tauri::AppHandle,
     dependencies: Box<dyn QuickLookupWindowDependencies>,
     initialization_script: String,
-    quick_lookup_window_settings: Option<settings::data::QuickLookupWindow>,
+    quick_lookup_window_settings: settings::data::QuickLookupWindow,
     current_state: QuickLookupWindowState,
     current_layer: usize,
 }
 
 impl QuickLookupWindow {
-    pub fn new(tauri_app_handle: tauri::AppHandle,
-               dependencies: Box<dyn QuickLookupWindowDependencies>) -> Self {
+    pub fn new(
+       tauri_app_handle: tauri::AppHandle,
+       dependencies: Box<dyn QuickLookupWindowDependencies>,
+       quick_lookup_window_settings: settings::data::QuickLookupWindow,
+       ) -> Self {
         Self { 
             tauri_app_handle,
             dependencies,
             initialization_script: DEFAULT_QUICK_LOOKUP_INIT_SCRIPT.to_string(),
-            quick_lookup_window_settings: None,
+            quick_lookup_window_settings,
             current_state: QuickLookupWindowState::Hidden,
             current_layer: 0,
         }
-    }
-    pub fn set_window_settings(&mut self, settings: settings::data::QuickLookupWindow) {
-        self.quick_lookup_window_settings = Some(settings);
     }
 
     /// Load startup script from the specified file.
@@ -110,15 +110,12 @@ impl QuickLookupWindowTrait for QuickLookupWindow {
 
             // TODO: consider using https://lib.rs/crates/tap
             // instead of this if-let
-            if let Some(settings) = &self.quick_lookup_window_settings {
-                window
-                .inner_size(settings.inner_size.width, settings.inner_size.height)
-                .center()
-                .build()?;
-            }
-            else {
-                window.build()?;
-            }
+            window
+            .inner_size(
+                self.quick_lookup_window_settings.inner_size.width,
+                self.quick_lookup_window_settings.inner_size.height)
+            .center()
+            .build()?;
 
             Ok(())
         }

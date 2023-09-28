@@ -75,8 +75,9 @@ pub fn start_main_loop(
         let mut quick_lookup_window = QuickLookupWindow::new(
             handle.clone(),
             Box::new(QuickLookupWindowDependenciesImpl),
+            active_profile.quick_lookup_window,
         );
-        quick_lookup_window.set_window_settings(active_profile.quick_lookup_window);
+
         match quick_lookup_window.load_startup_script() {
             Err(e) => {
                 match e {
