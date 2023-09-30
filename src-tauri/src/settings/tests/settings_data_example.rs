@@ -8,6 +8,7 @@ pub fn setup_settings_data_example() -> SettingsData {
                 height: 100.0,
                 width: 100.0,
             },
+            js_bundle_file_path: Some("path/to/file/bundle.js".to_string()),
         },
         stick_switches_click_thresholds: StickSwitchesClickThresholds {
             left_stick_up: 0.5,

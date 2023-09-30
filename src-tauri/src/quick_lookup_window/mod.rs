@@ -62,29 +62,35 @@ impl QuickLookupWindow {
     /// Load startup script from the specified file.
     /// If reading or parsing the file fails, load the default startup script.
     pub fn load_startup_script(&mut self) -> Result<(), StartupScriptLoadError> {
-        match self.dependencies.read_to_string(
-            "/home/haxwell/.config/joytyping/quick-lookup/build/bundle.js") {
-            Err(e) => {
-                self.initialization_script = DEFAULT_QUICK_LOOKUP_INIT_SCRIPT.to_string();
-                match e.kind() {
-                    std::io::ErrorKind::NotFound => {
-                        Err(StartupScriptLoadError::FileNotFound)
-                    },
-                    std::io::ErrorKind::PermissionDenied => {
-                        Err(StartupScriptLoadError::PermissionDenied)
-                    },
-                    _ => {
-                        Err(StartupScriptLoadError::FileNotReadable)
-                    },
-                }
-            },
-            Ok(rollup_script_str) => {
-                let mut init_script = String::from("window.addEventListener(\"load\", (event) => {");
-                init_script.push_str(&rollup_script_str);
-                init_script.push_str("});");
-                self.initialization_script = init_script;
-                Ok(())
-            },
+        if let Some(path) 
+            = &self.quick_lookup_window_settings.js_bundle_file_path {
+            match self.dependencies.read_to_string(path) {
+                Err(e) => {
+                    self.initialization_script = DEFAULT_QUICK_LOOKUP_INIT_SCRIPT.to_string();
+                    match e.kind() {
+                        std::io::ErrorKind::NotFound => {
+                            Err(StartupScriptLoadError::FileNotFound)
+                        },
+                        std::io::ErrorKind::PermissionDenied => {
+                            Err(StartupScriptLoadError::PermissionDenied)
+                        },
+                        _ => {
+                            Err(StartupScriptLoadError::FileNotReadable)
+                        },
+                    }
+                },
+                Ok(rollup_script_str) => {
+                    let mut init_script = String::from("window.addEventListener(\"load\", (event) => {");
+                    init_script.push_str(&rollup_script_str);
+                    init_script.push_str("});");
+                    self.initialization_script = init_script;
+                    Ok(())
+                },
+            }
+        }
+        else{
+            self.initialization_script = DEFAULT_QUICK_LOOKUP_INIT_SCRIPT.to_string();
+            Ok(())
         }
         .and_then(|()|{
             if let Some(win) 
@@ -117,14 +123,12 @@ impl QuickLookupWindowTrait for QuickLookupWindow {
                                            self.initialization_script).as_str())
             .title("Joytyping Quick Lookup");
 
-            // TODO: consider using https://lib.rs/crates/tap
-            // instead of this if-let
             window
-            .inner_size(
-                self.quick_lookup_window_settings.inner_size.width,
-                self.quick_lookup_window_settings.inner_size.height)
-            .center()
-            .build()?;
+                .inner_size(
+                    self.quick_lookup_window_settings.inner_size.width,
+                    self.quick_lookup_window_settings.inner_size.height)
+                .center()
+                .build()?;
 
             Ok(())
         }
