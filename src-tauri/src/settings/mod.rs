@@ -124,7 +124,12 @@ match self.dependencies.read_to_string(&self.file_path)
                 if let Err(e) = Settings::validate_settings_data(&deserialized) {
                     panic!("Default settings file not parsable: {}", e.to_string());
                 }
-                self.data = Some(deserialized);
+
+                match deserialized.clone_and_set_layer_pointers() {
+                    Ok(data) => self.data = Some(data),
+                    Err(e) => panic!("Default settings file not parsable: {}", e.to_string()),
+                };
+                
             }
         }
     }
