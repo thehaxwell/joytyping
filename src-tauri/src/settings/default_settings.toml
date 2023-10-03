@@ -5,6 +5,7 @@ default_profile= "default" # The name of the profile to use by default
 name="default"
 [profiles.quick_lookup_window]
 inner_size = {width= 600,height= 400}
+js_bundle_file_path="/home/haxwell/.config/joytyping/quick-lookup/build/bundle.js"
 [profiles.stick_switches_click_thresholds]
 left_stick_up = 0.5
 left_stick_down = 0.5
@@ -33,14 +34,14 @@ right_stick_up = {on_click = {keyboard = {key = "e"}}}
 right_stick_down = {on_click = {keyboard = {key = "i"}}}
 right_stick_left = {on_click = {keyboard = {key = "a"}}}
 right_stick_right = {on_click = {keyboard = {key = "Space"}}}
+left_trigger_2 = {on_click = {show_quick_lookup_window = {}}}
 [profiles.layers.switches.left_trigger]
-on_click_and_hold = {visit_layer="first-layer-step-3"}
-on_double_click = {move_to_layer="second-layer-step-1"}
-on_double_click_and_hold = {visit_layer="second-layer-step-1"}
+on_click = {visit_layer="first-layer-step-3"}
+on_double_click = {move_to_or_visit_layer="second-layer-step-1"}
+
 [profiles.layers.switches.right_trigger]
-on_click_and_hold = {visit_layer="first-layer-step-2"}
-on_double_click = {move_to_layer="second-layer-step-1"}
-on_double_click_and_hold = {visit_layer="second-layer-step-1"}
+on_click = {visit_layer="first-layer-step-2"}
+on_double_click = {move_to_or_visit_layer="second-layer-step-1"}
 
 [[profiles.layers]]
 id = "first-layer-step-2"
@@ -61,8 +62,9 @@ right_stick_up = {on_click = {keyboard = {key = "h"}}}
 right_stick_down = {on_click = {keyboard = {key = "u"}}}
 right_stick_left = {on_click = {keyboard = {key = "d"}}}
 right_stick_right = {on_click = {keyboard = {key = "s"}}}
+left_trigger_2 = {on_click = {show_quick_lookup_window = {}}}
 [profiles.layers.switches.left_trigger]
-on_click_and_hold = {visit_layer="first-layer-step-4"}
+on_click = {visit_layer="first-layer-step-4"}
 
 [[profiles.layers]]
 id = "first-layer-step-3"
@@ -83,8 +85,9 @@ right_stick_up = {on_click = {keyboard = {key = "g"}}}
 right_stick_down = {on_click = {keyboard = {key = "v"}}}
 right_stick_left = {on_click = {keyboard = {key = "y"}}}
 right_stick_right = {on_click = {keyboard = {key = "f"}}}
+left_trigger_2 = {on_click = {show_quick_lookup_window = {}}}
 [profiles.layers.switches.right_trigger]
-on_click_and_hold = {visit_layer="first-layer-step-4"}
+on_click = {visit_layer="first-layer-step-4"}
 
 [[profiles.layers]]
 id = "first-layer-step-4"
@@ -97,9 +100,27 @@ left_stick_up = {on_click = {keyboard = {key = "z"}}}
 left_stick_left = {on_click = {keyboard = {key = "j"}}}
 right_stick_up = {on_click = {keyboard = {key = "q"}}}
 right_stick_right = {on_click = {keyboard = {key = "x"}}}
+left_trigger_2 = {on_click = {show_quick_lookup_window = {}}}
+
 
 [[profiles.layers]]
 id = "second-layer-step-1"
+[profiles.layers.switches]
+south = {on_click= {mouse= {button= "Left"}}}
+east = {on_click= {mouse= {button= "Right"}}}
+left_trigger_2 = {on_click = {show_quick_lookup_window = {}}}
+[profiles.layers.cardinal_levers]
+left_stick = {control_mouse_cursor={deadzone_upper_limit=0.0, scale_factor=10.0}}
+right_stick = {control_mouse_scrollwheel={deadzone_upper_limit=0.0, scale_factor=10.0}}
+[profiles.layers.switches.left_trigger]
+on_click = {visit_layer="second-layer-step-3"}
+on_double_click = {move_to_or_visit_layer="first-layer-step-1"}
+[profiles.layers.switches.right_trigger]
+on_click = {visit_layer="second-layer-step-2"}
+on_double_click = {move_to_or_visit_layer="first-layer-step-1"}
+
+[[profiles.layers]]
+id = "second-layer-step-2"
 [profiles.layers.switches]
 south = {on_click = {keyboard = {key = "&"}}}
 east = {on_click = {keyboard = {key = "^"}}}
@@ -117,18 +138,12 @@ right_stick_up = {on_click = {keyboard = {key = "5"}}}
 right_stick_down = {on_click = {keyboard = {key = "7"}}}
 right_stick_left = {on_click = {keyboard = {key = "8"}}}
 right_stick_right = {on_click = {keyboard = {key = "6"}}}
+left_trigger_2 = {on_click = {show_quick_lookup_window = {}}}
 [profiles.layers.switches.left_trigger]
-on_click_and_hold = {visit_layer="second-layer-step-3"}
-on_double_click = {move_to_layer="first-layer-step-1"}
-on_double_click_and_hold = {visit_layer="first-layer-step-1"}
-[profiles.layers.switches.right_trigger]
-on_click_and_hold = {visit_layer="second-layer-step-2"}
-on_double_click = {move_to_layer="first-layer-step-1"}
-on_double_click_and_hold = {visit_layer="first-layer-step-1"}
-
+on_click = {visit_layer="second-layer-step-4"}
 
 [[profiles.layers]]
-id = "second-layer-step-2"
+id = "second-layer-step-3"
 [profiles.layers.switches]
 south = {on_click = {keyboard = {key = "}"}}}
 east = {on_click = {keyboard = {key = ":"}}}
@@ -146,11 +161,12 @@ right_stick_up = {on_click = {keyboard = {key = "'"}}}
 right_stick_down = {on_click = {keyboard = {key = "]"}}}
 right_stick_left = {on_click = {keyboard = {key = "["}}}
 right_stick_right = {on_click = {keyboard = {key = ";"}}}
-[profiles.layers.switches.left_trigger]
-on_click_and_hold = {visit_layer="second-layer-step-4"}
+left_trigger_2 = {on_click = {show_quick_lookup_window = {}}}
+[profiles.layers.switches.right_trigger]
+on_click = {visit_layer="second-layer-step-4"}
 
 [[profiles.layers]]
-id = "second-layer-step-3"
+id = "second-layer-step-4"
 [profiles.layers.switches]
 east = {on_click = {keyboard = {key = "|"}}}
 north = {on_click = {keyboard = {key = "Tab", modifiers=["Shift"]}}}
@@ -158,21 +174,10 @@ d_pad_up = {on_click = {keyboard = {key = "_"}}}
 d_pad_down = {on_click = {keyboard = {key = "+"}}}
 d_pad_left = {on_click = {keyboard = {key = "~"}}}
 d_pad_right = {on_click = {keyboard = {key = "?"}}}
-left_stick_up = {on_click = {keyboard = {key = "_"}}}
+left_stick_up = {on_click = {keyboard = {key = "-"}}}
 left_stick_down = {on_click = {keyboard = {key = "="}}}
 left_stick_left = {on_click = {keyboard = {key = "`"}}}
 left_stick_right = {on_click = {keyboard = {key = "/"}}}
 right_stick_up = {on_click = {keyboard = {key = "Tab"}}}
 right_stick_right = {on_click = {keyboard = {key = "\\"}}}
-[profiles.layers.switches.right_trigger]
-on_click_and_hold = {visit_layer="second-layer-step-4"}
-
-[[profiles.layers]]
-id = "second-layer-step-4"
-[profiles.layers.switches]
-south = {mouse= {button= "Left"}}
-west = {mouse= {button= "Right"}}
-[profiles.layers.cardinal_levers]
-left_stick = {control_mouse_cursor={center_at={x=0.0, y=0.0}}}
-right_stick = {control_mouse_scrollwheel={center_at_y=0.0}}
-
+left_trigger_2 = {on_click = {show_quick_lookup_window = {}}}

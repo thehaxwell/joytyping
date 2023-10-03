@@ -1,4 +1,3 @@
-window.addEventListener("load", (event) => {
 var app = (function () {
 	'use strict';
 
@@ -1092,7 +1091,7 @@ var app = (function () {
 
 		leftbuttonsset = new LeftButtonsSet({
 				props: {
-					layerIsActive: /*layerNum*/ ctx[0] == 1,
+					layerIsActive: /*levelNum*/ ctx[0] == 1,
 					activeStepNum: /*stepNum*/ ctx[1],
 					labels: /*layer_1_left_labels*/ ctx[2]
 				}
@@ -1108,7 +1107,7 @@ var app = (function () {
 			},
 			p(ctx, dirty) {
 				const leftbuttonsset_changes = {};
-				if (dirty & /*layerNum*/ 1) leftbuttonsset_changes.layerIsActive = /*layerNum*/ ctx[0] == 1;
+				if (dirty & /*levelNum*/ 1) leftbuttonsset_changes.layerIsActive = /*levelNum*/ ctx[0] == 1;
 				if (dirty & /*stepNum*/ 2) leftbuttonsset_changes.activeStepNum = /*stepNum*/ ctx[1];
 				if (dirty & /*layer_1_left_labels*/ 4) leftbuttonsset_changes.labels = /*layer_1_left_labels*/ ctx[2];
 				leftbuttonsset.$set(leftbuttonsset_changes);
@@ -1135,7 +1134,7 @@ var app = (function () {
 
 		rightbuttonsset = new RightButtonsSet({
 				props: {
-					layerIsActive: /*layerNum*/ ctx[0] == 1,
+					layerIsActive: /*levelNum*/ ctx[0] == 1,
 					activeStepNum: /*stepNum*/ ctx[1],
 					labels: /*layer_1_right_labels*/ ctx[3]
 				}
@@ -1151,7 +1150,7 @@ var app = (function () {
 			},
 			p(ctx, dirty) {
 				const rightbuttonsset_changes = {};
-				if (dirty & /*layerNum*/ 1) rightbuttonsset_changes.layerIsActive = /*layerNum*/ ctx[0] == 1;
+				if (dirty & /*levelNum*/ 1) rightbuttonsset_changes.layerIsActive = /*levelNum*/ ctx[0] == 1;
 				if (dirty & /*stepNum*/ 2) rightbuttonsset_changes.activeStepNum = /*stepNum*/ ctx[1];
 				if (dirty & /*layer_1_right_labels*/ 8) rightbuttonsset_changes.labels = /*layer_1_right_labels*/ ctx[3];
 				rightbuttonsset.$set(rightbuttonsset_changes);
@@ -1178,7 +1177,7 @@ var app = (function () {
 
 		leftbuttonsset = new LeftButtonsSet({
 				props: {
-					layerIsActive: /*layerNum*/ ctx[0] == 2,
+					layerIsActive: /*levelNum*/ ctx[0] == 2,
 					activeStepNum: /*stepNum*/ ctx[1],
 					labels: /*layer_2_left_labels*/ ctx[4]
 				}
@@ -1194,7 +1193,7 @@ var app = (function () {
 			},
 			p(ctx, dirty) {
 				const leftbuttonsset_changes = {};
-				if (dirty & /*layerNum*/ 1) leftbuttonsset_changes.layerIsActive = /*layerNum*/ ctx[0] == 2;
+				if (dirty & /*levelNum*/ 1) leftbuttonsset_changes.layerIsActive = /*levelNum*/ ctx[0] == 2;
 				if (dirty & /*stepNum*/ 2) leftbuttonsset_changes.activeStepNum = /*stepNum*/ ctx[1];
 				if (dirty & /*layer_2_left_labels*/ 16) leftbuttonsset_changes.labels = /*layer_2_left_labels*/ ctx[4];
 				leftbuttonsset.$set(leftbuttonsset_changes);
@@ -1221,7 +1220,7 @@ var app = (function () {
 
 		rightbuttonsset = new RightButtonsSet({
 				props: {
-					layerIsActive: /*layerNum*/ ctx[0] == 2,
+					layerIsActive: /*levelNum*/ ctx[0] == 2,
 					activeStepNum: /*stepNum*/ ctx[1],
 					labels: /*layer_2_right_labels*/ ctx[5]
 				}
@@ -1237,7 +1236,7 @@ var app = (function () {
 			},
 			p(ctx, dirty) {
 				const rightbuttonsset_changes = {};
-				if (dirty & /*layerNum*/ 1) rightbuttonsset_changes.layerIsActive = /*layerNum*/ ctx[0] == 2;
+				if (dirty & /*levelNum*/ 1) rightbuttonsset_changes.layerIsActive = /*levelNum*/ ctx[0] == 2;
 				if (dirty & /*stepNum*/ 2) rightbuttonsset_changes.activeStepNum = /*stepNum*/ ctx[1];
 				if (dirty & /*layer_2_right_labels*/ 32) rightbuttonsset_changes.labels = /*layer_2_right_labels*/ ctx[5];
 				rightbuttonsset.$set(rightbuttonsset_changes);
@@ -1379,7 +1378,7 @@ var app = (function () {
 	}
 
 	function instance$1($$self, $$props, $$invalidate) {
-		let { layerNum = 1 } = $$props;
+		let { levelNum = 1 } = $$props;
 		let { stepNum = 1 } = $$props;
 		let { layer_1_left_labels = [] } = $$props;
 		let { layer_1_right_labels = [] } = $$props;
@@ -1387,7 +1386,7 @@ var app = (function () {
 		let { layer_2_right_labels = [] } = $$props;
 
 		$$self.$$set = $$props => {
-			if ('layerNum' in $$props) $$invalidate(0, layerNum = $$props.layerNum);
+			if ('levelNum' in $$props) $$invalidate(0, levelNum = $$props.levelNum);
 			if ('stepNum' in $$props) $$invalidate(1, stepNum = $$props.stepNum);
 			if ('layer_1_left_labels' in $$props) $$invalidate(2, layer_1_left_labels = $$props.layer_1_left_labels);
 			if ('layer_1_right_labels' in $$props) $$invalidate(3, layer_1_right_labels = $$props.layer_1_right_labels);
@@ -1396,7 +1395,7 @@ var app = (function () {
 		};
 
 		return [
-			layerNum,
+			levelNum,
 			stepNum,
 			layer_1_left_labels,
 			layer_1_right_labels,
@@ -1410,7 +1409,7 @@ var app = (function () {
 			super();
 
 			init(this, options, instance$1, create_fragment$1, safe_not_equal, {
-				layerNum: 0,
+				levelNum: 0,
 				stepNum: 1,
 				layer_1_left_labels: 2,
 				layer_1_right_labels: 3,
@@ -1428,7 +1427,7 @@ var app = (function () {
 
 		keyboard = new Keyboard({
 				props: {
-					layerNum: /*layerNum*/ ctx[1],
+					levelNum: /*levelNum*/ ctx[1],
 					stepNum: /*stepNum*/ ctx[0],
 					layer_1_left_labels: /*layer_1_left_labels*/ ctx[2],
 					layer_1_right_labels: /*layer_1_right_labels*/ ctx[3],
@@ -1447,7 +1446,7 @@ var app = (function () {
 			},
 			p(ctx, [dirty]) {
 				const keyboard_changes = {};
-				if (dirty & /*layerNum*/ 2) keyboard_changes.layerNum = /*layerNum*/ ctx[1];
+				if (dirty & /*levelNum*/ 2) keyboard_changes.levelNum = /*levelNum*/ ctx[1];
 				if (dirty & /*stepNum*/ 1) keyboard_changes.stepNum = /*stepNum*/ ctx[0];
 				keyboard.$set(keyboard_changes);
 			},
@@ -1468,12 +1467,27 @@ var app = (function () {
 
 	function instance($$self, $$props, $$invalidate) {
 		let stepNum = 1;
-		let layerNum = 1;
+		let levelNum = 1;
 
-		E('update-keyboard', event => {
-			$$invalidate(0, stepNum = event.payload.step);
-			$$invalidate(1, layerNum = event.payload.layer);
-		}).then();
+		const updateKeyboard = event => {
+			let layer = event.payload.layer;
+			$$invalidate(0, stepNum = layer % 4 + 1);
+			console.log("stepNum: ", stepNum);
+
+			if (layer < 4) {
+				$$invalidate(1, levelNum = 1);
+			} else {
+				$$invalidate(1, levelNum = 2);
+			}
+
+			console.log("levelNum: ", levelNum);
+		};
+
+		updateKeyboard({
+			payload: { layer: window.__START_LAYER__ }
+		});
+
+		E('update-keyboard', updateKeyboard).then();
 
 		let layer_1_left_labels = [
 			"t",
@@ -1546,6 +1560,14 @@ var app = (function () {
 		];
 
 		let layer_2_left_labels = [
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
 			"1",
 			"2",
 			"3",
@@ -1569,18 +1591,18 @@ var app = (function () {
 			"_",
 			"?",
 			"+",
-			"~",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			""
+			"~"
 		];
 
 		let layer_2_right_labels = [
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
 			"5",
 			"6",
 			"7",
@@ -1604,20 +1626,12 @@ var app = (function () {
 			"⇤",
 			"|",
 			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
 			""
 		];
 
 		return [
 			stepNum,
-			layerNum,
+			levelNum,
 			layer_1_left_labels,
 			layer_1_right_labels,
 			layer_2_left_labels,
@@ -1642,4 +1656,4 @@ var app = (function () {
 	return app;
 
 })();
-});
+
