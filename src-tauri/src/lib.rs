@@ -9,6 +9,7 @@ use input_controller::{KeyboardInputController,KeyboardInputControllerTrait};
 use input_controller::enigo_wrapper::{EnigoWrapper, EnigoTrait};
 use settings::error_display_window::ErrorDisplayWindow;
 use settings::{Settings,SettingsDependenciesImpl};
+use notify::{Watcher,RecommendedWatcher, RecursiveMode, Config};
 
 use crate::gamepad::switch_click_pattern_detector::SwitchClickPatternDetector;
 use crate::input_controller::{MouseInputController, MouseInputControllerTrait};
@@ -72,11 +73,33 @@ pub fn start_main_loop(
         //         settings_data::ControlMouseScrollwheelFunction{
         //             center_at_y: 0.0}));
 
-        let mut quick_lookup_window = QuickLookupWindow::new(
-            handle.clone(),
-            Box::new(QuickLookupWindowDependenciesImpl),
-            active_profile.quick_lookup_window,
-        );
+        let (tx, rx) = std::sync::mpsc::channel();
+        // NOTE: this next line doesn't work if it's in a nested scope(idk why)
+        let mut watcher = RecommendedWatcher::new(tx, Config::default()).unwrap();
+
+        let mut quick_lookup_window 
+            = if let Some(dev_quick_lookup_window_settings) 
+                = settings_data.development.and_then(|dev| dev.quick_lookup_window){
+        
+                if let Some(path) = &dev_quick_lookup_window_settings.js_bundle_file_path {
+                    watcher
+                        .watch(path.as_ref(), RecursiveMode::Recursive)
+                        .unwrap();
+                }
+        
+                QuickLookupWindow::new(
+                    handle.clone(),
+                    Box::new(QuickLookupWindowDependenciesImpl),
+                    dev_quick_lookup_window_settings,
+                )
+            }
+            else {
+                QuickLookupWindow::new(
+                    handle.clone(),
+                    Box::new(QuickLookupWindowDependenciesImpl),
+                    active_profile.quick_lookup_window,
+                )
+            };
 
         match quick_lookup_window.load_startup_script() {
             Err(e) => {
@@ -132,6 +155,16 @@ pub fn start_main_loop(
         'main_loop: loop {
             // slow this loop down a little
             std::thread::sleep(std::time::Duration::from_millis(10));
+
+            if let Ok(res) = rx.try_recv() {
+                match res {
+                    Ok(event) => {
+                        println!("Restarting at dev event: {:?}",event);
+                        break 'main_loop;
+                    },
+                    Err(e) => println!("watch error: {:?}", e),
+                }
+            }
 
             match end_signal_mpsc_receiver.try_recv() {
                 Ok(MainLoopInterruption::ReInitiailze) => {
