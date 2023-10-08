@@ -12,6 +12,7 @@ mod tests;
 pub struct SettingsData {
 	pub profiles: Vec<Profile>,
     pub global: Global,
+    pub development: Option<Development>,
 }
 
 impl SettingsData {
@@ -21,9 +22,15 @@ impl SettingsData {
                 .iter()
                 .map(|profile|profile.clone_and_set_layer_pointers())
                 .collect::<Result<Vec<_>,_>>()?,
-            global: self.global.clone()
+            global: self.global.clone(),
+            development: self.development.clone(),
         })    
     }
+}
+
+#[derive(Deserialize, Debug, Clone, PartialEq)]
+pub struct Development {
+    pub quick_lookup_window: Option<QuickLookupWindow>,
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
@@ -71,7 +78,7 @@ impl Profile {
 #[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct QuickLookupWindow {
     pub inner_size: HeightAndWidth,
-    pub js_bundle_file_path: Option<String>
+    pub js_bundle_file_path: Option<String>,
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
