@@ -14,7 +14,10 @@ pub fn setup_settings_data_example(config: SetupConfig) -> SettingsData {
                 height: 100.0,
                 width: 100.0,
             },
-            js_bundle_file_path: Some("path/to/file/bundle.js".to_string()),
+            source_code: Some(BrowserSourceCode{
+                js_iife_bundle_file_path: "path/to/file/bundle.js".to_string(),
+                css_file_path: None,
+            })
         },
         stick_switches_click_thresholds: StickSwitchesClickThresholds {
             left_stick_up: 0.5,
@@ -928,6 +931,7 @@ pub fn setup_settings_data_example(config: SetupConfig) -> SettingsData {
 
     SettingsData {
         profiles: vec![ps4_controller_profile],
-        global: Global{default_profile:"My PS3 Controller".to_string()} 
+        global: Global{default_profile:"My PS3 Controller".to_string()},
+        development: None,
     }
 }

@@ -3,6 +3,7 @@ use crate::settings::data::*;
 pub fn setup_settings_data_example() -> SettingsData {
     let ps4_controller_profile = Profile{
         name: "My PS3 Controller".to_string(),
+        development: None,
         quick_lookup_window: QuickLookupWindow{
             inner_size: HeightAndWidth{
                 height: 100.0,

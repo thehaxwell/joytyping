@@ -81,9 +81,9 @@ pub fn start_main_loop(
             = if let Some(dev_quick_lookup_window_settings) 
                 = settings_data.development.and_then(|dev| dev.quick_lookup_window){
         
-                if let Some(path) = &dev_quick_lookup_window_settings.js_bundle_file_path {
+                if let Some(source_code) = &dev_quick_lookup_window_settings.source_code {
                     watcher
-                        .watch(path.as_ref(), RecursiveMode::Recursive)
+                        .watch(source_code.js_iife_bundle_file_path.as_ref(), RecursiveMode::Recursive)
                         .unwrap();
                 }
         

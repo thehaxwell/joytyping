@@ -78,7 +78,13 @@ impl Profile {
 #[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct QuickLookupWindow {
     pub inner_size: HeightAndWidth,
-    pub js_bundle_file_path: Option<String>,
+    pub source_code: Option<BrowserSourceCode>,
+}
+
+#[derive(Deserialize, Debug, Clone, PartialEq)]
+pub struct BrowserSourceCode {
+    pub js_iife_bundle_file_path: String,
+    pub css_file_path: Option<String>,
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]

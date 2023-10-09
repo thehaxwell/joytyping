@@ -59,48 +59,80 @@ impl QuickLookupWindow {
         }
     }
 
+    fn load_css(&mut self) -> Result<Option<String>, StartupScriptLoadError> {
+        if let Some(css_path) 
+            = self.quick_lookup_window_settings.source_code.clone()
+                .and_then(|src| src.css_file_path) {
+            match self.dependencies.read_to_string(&css_path) {
+                Err(e) => {
+                    self.initialization_script = DEFAULT_QUICK_LOOKUP_INIT_SCRIPT.to_string();
+                    return Err(get_file_load_error(e.kind(), "js_bundle_file_path".to_string()))
+                },
+                Ok(rollup_script_str) => {
+                    Ok(Some(format!("\
+                        var styleSheet = document.createElement(\"style\");\n\
+                        styleSheet.innerText = `{rollup_script_str}`;\n\
+                        document.head.appendChild(styleSheet);")))
+                }
+            }
+        }
+        else {
+            Ok(None)
+        }
+    }
+
+    fn load_js(&mut self) -> Result<Option<String>, StartupScriptLoadError> {
+        if let Some(source_code) 
+            = &self.quick_lookup_window_settings.source_code {
+            match self.dependencies.read_to_string(&source_code.js_iife_bundle_file_path) {
+                Err(e) => {
+                    self.initialization_script = DEFAULT_QUICK_LOOKUP_INIT_SCRIPT.to_string();
+                    return Err(get_file_load_error(e.kind(), "js_bundle_file_path".to_string()))
+                },
+                Ok(rollup_script_str) => {
+                    Ok(Some(rollup_script_str))
+                }
+            }
+        }
+        else {
+            Ok(None)
+        }
+    }
+
     /// Load startup script from the specified file.
     /// If reading or parsing the file fails, load the default startup script.
     pub fn load_startup_script(&mut self) -> Result<(), StartupScriptLoadError> {
-        if let Some(path) 
-            = &self.quick_lookup_window_settings.js_bundle_file_path {
-            match self.dependencies.read_to_string(path) {
-                Err(e) => {
-                    self.initialization_script = DEFAULT_QUICK_LOOKUP_INIT_SCRIPT.to_string();
-                    match e.kind() {
-                        std::io::ErrorKind::NotFound => {
-                            Err(StartupScriptLoadError::FileNotFound)
-                        },
-                        std::io::ErrorKind::PermissionDenied => {
-                            Err(StartupScriptLoadError::PermissionDenied)
-                        },
-                        _ => {
-                            Err(StartupScriptLoadError::FileNotReadable)
-                        },
-                    }
-                },
-                Ok(rollup_script_str) => {
+        self.load_js()
+            .and_then(|js_str| self.load_css()
+                                   .map(|css_str| (js_str,css_str)))
+            .map_err(|err|{
+                self.initialization_script = DEFAULT_QUICK_LOOKUP_INIT_SCRIPT.to_string();
+                err
+            })
+            .and_then(|(js_str_opt,css_str_opt)|{
+                self.initialization_script = if let Some(js_str) = js_str_opt {
                     let mut init_script = String::from("window.addEventListener(\"load\", (event) => {");
-                    init_script.push_str(&rollup_script_str);
+                    if let Some(css_str) = css_str_opt { init_script.push_str(&css_str) };
+                    init_script.push_str(&js_str); 
                     init_script.push_str("});");
-                    self.initialization_script = init_script;
-                    Ok(())
-                },
-            }
-        }
-        else{
-            self.initialization_script = DEFAULT_QUICK_LOOKUP_INIT_SCRIPT.to_string();
-            Ok(())
-        }
-        .and_then(|()|{
-            if let Some(win) 
-                = self.tauri_app_handle.get_window(WINDOW_LABEL) {
-                    if let Ok(()) = win.close() {
-                        self.current_state = QuickLookupWindowState::Hidden;
-                    }
+                    init_script
                 }
-            Ok(())
-        })
+                else {
+                    DEFAULT_QUICK_LOOKUP_INIT_SCRIPT.to_string()
+                };
+                Ok(())
+            })
+            .and_then(|()|{
+                if let Some(win) 
+                    = self.tauri_app_handle.get_window(WINDOW_LABEL) {
+                        if let Ok(()) = win.close() {
+                            self.current_state = QuickLookupWindowState::Hidden;
+                        }
+                    }
+                Ok(())
+            })?;
+
+        Ok(())
     }
 }
 
@@ -181,17 +213,32 @@ struct UpdateKeyboardEventPayload {
 
 #[derive(Error, Debug)]
 pub enum StartupScriptLoadError {
-    #[error("Startup script file not found")]
-    FileNotFound,
+    #[error("{0} file not found")]
+    FileNotFound(String),
 
-    #[error("Startup script file not readable")]
-    FileNotReadable,
+    #[error("{0} file not readable")]
+    FileNotReadable(String),
 
-    #[error("OS denied access to startup script file")]
-    PermissionDenied
+    #[error("OS denied access to {0} file")]
+    PermissionDenied(String),
 }
 
 enum QuickLookupWindowState {
     Showing(Switch),
     Hidden
+}
+
+fn get_file_load_error(
+    err_kind: std::io::ErrorKind,file_name: String)-> StartupScriptLoadError {
+    match err_kind {
+        std::io::ErrorKind::NotFound => {
+            StartupScriptLoadError::FileNotFound(file_name)
+        },
+        std::io::ErrorKind::PermissionDenied => {
+            StartupScriptLoadError::PermissionDenied(file_name)
+        },
+        _ => {
+            StartupScriptLoadError::FileNotReadable(file_name)
+        },
+    }
 }
