@@ -4,9 +4,10 @@ use gamepad::cardinal_levers_move_detector::CardinalLeversMoveDetector;
 use gamepad::gilrs_events::GilrsEvents;
 use gamepad::gilrs_events::gilrs_wrapper::GilrsWrapper;
 use gamepad::gilrs_events::stick_switch_interpreter::{CardinalCustomButtons, StickSwitchInterpreter, AxisClickThresholds, self};
+use gamepad::gilrs_events::trigger_2_switch_interpreter::Trigger2SwitchInterpreter;
 use gamepad::layers_navigator::LayersNavigator;
 use input_controller::{KeyboardInputController,KeyboardInputControllerTrait};
-use input_controller::enigo_wrapper::{EnigoWrapper, EnigoTrait};
+use input_controller::enigo_wrapper::EnigoWrapper;
 use settings::error_display_window::ErrorDisplayWindow;
 use settings::{Settings,SettingsDependenciesImpl};
 use notify::{Watcher,RecommendedWatcher, RecursiveMode, Config};
@@ -33,7 +34,7 @@ pub fn start_main_loop(
 
         let mut settings = Settings::new(
             Box::new(SettingsDependenciesImpl),
-            "/home/haxwell/.config/joytyping/joytyping1.toml".to_string());
+            "/home/haxwell/.config/joytyping/joytyping.toml".to_string());
 
         if let Err(e) = settings.load() {
            let _ = settings_error_display_window.open_and_show(e);
@@ -138,6 +139,14 @@ pub fn start_main_loop(
                         left: stick_switch_interpreter::StickSwitchButton::RightStickLeft,
                         right: stick_switch_interpreter::StickSwitchButton::RightStickRight,
                     }
+                )),
+                Box::new(Trigger2SwitchInterpreter::new(
+                    active_profile.trigger_2_switches_click_thresholds,
+                    LeftOrRight::Left,
+                )),
+                Box::new(Trigger2SwitchInterpreter::new(
+                    active_profile.trigger_2_switches_click_thresholds,
+                    LeftOrRight::Right,
                 )),
             )),
             active_profile.layers.clone(),

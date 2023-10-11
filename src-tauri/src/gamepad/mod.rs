@@ -1,6 +1,6 @@
 use gilrs::Button;
 
-use crate::{settings::{self,data::{Layer, SwitchOnClickReaction, KeyboardInput, SwitchEventAndReaction, Switches, CardinalLevers, SingleCardinalLever, MouseControl}}, quick_lookup_window::QuickLookupWindowTrait};
+use crate::{settings::{self,data::{Layer, SwitchOnClickReaction, KeyboardInput, SwitchEventAndReaction, Switches, CardinalLevers, SingleCardinalLever}}, quick_lookup_window::QuickLookupWindowTrait};
 
 use self::{gilrs_events::{gilrs_wrapper::GilrsEventType, GilrsEventsTrait,stick_switch_interpreter::{StickSwitchButton,StickSwitchEvent}}, layers_navigator::{LayersNavigatorTrait, LayerVisitTrigger}, cardinal_levers_move_detector::CardinalLeversMoveDetectorTrait};
 
@@ -191,7 +191,7 @@ impl Gamepad {
             match event.event {
                 GilrsEventType::ButtonPressed(button, ) => {
                     print!("ButtonPressed: {:?}\n",button);
-                        self.switch_click_pattern_detector.button_pressed(button);
+                    self.switch_click_pattern_detector.button_pressed(button);
                 }
                 GilrsEventType::ButtonRepeated(button, ) => {
                     print!("ButtonRepeated: {:?}\n",button);
@@ -199,17 +199,16 @@ impl Gamepad {
                 },
                 GilrsEventType::ButtonReleased(button, ) => {
                     print!("ButtonReleased: {:?}\n",button);
-                        self.switch_click_pattern_detector.button_released(button);
+                    self.switch_click_pattern_detector.button_released(button);
                 },
-                GilrsEventType::ButtonChanged(button, _value, ) => {
+                GilrsEventType::ButtonChanged(button, _value) => {
                     print!("ButtonChanged: {:?}\n",button);
-                    //     self.switch_click_pattern_detector.button_changed(button);
                 },
-                GilrsEventType::AxisChanged(axis, value, switch_stick_event) => {
+                GilrsEventType::AxisChanged(axis, value, stick_switch_event_opt) => {
                     print!("AxisChanged: {:?}: {:?}\n",axis,value);
                     self.mouse_cursor_move_detector.axis_changed(axis,value);
                     self.mouse_scroll_detector.axis_changed(axis,value);
-                    if let Some(event) = switch_stick_event {
+                    if let Some(event) = stick_switch_event_opt {
                         match event {
                             StickSwitchEvent::ButtonPressed(button)
                                 => self.switch_click_pattern_detector.axis_button_pressed(button),

@@ -29,6 +29,10 @@ pub fn setup_settings_data_example(config: SetupConfig) -> SettingsData {
             right_stick_left: 0.5,
             right_stick_right: 0.5
         },
+        trigger_2_switches_click_thresholds: Trigger2SwitchesClickThresholds { 
+            left_trigger_2: 0.3,
+            right_trigger_2: 0.3 
+        },
         layers: vec![
             Layer {
                 id: "first-layer-step-1".to_string(),

@@ -44,6 +44,7 @@ pub struct Profile {
     pub quick_lookup_window: QuickLookupWindow,
     pub layers: Vec<Layer>,
     pub stick_switches_click_thresholds: StickSwitchesClickThresholds,
+    pub trigger_2_switches_click_thresholds: Trigger2SwitchesClickThresholds,
 }
 
 impl Profile {
@@ -70,7 +71,8 @@ impl Profile {
                         &pointers,
                         format!("Error in profile \"{}\" > ",self.name)))
                 .collect::<Result<Vec<_>,_>>()?,
-            stick_switches_click_thresholds: self.stick_switches_click_thresholds
+            stick_switches_click_thresholds: self.stick_switches_click_thresholds,
+            trigger_2_switches_click_thresholds: self.trigger_2_switches_click_thresholds,
         })
     }
 }
@@ -92,6 +94,7 @@ pub struct HeightAndWidth {
     pub width: f64,
     pub height: f64,
 }
+
 #[derive(Deserialize, Debug, Clone, Copy, PartialEq)]
 pub struct StickSwitchesClickThresholds {
     pub left_stick_up: f32,
@@ -102,6 +105,12 @@ pub struct StickSwitchesClickThresholds {
     pub right_stick_down: f32,
     pub right_stick_left: f32,
     pub right_stick_right: f32,
+}
+
+#[derive(Deserialize, Debug, Clone, Copy, PartialEq)]
+pub struct Trigger2SwitchesClickThresholds {
+    pub left_trigger_2: f32,
+    pub right_trigger_2: f32,
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]

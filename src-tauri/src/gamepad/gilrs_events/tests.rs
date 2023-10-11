@@ -1,6 +1,6 @@
 use crate::{gamepad::gilrs_events::{GilrsEvents,GilrsEventsTrait, stick_switch_interpreter::{StickSwitchButton, StickSwitchEvent}}, LeftOrRight};
 
-use super::{gilrs_wrapper::{MockGilrs, GilrsEventType, GilrsEvent}, stick_switch_interpreter::MockStickSwitchInterpreterTrait};
+use super::{gilrs_wrapper::{MockGilrs, GilrsEventType, GilrsEvent}, stick_switch_interpreter::MockStickSwitchInterpreterTrait, trigger_2_switch_interpreter::{MockTrigger2SwitchInterpreterTrait, Trigger2SwitchEvent}};
 
 use mockall::predicate::*;
 
@@ -12,6 +12,8 @@ fn setup_next_when_gilrs_next_event_is(event: GilrsEventType) -> Option<GilrsEve
     let mut mock_gilrs = MockGilrs::new();
     let mut mock_left_stick_switch_interpreter = MockStickSwitchInterpreterTrait::new();
     let mut mock_right_stick_switch_interpreter = MockStickSwitchInterpreterTrait::new();
+    let mut mock_left_trigger_2_switch_interpreter = MockTrigger2SwitchInterpreterTrait::new();
+    let mut mock_right_trigger_2_switch_interpreter = MockTrigger2SwitchInterpreterTrait::new();
     mock_gilrs
         .expect_next_event()
         .times(1)
@@ -25,17 +27,25 @@ fn setup_next_when_gilrs_next_event_is(event: GilrsEventType) -> Option<GilrsEve
     mock_right_stick_switch_interpreter
         .expect_interpret_stick_move()
         .times(0);
+    mock_left_trigger_2_switch_interpreter
+        .expect_interpret_move()
+        .times(0);
+    mock_right_trigger_2_switch_interpreter
+        .expect_interpret_move()
+        .times(0);
 
     let mut gamepad = GilrsEvents::new(
         Box::new(mock_gilrs),
         Box::new(mock_left_stick_switch_interpreter),
         Box::new(mock_right_stick_switch_interpreter),
-        );
+        Box::new(mock_left_trigger_2_switch_interpreter),
+        Box::new(mock_right_trigger_2_switch_interpreter),
+    );
     gamepad.next()
 }
 
 #[test]
-fn next_passes_through_all_non_axis_events(){
+fn next_passes_through_all_non_intercepted_events(){
     let event = GilrsEventType::ButtonPressed(gilrs::ev::Button::North);
     let res = setup_next_when_gilrs_next_event_is(event.clone()).unwrap();
     assert_eq!(res.event,event.clone());
@@ -77,6 +87,8 @@ fn next_returns_none_when_appropriate() {
     let mut mock_gilrs = MockGilrs::new();
     let mut mock_left_stick_switch_interpreter = MockStickSwitchInterpreterTrait::new();
     let mut mock_right_stick_switch_interpreter = MockStickSwitchInterpreterTrait::new();
+    let mock_left_trigger_2_switch_interpreter = MockTrigger2SwitchInterpreterTrait::new();
+    let mock_right_trigger_2_switch_interpreter = MockTrigger2SwitchInterpreterTrait::new();
     mock_gilrs
         .expect_next_event()
         .times(1)
@@ -94,7 +106,9 @@ fn next_returns_none_when_appropriate() {
         Box::new(mock_gilrs),
         Box::new(mock_left_stick_switch_interpreter),
         Box::new(mock_right_stick_switch_interpreter),
-        );
+        Box::new(mock_left_trigger_2_switch_interpreter),
+        Box::new(mock_right_trigger_2_switch_interpreter),
+    );
     assert_eq!(gamepad.next(),None);
 }
 
@@ -105,6 +119,8 @@ fn setup_next_when_gilrs_next_event_is_axis_change(
     let mut mock_gilrs = MockGilrs::new();
     let mut mock_left_stick_switch_interpreter = MockStickSwitchInterpreterTrait::new();
     let mut mock_right_stick_switch_interpreter = MockStickSwitchInterpreterTrait::new();
+    let mock_left_trigger_2_switch_interpreter = MockTrigger2SwitchInterpreterTrait::new();
+    let mock_right_trigger_2_switch_interpreter = MockTrigger2SwitchInterpreterTrait::new();
 
     mock_gilrs
         .expect_next_event()
@@ -159,6 +175,8 @@ fn setup_next_when_gilrs_next_event_is_axis_change(
         Box::new(mock_gilrs),
         Box::new(mock_left_stick_switch_interpreter),
         Box::new(mock_right_stick_switch_interpreter),
+        Box::new(mock_left_trigger_2_switch_interpreter),
+        Box::new(mock_right_trigger_2_switch_interpreter),
     );
     gamepad.next()
 }
@@ -216,4 +234,91 @@ fn next_correctly_adds_to_axis_changed_event() {
         GilrsEventType::AxisChanged(
             axis, value, Some(switch_stick_event)));
     assert_just_now(res.time);
+}
+
+fn setup_next_trigger_button_pressed_event(
+    button: gilrs::ev::Button, value: f32) -> Option<GilrsEvent>{
+    let mut mock_gilrs = MockGilrs::new();
+    let mut mock_left_stick_switch_interpreter = MockStickSwitchInterpreterTrait::new();
+    let mut mock_right_stick_switch_interpreter = MockStickSwitchInterpreterTrait::new();
+    let mut mock_left_trigger_2_switch_interpreter = MockTrigger2SwitchInterpreterTrait::new();
+    let mut mock_right_trigger_2_switch_interpreter = MockTrigger2SwitchInterpreterTrait::new();
+
+    let event = GilrsEventType::ButtonChanged(button,value);
+
+    mock_gilrs
+        .expect_next_event()
+        .times(1)
+        .returning(move || Some(GilrsEvent {
+            event,
+            time: std::time::SystemTime::now(),
+        }));
+    mock_left_stick_switch_interpreter
+        .expect_interpret_stick_move()
+        .times(0);
+    mock_right_stick_switch_interpreter
+        .expect_interpret_stick_move()
+        .times(0);
+
+    if let gilrs::ev::Button::LeftTrigger2 = button {
+        mock_left_trigger_2_switch_interpreter
+            .expect_interpret_move()
+            .times(1)
+            .with(eq(value))
+            .return_const(Trigger2SwitchEvent::ButtonPressed(button));
+    }
+    else {
+        mock_left_trigger_2_switch_interpreter
+            .expect_interpret_move()
+            .times(0);
+    }
+
+    if let gilrs::ev::Button::RightTrigger2 = button {
+        mock_right_trigger_2_switch_interpreter
+            .expect_interpret_move()
+            .times(1)
+            .with(eq(value))
+            .return_const(Trigger2SwitchEvent::ButtonPressed(button));
+    }
+    else {
+        mock_right_trigger_2_switch_interpreter
+            .expect_interpret_move()
+            .times(0);
+    }
+
+    let mut gamepad = GilrsEvents::new(
+        Box::new(mock_gilrs),
+        Box::new(mock_left_stick_switch_interpreter),
+        Box::new(mock_right_stick_switch_interpreter),
+        Box::new(mock_left_trigger_2_switch_interpreter),
+        Box::new(mock_right_trigger_2_switch_interpreter),
+    );
+    gamepad.next()
+}
+
+#[test]
+fn next_correctly_changes_trigger_2_button_changed_events_to_button_pressed() {
+    let res = setup_next_trigger_button_pressed_event(
+        gilrs::ev::Button::LeftTrigger2,0.1452);
+    assert_eq!(res.unwrap().event,
+        GilrsEventType::ButtonPressed(gilrs::ev::Button::LeftTrigger2));
+    assert_just_now(res.unwrap().time);
+
+    let res = setup_next_trigger_button_pressed_event(
+        gilrs::ev::Button::LeftTrigger2,0.321);
+    assert_eq!(res.unwrap().event,
+        GilrsEventType::ButtonPressed(gilrs::ev::Button::LeftTrigger2));
+    assert_just_now(res.unwrap().time);
+
+    let res = setup_next_trigger_button_pressed_event(
+        gilrs::ev::Button::RightTrigger2,0.32);
+    assert_eq!(res.unwrap().event,
+        GilrsEventType::ButtonPressed(gilrs::ev::Button::RightTrigger2));
+    assert_just_now(res.unwrap().time);
+
+    let res = setup_next_trigger_button_pressed_event(
+        gilrs::ev::Button::RightTrigger2,0.0001);
+    assert_eq!(res.unwrap().event,
+        GilrsEventType::ButtonPressed(gilrs::ev::Button::RightTrigger2));
+    assert_just_now(res.unwrap().time);
 }
