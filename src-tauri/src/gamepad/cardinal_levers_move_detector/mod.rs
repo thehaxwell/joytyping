@@ -1,8 +1,12 @@
 use crate::settings::data::MouseControl;
 
 #[cfg(test)]
+use mockall::{automock, predicate::*};
+
+#[cfg(test)]
 mod tests;
 
+#[cfg_attr(test, automock)]
 pub trait CardinalLeversMoveDetectorTrait {
     fn set_mouse_controls(&mut self,
         left_mouse_control: Option<MouseControl>,

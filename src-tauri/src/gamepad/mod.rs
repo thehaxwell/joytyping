@@ -11,8 +11,8 @@ pub mod switch_click_pattern_detector;
 pub mod layers_navigator;
 pub mod cardinal_levers_move_detector;
 
-// #[cfg(test)]
-// mod tests;
+#[cfg(test)]
+mod tests;
 
 
 pub struct Gamepad {
