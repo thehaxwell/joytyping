@@ -6,6 +6,7 @@ use gamepad::gilrs_events::gilrs_wrapper::GilrsWrapper;
 use gamepad::gilrs_events::stick_switch_interpreter::{CardinalCustomButtons, StickSwitchInterpreter, AxisClickThresholds, self};
 use gamepad::gilrs_events::trigger_2_switch_interpreter::Trigger2SwitchInterpreter;
 use gamepad::layers_navigator::LayersNavigator;
+use gamepad::layers_wrapper::LayersWrapper;
 use input_controller::{KeyboardInputController,KeyboardInputControllerTrait};
 use input_controller::enigo_wrapper::EnigoWrapper;
 use settings::error_display_window::ErrorDisplayWindow;
@@ -149,7 +150,7 @@ pub fn start_main_loop(
                     LeftOrRight::Right,
                 )),
             )),
-            active_profile.layers.clone(),
+            Box::new(LayersWrapper::new(active_profile.layers.clone())),
             Box::new(SwitchClickPatternDetector::new()),
             Box::new(LayersNavigator::new(active_profile.layers)),
             Box::new(quick_lookup_window),

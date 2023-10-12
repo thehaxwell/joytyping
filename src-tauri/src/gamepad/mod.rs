@@ -2,7 +2,7 @@ use gilrs::Button;
 
 use crate::{settings::{self,data::{Layer, SwitchOnClickReaction, KeyboardInput, SwitchEventAndReaction, Switches, CardinalLevers, SingleCardinalLever}}, quick_lookup_window::QuickLookupWindowTrait};
 
-use self::{gilrs_events::{gilrs_wrapper::GilrsEventType, GilrsEventsTrait,stick_switch_interpreter::{StickSwitchButton,StickSwitchEvent}}, layers_navigator::{LayersNavigatorTrait, LayerVisitTrigger}, cardinal_levers_move_detector::CardinalLeversMoveDetectorTrait};
+use self::{gilrs_events::{gilrs_wrapper::GilrsEventType, GilrsEventsTrait,stick_switch_interpreter::{StickSwitchButton,StickSwitchEvent}}, layers_navigator::{LayersNavigatorTrait, LayerVisitTrigger}, cardinal_levers_move_detector::CardinalLeversMoveDetectorTrait, layers_wrapper::LayersWrapperTrait};
 
 use self::switch_click_pattern_detector::{SwitchClickPatternDetectorTrait, SwitchClickPattern};
 
@@ -10,6 +10,7 @@ pub mod gilrs_events;
 pub mod switch_click_pattern_detector;
 pub mod layers_navigator;
 pub mod cardinal_levers_move_detector;
+pub mod layers_wrapper;
 
 #[cfg(test)]
 mod tests;
@@ -17,7 +18,7 @@ mod tests;
 
 pub struct Gamepad {
    gilrs_events: Box<dyn GilrsEventsTrait>,
-   layers: Vec<Layer>,
+   layers: Box<dyn LayersWrapperTrait>,
    switch_click_pattern_detector: Box<dyn SwitchClickPatternDetectorTrait>,
    layers_navigator: Box<dyn LayersNavigatorTrait>,
    quick_lookup_window: Box<dyn QuickLookupWindowTrait>,
@@ -28,7 +29,7 @@ pub struct Gamepad {
 impl Gamepad {
     pub fn new(
        gilrs_events: Box<dyn GilrsEventsTrait>,
-       layers_source: Vec<settings::data::Layer>,
+       layers: Box<dyn LayersWrapperTrait>,
        switch_click_pattern_detector: Box<dyn SwitchClickPatternDetectorTrait>,
        layers_navigator: Box<dyn LayersNavigatorTrait>,
        quick_lookup_window: Box<dyn QuickLookupWindowTrait>,
@@ -37,7 +38,7 @@ impl Gamepad {
     ) -> Self {
         Gamepad{
             gilrs_events,
-            layers: layers_source,
+            layers,
             switch_click_pattern_detector,
 
             layers_navigator,
@@ -60,9 +61,9 @@ impl Gamepad {
 
         match next_event_opt.clone() {
             Some(SwitchClickPattern::Click(switch)) => {
-                match self.layers[
-                         self.layers_navigator.get_current_layer_index()
-                      ].get_switch_event_and_reaction(switch.clone())
+                match self.layers.get_switch_event_and_reaction(
+                         self.layers_navigator.get_current_layer_index(),
+                         switch.clone())
                        .and_then(|s_e_a_r| s_e_a_r.on_click) {
                     Some(SwitchOnClickReaction::Keyboard(keyboard_input)) 
                     => return Some(InputEvent::KeyClick(keyboard_input)),
@@ -80,9 +81,9 @@ impl Gamepad {
             },
             Some(SwitchClickPattern::ClickAndHold(switch)) => {
                 if let Some(s_e_a_r)
-                    = self.layers[
-                         self.layers_navigator.get_current_layer_index()
-                      ].get_switch_event_and_reaction(switch.clone()) {
+                    = self.layers.get_switch_event_and_reaction(
+                         self.layers_navigator.get_current_layer_index(),
+                         switch.clone()) {
                     // if on_click is set to
                     // type out some key, then hold down that key
                     if let Some(SwitchOnClickReaction::Keyboard(keyboard_input)) 
@@ -92,9 +93,9 @@ impl Gamepad {
                 };
             },
             Some(SwitchClickPattern::DoubleClick(switch)) => {
-                match self.layers[
-                         self.layers_navigator.get_current_layer_index()
-                      ].get_switch_event_and_reaction(switch.clone())
+                match self.layers.get_switch_event_and_reaction(
+                         self.layers_navigator.get_current_layer_index(),
+                         switch.clone())
                        .and_then(
                            // this is useful to allow typing a letter twice fast,
                            // like "oo" in "look","book","too" etc.
@@ -116,9 +117,9 @@ impl Gamepad {
             },
             Some(SwitchClickPattern::DoubleClickAndHold(switch)) => {
                 if let Some(s_e_a_r)
-                    = self.layers[
-                         self.layers_navigator.get_current_layer_index()
-                      ].get_switch_event_and_reaction(switch.clone()) {
+                    = self.layers.get_switch_event_and_reaction(
+                         self.layers_navigator.get_current_layer_index(),
+                         switch.clone()) {
                     // if on_double_click (or fallback to on_click) is set to
                     // type out some key, then hold down that key
                     if let Some(SwitchOnClickReaction::Keyboard(keyboard_input)) 
@@ -148,18 +149,18 @@ impl Gamepad {
                 .update(new_layer_index);
 
             if let Some(CardinalLevers { left_stick, right_stick }) 
-                = &self.layers[new_layer_index].cardinal_levers {
+                = self.layers.get_cardinal_levers(new_layer_index) {
                 self.mouse_cursor_move_detector.set_mouse_controls(
-                    match left_stick {
+                    match left_stick.clone() {
                         Some(SingleCardinalLever::ControlMouseCursor(
                            mouse_control)) 
-                        => Some(mouse_control.clone()),
+                        => Some(mouse_control),
                         _ => None,
                     },
-                    match right_stick {
+                    match right_stick.clone() {
                         Some(SingleCardinalLever::ControlMouseCursor(
                            mouse_control)) 
-                        => Some(mouse_control.clone()),
+                        => Some(mouse_control),
                         _ => None,
                     });
 
