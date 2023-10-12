@@ -1,9 +1,10 @@
 use enigo::MouseButton;
+use gilrs::Button;
 use serde::Deserialize;
 use std::fmt;
 use serde::de::{self, Deserializer, Visitor, MapAccess};
 
-use crate::settings::LayerNodeRef;
+use crate::{settings::LayerNodeRef, gamepad::{Switch, gilrs_events::stick_switch_interpreter::StickSwitchButton}};
 
 #[cfg(test)]
 mod tests;
@@ -134,6 +135,12 @@ impl Layer {
                         format!("{}layer with id, \"{}\" > ",err_prefix,self.id.clone()))?) } else { None },
             cardinal_levers: self.cardinal_levers.clone(),
         })
+    }
+
+    pub fn get_switch_event_and_reaction(
+        &self, switch: Switch) -> Option<SwitchEventAndReaction> {
+        self.switches.clone().and_then(
+            |switches| switches.get_switch_event_and_reaction(switch))
     }
 }
 
@@ -296,6 +303,37 @@ impl Switches {
 					pointers,
 					format!("{}left_trigger_2 > ",err_prefix))?) } else { None },
         })
+    }
+
+    pub fn get_switch_event_and_reaction(
+        &self, switch: Switch) -> Option<SwitchEventAndReaction> {
+        match switch {
+            Switch::Button(button) => match button {
+                Button::North => self.north.clone(),
+                Button::South => self.south.clone(),
+                Button::East => self.east.clone(),
+                Button::West => self.west.clone(),
+                Button::DPadUp => self.d_pad_up.clone(),
+                Button::DPadDown => self.d_pad_down.clone(),
+                Button::DPadRight => self.d_pad_right.clone(),
+                Button::DPadLeft => self.d_pad_left.clone(),
+                Button::LeftTrigger => self.left_trigger.clone(),
+                Button::RightTrigger => self.right_trigger.clone(),
+                Button::LeftTrigger2 => self.left_trigger_2.clone(),
+                Button::RightTrigger2 => self.right_trigger_2.clone(),
+                _ => None
+            },
+            Switch::StickSwitchButton(button) => match button {
+                StickSwitchButton::LeftStickUp => self.left_stick_up.clone(),
+                StickSwitchButton::LeftStickDown => self.left_stick_down.clone(),
+                StickSwitchButton::LeftStickRight => self.left_stick_right.clone(),
+                StickSwitchButton::LeftStickLeft => self.left_stick_left.clone(),
+                StickSwitchButton::RightStickUp => self.right_stick_up.clone(),
+                StickSwitchButton::RightStickDown => self.right_stick_down.clone(),
+                StickSwitchButton::RightStickRight => self.right_stick_right.clone(),
+                StickSwitchButton::RightStickLeft => self.right_stick_left.clone(),
+            }
+        }
     }
 }
 

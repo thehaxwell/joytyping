@@ -60,8 +60,10 @@ impl Gamepad {
 
         match next_event_opt.clone() {
             Some(SwitchClickPattern::Click(switch)) => {
-                match self.get_switch_event_and_reaction(switch.clone())
-                            .and_then(|s_e_a_r| s_e_a_r.on_click) {
+                match self.layers[
+                         self.layers_navigator.get_current_layer_index()
+                      ].get_switch_event_and_reaction(switch.clone())
+                       .and_then(|s_e_a_r| s_e_a_r.on_click) {
                     Some(SwitchOnClickReaction::Keyboard(keyboard_input)) 
                     => return Some(InputEvent::KeyClick(keyboard_input)),
                     Some(SwitchOnClickReaction::MoveToLayer(layer_specifier))
@@ -78,7 +80,9 @@ impl Gamepad {
             },
             Some(SwitchClickPattern::ClickAndHold(switch)) => {
                 if let Some(s_e_a_r)
-                = self.get_switch_event_and_reaction(switch.clone()) {
+                    = self.layers[
+                         self.layers_navigator.get_current_layer_index()
+                      ].get_switch_event_and_reaction(switch.clone()) {
                     // if on_click is set to
                     // type out some key, then hold down that key
                     if let Some(SwitchOnClickReaction::Keyboard(keyboard_input)) 
@@ -88,7 +92,9 @@ impl Gamepad {
                 };
             },
             Some(SwitchClickPattern::DoubleClick(switch)) => {
-                match self.get_switch_event_and_reaction(switch.clone())
+                match self.layers[
+                         self.layers_navigator.get_current_layer_index()
+                      ].get_switch_event_and_reaction(switch.clone())
                             .and_then(
                                 // use on_double_click or on_click if it isn't set
                                 |s_e_a_r| s_e_a_r.on_double_click
@@ -108,7 +114,9 @@ impl Gamepad {
             },
             Some(SwitchClickPattern::DoubleClickAndHold(switch)) => {
                 if let Some(s_e_a_r)
-                = self.get_switch_event_and_reaction(switch.clone()) {
+                    = self.layers[
+                         self.layers_navigator.get_current_layer_index()
+                      ].get_switch_event_and_reaction(switch.clone()) {
                     // if on_double_click (or fallback to on_click) is set to
                     // type out some key, then hold down that key
                     if let Some(SwitchOnClickReaction::Keyboard(keyboard_input)) 
@@ -231,48 +239,6 @@ impl Gamepad {
         }
         else {
             false
-        }
-    }
-
-    fn get_switch_event_and_reaction_from_switches(
-        switch: Switch, switches: &Switches) -> Option<SwitchEventAndReaction> {
-        match switch {
-            Switch::Button(button) => match button {
-                Button::North => switches.north.clone(),
-                Button::South => switches.south.clone(),
-                Button::East => switches.east.clone(),
-                Button::West => switches.west.clone(),
-                Button::DPadUp => switches.d_pad_up.clone(),
-                Button::DPadDown => switches.d_pad_down.clone(),
-                Button::DPadRight => switches.d_pad_right.clone(),
-                Button::DPadLeft => switches.d_pad_left.clone(),
-                Button::LeftTrigger => switches.left_trigger.clone(),
-                Button::RightTrigger => switches.right_trigger.clone(),
-                Button::LeftTrigger2 => switches.left_trigger_2.clone(),
-                Button::RightTrigger2 => switches.right_trigger_2.clone(),
-                _ => None
-            },
-            Switch::StickSwitchButton(button) => match button {
-                StickSwitchButton::LeftStickUp => switches.left_stick_up.clone(),
-                StickSwitchButton::LeftStickDown => switches.left_stick_down.clone(),
-                StickSwitchButton::LeftStickRight => switches.left_stick_right.clone(),
-                StickSwitchButton::LeftStickLeft => switches.left_stick_left.clone(),
-                StickSwitchButton::RightStickUp => switches.right_stick_up.clone(),
-                StickSwitchButton::RightStickDown => switches.right_stick_down.clone(),
-                StickSwitchButton::RightStickRight => switches.right_stick_right.clone(),
-                StickSwitchButton::RightStickLeft => switches.right_stick_left.clone(),
-            }
-        }
-    }
-
-    fn get_switch_event_and_reaction(
-        &self,switch: Switch) -> Option<SwitchEventAndReaction> {
-        if let Some(switches) = &self.layers[self.layers_navigator.get_current_layer_index()].switches {
-            Gamepad::get_switch_event_and_reaction_from_switches(
-                switch, switches)
-        }
-        else {
-            None
         }
     }
 }
