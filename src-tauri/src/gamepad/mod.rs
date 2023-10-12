@@ -95,10 +95,12 @@ impl Gamepad {
                 match self.layers[
                          self.layers_navigator.get_current_layer_index()
                       ].get_switch_event_and_reaction(switch.clone())
-                            .and_then(
-                                // use on_double_click or on_click if it isn't set
-                                |s_e_a_r| s_e_a_r.on_double_click
-                                                 .or_else(|| s_e_a_r.on_click )) {
+                       .and_then(
+                           // this is useful to allow typing a letter twice fast,
+                           // like "oo" in "look","book","too" etc.
+                           // the first click will be Click and the second DoubleClick
+                           |s_e_a_r| s_e_a_r.on_double_click
+                                            .or_else(|| s_e_a_r.on_click )) {
                     Some(SwitchOnClickReaction::Keyboard(keyboard_input)) 
                     => return Some(InputEvent::KeyClick(keyboard_input)),
                     Some(SwitchOnClickReaction::MoveToLayer(layer_specifier))
