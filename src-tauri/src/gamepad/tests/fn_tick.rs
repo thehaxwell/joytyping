@@ -1298,3 +1298,87 @@ fn processes_click_end_switch_pattern(){
     ).unwrap(),InputEvent::KeyUp);
 
 }
+
+
+struct SetupProcessesMouseMoveEventsArgs {
+    mouse_input_event: Option<InputEvent>,
+}
+
+fn setup_processes_mouse_move_events(
+    args: SetupProcessesMouseMoveEventsArgs,
+    ) -> Option<InputEvent> {
+
+        let mut mock_switch_click_pattern_detector = MockSwitchClickPatternDetectorTrait::new();
+        let mock_layers_wrapper = MockLayersWrapperTrait::new();
+        let mock_gilrs_events = MockGilrsEventsTrait::new();
+        let mut mock_layers_navigator = MockLayersNavigatorTrait::new();
+        let mock_quick_lookup_window = MockQuickLookupWindowTrait::new();
+        let mut mock_mouse_cardinal_levers_move_detector 
+            = cardinal_levers_move_detector::mouse::MockMouseTrait::new();
+
+        mock_switch_click_pattern_detector
+            .expect_tick()
+            .times(1)
+            .return_const(None);
+
+        mock_layers_navigator
+            .expect_consumable_get_current_layer_index()
+            .times(1)
+            .with()
+            .return_const(None);
+
+        mock_mouse_cardinal_levers_move_detector
+            .expect_tick()
+            .times(1)
+            .with()
+            .return_const(args.mouse_input_event);
+
+        let mut gamepad = Gamepad {
+           gilrs_events: Box::new(mock_gilrs_events),
+           layers: Box::new(mock_layers_wrapper),
+           switch_click_pattern_detector: Box::new(mock_switch_click_pattern_detector),
+           layers_navigator: Box::new(mock_layers_navigator),
+           quick_lookup_window: Box::new(mock_quick_lookup_window),
+           mouse_cardinal_levers_move_detector:
+               Box::new(mock_mouse_cardinal_levers_move_detector),
+        };
+
+        gamepad.tick()
+}
+
+#[test]
+fn processes_mouse_move_events(){
+    let event = InputEvent::MoveMouseCursor(2,13);
+    assert_eq!(setup_processes_mouse_move_events(
+        SetupProcessesMouseMoveEventsArgs {
+            mouse_input_event: Some(event.clone()),
+        }
+    ).unwrap(),event);
+
+    let event = InputEvent::MoveMouseCursor(1,2);
+    assert_eq!(setup_processes_mouse_move_events(
+        SetupProcessesMouseMoveEventsArgs {
+            mouse_input_event: Some(event.clone()),
+        }
+    ).unwrap(),event);
+
+    let event = InputEvent::MouseScroll(102,1120);
+    assert_eq!(setup_processes_mouse_move_events(
+        SetupProcessesMouseMoveEventsArgs {
+            mouse_input_event: Some(event.clone()),
+        }
+    ).unwrap(),event);
+
+    let event = InputEvent::MouseScroll(5245,589);
+    assert_eq!(setup_processes_mouse_move_events(
+        SetupProcessesMouseMoveEventsArgs {
+            mouse_input_event: Some(event.clone()),
+        }
+    ).unwrap(),event);
+
+    assert!(setup_processes_mouse_move_events(
+        SetupProcessesMouseMoveEventsArgs {
+            mouse_input_event: None,
+        }
+    ).is_none());
+}

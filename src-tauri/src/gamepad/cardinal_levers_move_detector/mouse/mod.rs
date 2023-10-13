@@ -34,8 +34,9 @@ impl Mouse {
 }
 
 impl MouseTrait for Mouse {
-    fn set_mouse_controls(&mut self,
-                          cardinal_levers: Option<CardinalLevers>,
+    fn set_mouse_controls(
+        &mut self,
+        cardinal_levers: Option<CardinalLevers>,
         ){
             if let Some(CardinalLevers { left_stick, right_stick }) 
                 = cardinal_levers {
