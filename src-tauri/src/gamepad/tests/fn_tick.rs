@@ -2,7 +2,7 @@ use enigo::Key;
 use gilrs::Button;
 use mockall::{predicate::*, Sequence};
 
-use crate::{gamepad::{switch_click_pattern_detector::{MockSwitchClickPatternDetectorTrait, SwitchClickPattern}, gilrs_events::MockGilrsEventsTrait, layers_navigator::MockLayersNavigatorTrait, cardinal_levers_move_detector::MockCardinalLeversMoveDetectorTrait, Gamepad, InputEvent, Switch}, quick_lookup_window::{QuickLookupWindowTrait, MockQuickLookupWindowTrait}, settings::{self, data::{LayerSpecifier, SwitchEventAndReaction, SwitchOnClickReaction, KeyboardInput}}};
+use crate::{gamepad::{switch_click_pattern_detector::{MockSwitchClickPatternDetectorTrait, SwitchClickPattern}, gilrs_events::MockGilrsEventsTrait, layers_navigator::MockLayersNavigatorTrait, cardinal_levers_move_detector::{MockCardinalLeversMoveDetectorTrait, self}, Gamepad, InputEvent, Switch}, quick_lookup_window::{QuickLookupWindowTrait, MockQuickLookupWindowTrait}, settings::{self, data::{LayerSpecifier, SwitchEventAndReaction, SwitchOnClickReaction, KeyboardInput}}};
 
 use super::super::{gilrs_events::stick_switch_interpreter::StickSwitchButton, layers_wrapper::MockLayersWrapperTrait, layers_navigator::LayerVisitTrigger};
 
@@ -13,8 +13,8 @@ fn setup_handles_keyboard_input_events(
         let mock_gilrs_events = MockGilrsEventsTrait::new();
         let mut mock_layers_navigator = MockLayersNavigatorTrait::new();
         let mock_quick_lookup_window = MockQuickLookupWindowTrait::new();
-        let mock_mouse_cursor_move_detector = MockCardinalLeversMoveDetectorTrait::new();
-        let mock_scroll_detector = MockCardinalLeversMoveDetectorTrait::new();
+        let mock_mouse_cardinal_levers_move_detector 
+            = cardinal_levers_move_detector::mouse::MockMouseTrait::new();
 
         mock_switch_click_pattern_detector
             .expect_tick()
@@ -53,8 +53,8 @@ fn setup_handles_keyboard_input_events(
            switch_click_pattern_detector: Box::new(mock_switch_click_pattern_detector),
            layers_navigator: Box::new(mock_layers_navigator),
            quick_lookup_window: Box::new(mock_quick_lookup_window),
-           mouse_cursor_move_detector: Box::new(mock_mouse_cursor_move_detector),
-           mouse_scroll_detector: Box::new(mock_scroll_detector),
+           mouse_cardinal_levers_move_detector: 
+               Box::new(mock_mouse_cardinal_levers_move_detector),
         };
 
         gamepad.tick()
@@ -597,8 +597,8 @@ fn setup_handles_move_to_layer_events(
         let mock_gilrs_events = MockGilrsEventsTrait::new();
         let mut mock_layers_navigator = MockLayersNavigatorTrait::new();
         let mut mock_quick_lookup_window = MockQuickLookupWindowTrait::new();
-        let mut mock_mouse_cursor_move_detector = MockCardinalLeversMoveDetectorTrait::new();
-        let mut mock_mouse_scroll_detector = MockCardinalLeversMoveDetectorTrait::new();
+        let mut mock_mouse_cardinal_levers_move_detector 
+            = cardinal_levers_move_detector::mouse::MockMouseTrait::new();
 
         mock_switch_click_pattern_detector
             .expect_tick()
@@ -656,24 +656,13 @@ fn setup_handles_move_to_layer_events(
             .with(eq(args.new_layer_index))
             .return_const(None);
 
-        mock_mouse_cursor_move_detector
+        mock_mouse_cardinal_levers_move_detector
             .expect_set_mouse_controls()
             .times(1)
-            .with(eq(None),eq(None))
+            .with(eq(None))
             .return_const(());
 
-        mock_mouse_scroll_detector
-            .expect_set_mouse_controls()
-            .times(1)
-            .with(eq(None),eq(None))
-            .return_const(());
-
-        mock_mouse_cursor_move_detector
-            .expect_tick()
-            .times(1)
-            .return_const(None);
-
-        mock_mouse_scroll_detector
+        mock_mouse_cardinal_levers_move_detector
             .expect_tick()
             .times(1)
             .return_const(None);
@@ -684,8 +673,8 @@ fn setup_handles_move_to_layer_events(
            switch_click_pattern_detector: Box::new(mock_switch_click_pattern_detector),
            layers_navigator: Box::new(mock_layers_navigator),
            quick_lookup_window: Box::new(mock_quick_lookup_window),
-           mouse_cursor_move_detector: Box::new(mock_mouse_cursor_move_detector),
-           mouse_scroll_detector: Box::new(mock_mouse_scroll_detector),
+           mouse_cardinal_levers_move_detector: 
+               Box::new(mock_mouse_cardinal_levers_move_detector),
         };
 
         gamepad.tick()
@@ -762,8 +751,8 @@ fn setup_handles_visit_layer_events(
         let mock_gilrs_events = MockGilrsEventsTrait::new();
         let mut mock_layers_navigator = MockLayersNavigatorTrait::new();
         let mut mock_quick_lookup_window = MockQuickLookupWindowTrait::new();
-        let mut mock_mouse_cursor_move_detector = MockCardinalLeversMoveDetectorTrait::new();
-        let mut mock_mouse_scroll_detector = MockCardinalLeversMoveDetectorTrait::new();
+        let mut mock_mouse_cardinal_levers_move_detector 
+            = cardinal_levers_move_detector::mouse::MockMouseTrait::new();
 
         mock_switch_click_pattern_detector
             .expect_tick()
@@ -833,24 +822,13 @@ fn setup_handles_visit_layer_events(
             .with(eq(args.new_layer_index))
             .return_const(None);
 
-        mock_mouse_cursor_move_detector
+        mock_mouse_cardinal_levers_move_detector
             .expect_set_mouse_controls()
             .times(1)
-            .with(eq(None),eq(None))
+            .with(eq(None))
             .return_const(());
 
-        mock_mouse_scroll_detector
-            .expect_set_mouse_controls()
-            .times(1)
-            .with(eq(None),eq(None))
-            .return_const(());
-
-        mock_mouse_cursor_move_detector
-            .expect_tick()
-            .times(1)
-            .return_const(None);
-
-        mock_mouse_scroll_detector
+        mock_mouse_cardinal_levers_move_detector
             .expect_tick()
             .times(1)
             .return_const(None);
@@ -861,8 +839,8 @@ fn setup_handles_visit_layer_events(
            switch_click_pattern_detector: Box::new(mock_switch_click_pattern_detector),
            layers_navigator: Box::new(mock_layers_navigator),
            quick_lookup_window: Box::new(mock_quick_lookup_window),
-           mouse_cursor_move_detector: Box::new(mock_mouse_cursor_move_detector),
-           mouse_scroll_detector: Box::new(mock_mouse_scroll_detector),
+           mouse_cardinal_levers_move_detector: 
+               Box::new(mock_mouse_cardinal_levers_move_detector),
         };
 
         gamepad.tick()
@@ -941,8 +919,8 @@ fn setup_handles_move_to_or_visit_layer_events(
         let mock_gilrs_events = MockGilrsEventsTrait::new();
         let mut mock_layers_navigator = MockLayersNavigatorTrait::new();
         let mut mock_quick_lookup_window = MockQuickLookupWindowTrait::new();
-        let mut mock_mouse_cursor_move_detector = MockCardinalLeversMoveDetectorTrait::new();
-        let mut mock_mouse_scroll_detector = MockCardinalLeversMoveDetectorTrait::new();
+        let mut mock_mouse_cardinal_levers_move_detector 
+            = cardinal_levers_move_detector::mouse::MockMouseTrait::new();
 
         mock_switch_click_pattern_detector
             .expect_tick()
@@ -1012,27 +990,17 @@ fn setup_handles_move_to_or_visit_layer_events(
             .with(eq(args.new_layer_index))
             .return_const(None);
 
-        mock_mouse_cursor_move_detector
+        mock_mouse_cardinal_levers_move_detector
             .expect_set_mouse_controls()
             .times(1)
-            .with(eq(None),eq(None))
+            .with(eq(None))
             .return_const(());
 
-        mock_mouse_scroll_detector
-            .expect_set_mouse_controls()
-            .times(1)
-            .with(eq(None),eq(None))
-            .return_const(());
-
-        mock_mouse_cursor_move_detector
+        mock_mouse_cardinal_levers_move_detector
             .expect_tick()
             .times(1)
             .return_const(None);
 
-        mock_mouse_scroll_detector
-            .expect_tick()
-            .times(1)
-            .return_const(None);
 
         let mut gamepad = Gamepad {
            gilrs_events: Box::new(mock_gilrs_events),
@@ -1040,8 +1008,8 @@ fn setup_handles_move_to_or_visit_layer_events(
            switch_click_pattern_detector: Box::new(mock_switch_click_pattern_detector),
            layers_navigator: Box::new(mock_layers_navigator),
            quick_lookup_window: Box::new(mock_quick_lookup_window),
-           mouse_cursor_move_detector: Box::new(mock_mouse_cursor_move_detector),
-           mouse_scroll_detector: Box::new(mock_mouse_scroll_detector),
+           mouse_cardinal_levers_move_detector:
+               Box::new(mock_mouse_cardinal_levers_move_detector),
         };
 
         gamepad.tick()
@@ -1119,8 +1087,8 @@ fn setup_handles_show_quick_lookup_window(
         let mock_gilrs_events = MockGilrsEventsTrait::new();
         let mut mock_layers_navigator = MockLayersNavigatorTrait::new();
         let mut mock_quick_lookup_window = MockQuickLookupWindowTrait::new();
-        let mut mock_mouse_cursor_move_detector = MockCardinalLeversMoveDetectorTrait::new();
-        let mut mock_mouse_scroll_detector = MockCardinalLeversMoveDetectorTrait::new();
+        let mut mock_mouse_cardinal_levers_move_detector 
+            = cardinal_levers_move_detector::mouse::MockMouseTrait::new();
 
         mock_switch_click_pattern_detector
             .expect_tick()
@@ -1178,24 +1146,13 @@ fn setup_handles_show_quick_lookup_window(
             .with(eq(args.new_layer_index))
             .return_const(None);
 
-        mock_mouse_cursor_move_detector
+        mock_mouse_cardinal_levers_move_detector
             .expect_set_mouse_controls()
             .times(1)
-            .with(eq(None),eq(None))
+            .with(eq(None))
             .return_const(());
 
-        mock_mouse_scroll_detector
-            .expect_set_mouse_controls()
-            .times(1)
-            .with(eq(None),eq(None))
-            .return_const(());
-
-        mock_mouse_cursor_move_detector
-            .expect_tick()
-            .times(1)
-            .return_const(None);
-
-        mock_mouse_scroll_detector
+        mock_mouse_cardinal_levers_move_detector
             .expect_tick()
             .times(1)
             .return_const(None);
@@ -1206,8 +1163,8 @@ fn setup_handles_show_quick_lookup_window(
            switch_click_pattern_detector: Box::new(mock_switch_click_pattern_detector),
            layers_navigator: Box::new(mock_layers_navigator),
            quick_lookup_window: Box::new(mock_quick_lookup_window),
-           mouse_cursor_move_detector: Box::new(mock_mouse_cursor_move_detector),
-           mouse_scroll_detector: Box::new(mock_mouse_scroll_detector),
+           mouse_cardinal_levers_move_detector:
+               Box::new(mock_mouse_cardinal_levers_move_detector),
         };
 
         gamepad.tick()
@@ -1271,8 +1228,8 @@ fn setup_processes_click_end_switch_pattern(
         let mock_gilrs_events = MockGilrsEventsTrait::new();
         let mut mock_layers_navigator = MockLayersNavigatorTrait::new();
         let mut mock_quick_lookup_window = MockQuickLookupWindowTrait::new();
-        let mock_mouse_cursor_move_detector = MockCardinalLeversMoveDetectorTrait::new();
-        let mock_mouse_scroll_detector = MockCardinalLeversMoveDetectorTrait::new();
+        let mock_mouse_cardinal_levers_move_detector 
+            = cardinal_levers_move_detector::mouse::MockMouseTrait::new();
 
         mock_switch_click_pattern_detector
             .expect_tick()
@@ -1312,8 +1269,8 @@ fn setup_processes_click_end_switch_pattern(
            switch_click_pattern_detector: Box::new(mock_switch_click_pattern_detector),
            layers_navigator: Box::new(mock_layers_navigator),
            quick_lookup_window: Box::new(mock_quick_lookup_window),
-           mouse_cursor_move_detector: Box::new(mock_mouse_cursor_move_detector),
-           mouse_scroll_detector: Box::new(mock_mouse_scroll_detector),
+           mouse_cardinal_levers_move_detector:
+               Box::new(mock_mouse_cardinal_levers_move_detector),
         };
 
         gamepad.tick()

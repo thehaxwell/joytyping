@@ -22,8 +22,7 @@ pub struct Gamepad {
    switch_click_pattern_detector: Box<dyn SwitchClickPatternDetectorTrait>,
    layers_navigator: Box<dyn LayersNavigatorTrait>,
    quick_lookup_window: Box<dyn QuickLookupWindowTrait>,
-   mouse_cursor_move_detector: Box<dyn CardinalLeversMoveDetectorTrait>,
-   mouse_scroll_detector: Box<dyn CardinalLeversMoveDetectorTrait>,
+   mouse_cardinal_levers_move_detector: Box<dyn cardinal_levers_move_detector::mouse::MouseTrait>,
 }
 
 impl Gamepad {
@@ -33,8 +32,7 @@ impl Gamepad {
        switch_click_pattern_detector: Box<dyn SwitchClickPatternDetectorTrait>,
        layers_navigator: Box<dyn LayersNavigatorTrait>,
        quick_lookup_window: Box<dyn QuickLookupWindowTrait>,
-       mouse_cursor_move_detector: Box<dyn CardinalLeversMoveDetectorTrait>,
-       mouse_scroll_detector: Box<dyn CardinalLeversMoveDetectorTrait>,
+       mouse_cardinal_levers_move_detector: Box<dyn cardinal_levers_move_detector::mouse::MouseTrait>,
     ) -> Self {
         Gamepad{
             gilrs_events,
@@ -43,8 +41,7 @@ impl Gamepad {
 
             layers_navigator,
             quick_lookup_window,
-            mouse_cursor_move_detector,
-            mouse_scroll_detector,
+            mouse_cardinal_levers_move_detector,
         }
     }
 
@@ -148,52 +145,12 @@ impl Gamepad {
                 .quick_lookup_window
                 .update(new_layer_index);
 
-            if let Some(CardinalLevers { left_stick, right_stick }) 
-                = self.layers.get_cardinal_levers(new_layer_index) {
-                self.mouse_cursor_move_detector.set_mouse_controls(
-                    match left_stick.clone() {
-                        Some(SingleCardinalLever::ControlMouseCursor(
-                           mouse_control)) 
-                        => Some(mouse_control),
-                        _ => None,
-                    },
-                    match right_stick.clone() {
-                        Some(SingleCardinalLever::ControlMouseCursor(
-                           mouse_control)) 
-                        => Some(mouse_control),
-                        _ => None,
-                    });
-
-
-                self.mouse_scroll_detector.set_mouse_controls(
-                    match left_stick {
-                        Some(SingleCardinalLever::ControlMouseScrollwheel(
-                           mouse_control)) 
-                        => Some(mouse_control.clone()),
-                        _ => None,
-                    },
-                    match right_stick {
-                        Some(SingleCardinalLever::ControlMouseScrollwheel(
-                           mouse_control)) 
-                        => Some(mouse_control.clone()),
-                        _ => None,
-                    });
-            }
-            else {
-                self.mouse_cursor_move_detector.set_mouse_controls(None,None);
-                self.mouse_scroll_detector.set_mouse_controls(None,None);
-            }
-
+            self.mouse_cardinal_levers_move_detector
+                .set_mouse_controls(self.layers.get_cardinal_levers(new_layer_index));
         }
 
-        if let Some((x,y)) = self.mouse_cursor_move_detector.tick() {
-            return Some(InputEvent::MoveMouseCursor(x,y))
-        }
-        if let Some((x,y)) = self.mouse_scroll_detector.tick() {
-            return Some(InputEvent::MouseScroll(x,y))
-        }
-
-        None
+        self.mouse_cardinal_levers_move_detector
+            .tick()
     }
 
     // returns true if there is yet another event
@@ -217,8 +174,7 @@ impl Gamepad {
                 },
                 GilrsEventType::AxisChanged(axis, value, stick_switch_event_opt) => {
                     print!("AxisChanged: {:?}: {:?}\n",axis,value);
-                    self.mouse_cursor_move_detector.axis_changed(axis,value);
-                    self.mouse_scroll_detector.axis_changed(axis,value);
+                    self.mouse_cardinal_levers_move_detector.axis_changed(axis,value);
                     if let Some(event) = stick_switch_event_opt {
                         match event {
                             StickSwitchEvent::ButtonPressed(button)
@@ -246,7 +202,7 @@ impl Gamepad {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum InputEvent {
     KeyClick(KeyboardInput),
     KeyDown(KeyboardInput),
