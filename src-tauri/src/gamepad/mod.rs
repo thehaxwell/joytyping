@@ -163,7 +163,6 @@ impl Gamepad {
                 }
                 GilrsEventType::ButtonRepeated(button, ) => {
                     print!("ButtonRepeated: {:?}\n",button);
-                    //     self.switch_click_pattern_detector.button_repeated(button);
                 },
                 GilrsEventType::ButtonReleased(button, ) => {
                     print!("ButtonReleased: {:?}\n",button);
@@ -210,12 +209,6 @@ pub enum InputEvent {
     MouseScroll(i32,i32),
     KeyUp,
 }
-
-// #[derive(Debug, PartialEq)]
-// pub struct LayerNodeRef{
-//     pub id: String,
-//     pub index: usize,
-// }
 
 #[derive(Debug,Clone,PartialEq)]
 pub enum Switch {
