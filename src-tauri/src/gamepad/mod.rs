@@ -83,6 +83,24 @@ impl Gamepad {
                          switch.clone()) {
                     // if on_click is set to
                     // type out some key, then hold down that key
+                    //
+                    // Interesting application: 
+                    //
+                    // Since SwitchClickPattern::ClickAndHold is fired a moment
+                    // after SwitchClickPattern::Click, if the switch has
+                    // been set to be a keyboard input on_click
+                    // Gamepad will fire InputEvent::KeyClick
+                    // event once, take a break, and InputEvent::KeyDown
+                    // (which tell KeyboardInputController to fire the key in
+                    // rapid-fire style). 
+                    //
+                    // This gives the effect for key clicks
+                    // similar to how the system keyboard works when the user
+                    // clicks and holds a alpha-numeric key.
+                    // Here's a visualisation of the effect
+                    //
+                    //  *Key press* |.............|..|..|..|..|..| *Key Release*
+                    //
                     if let Some(SwitchOnClickReaction::Keyboard(keyboard_input)) 
                         = s_e_a_r.on_click {
                         return Some(InputEvent::KeyDown(keyboard_input))
