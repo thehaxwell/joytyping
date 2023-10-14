@@ -7,14 +7,16 @@ use gamepad::gilrs_events::stick_switch_interpreter::{CardinalCustomButtons, Sti
 use gamepad::gilrs_events::trigger_2_switch_interpreter::Trigger2SwitchInterpreter;
 use gamepad::layers_navigator::LayersNavigator;
 use gamepad::layers_wrapper::LayersWrapper;
-use input_controller::{KeyboardInputController,KeyboardInputControllerTrait};
 use input_controller::enigo_wrapper::EnigoWrapper;
+use input_controller::keyboard_input_controller::KeyboardInputController;
+use input_controller::mouse_input_controller;
 use settings::error_display_window::ErrorDisplayWindow;
 use settings::{Settings,SettingsDependenciesImpl};
 use notify::{Watcher,RecommendedWatcher, RecursiveMode, Config};
 
 use crate::gamepad::switch_click_pattern_detector::SwitchClickPatternDetector;
-use crate::input_controller::{MouseInputController, MouseInputControllerTrait};
+use crate::input_controller::keyboard_input_controller::KeyboardInputControllerTrait;
+use crate::input_controller::mouse_input_controller::MouseInputControllerTrait;
 use quick_lookup_window::{QuickLookupWindow, QuickLookupWindowDependenciesImpl};
 
 pub mod settings;
@@ -161,7 +163,8 @@ pub fn start_main_loop(
         );
 
         let mut keyboard_input_controller = KeyboardInputController::new(Box::new(EnigoWrapper::new()));
-        let mut mouse_input_controller = MouseInputController::new(Box::new(EnigoWrapper::new()));
+        let mut mouse_cursor_input_controller = mouse_input_controller::cursor::Cursor::new(Box::new(EnigoWrapper::new()));
+        let mut mouse_scroll_input_controller = mouse_input_controller::scroll::Scroll::new(Box::new(EnigoWrapper::new()));
 
 
         'main_loop: loop {
@@ -191,7 +194,8 @@ pub fn start_main_loop(
             }
 
             keyboard_input_controller.trigger_input();
-            mouse_input_controller.trigger_input();
+            mouse_cursor_input_controller.trigger_input();
+            mouse_scroll_input_controller.trigger_input();
             while gamepad.next_event() {}
             match gamepad.tick() {
                 Some(gamepad::InputEvent::KeyClick(key))
@@ -210,13 +214,11 @@ pub fn start_main_loop(
                 }
                 Some(gamepad::InputEvent::MoveMouseCursor(x,y))
                 => {
-                    mouse_input_controller.set_mouse_cursor_x_axis(x);
-                    mouse_input_controller.set_mouse_cursor_y_axis(y);
+                    mouse_cursor_input_controller.set_x_and_y_axes(x,y);
                 }
                 Some(gamepad::InputEvent::MouseScroll(x,y))
                 => {
-                    mouse_input_controller.set_mouse_scroll_x_axis(x);
-                    mouse_input_controller.set_mouse_scroll_y_axis(y);
+                    mouse_scroll_input_controller.set_x_and_y_axes(x,y);
                 }
                 None => (),
             };
