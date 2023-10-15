@@ -1,4 +1,4 @@
-use crate::settings::data::{SettingsData, Layer};
+use crate::settings::data::SettingsData;
 use thiserror::Error;
 
 #[cfg(test)]

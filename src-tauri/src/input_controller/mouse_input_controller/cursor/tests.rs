@@ -3,7 +3,7 @@ use crate::input_controller::{mouse_input_controller::{MouseInputControllerTrait
 
 #[test]
 fn mouse_cursor_x_and_y(){
-    let mut mock_enigo = MockEnigoTrait::new();
+    let mock_enigo = MockEnigoTrait::new();
    
     let mut scroll = Cursor {
         enigo: Box::new(mock_enigo),

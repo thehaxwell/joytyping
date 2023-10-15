@@ -1,8 +1,8 @@
 use gilrs::Button;
 
-use crate::{settings::data::{SwitchOnClickReaction, KeyboardInput, CardinalLevers, SingleCardinalLever}, quick_lookup_window::QuickLookupWindowTrait};
+use crate::{settings::data::{SwitchOnClickReaction, KeyboardInput}, quick_lookup_window::QuickLookupWindowTrait};
 
-use self::{gilrs_events::{gilrs_wrapper::GilrsEventType, GilrsEventsTrait,stick_switch_interpreter::{StickSwitchButton,StickSwitchEvent}}, layers_navigator::{LayersNavigatorTrait, LayerVisitTrigger}, cardinal_levers_move_detector::CardinalLeversMoveDetectorTrait, layers_wrapper::LayersWrapperTrait};
+use self::{gilrs_events::{gilrs_wrapper::GilrsEventType, GilrsEventsTrait,stick_switch_interpreter::{StickSwitchButton,StickSwitchEvent}}, layers_navigator::{LayersNavigatorTrait, LayerVisitTrigger}, layers_wrapper::LayersWrapperTrait};
 
 use self::switch_click_pattern_detector::{SwitchClickPatternDetectorTrait, SwitchClickPattern};
 
