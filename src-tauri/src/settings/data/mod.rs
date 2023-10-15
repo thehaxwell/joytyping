@@ -6,8 +6,12 @@ use serde::de::{self, Deserializer, Visitor, MapAccess};
 
 use crate::{settings::LayerNodeRef, gamepad::{Switch, gilrs_events::stick_switch_interpreter::StickSwitchButton}};
 
+use self::err_message_builder::{ErrMessageBuilderNode, ErrMessageBuilder};
+
 #[cfg(test)]
 mod tests;
+
+mod err_message_builder;
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct SettingsData {
@@ -62,6 +66,7 @@ impl Profile {
             })
             .collect();
 
+        let err_message_builder = ErrMessageBuilder::new();
         Ok(Profile {
             name: self.name.clone(),
             quick_lookup_window: self.quick_lookup_window.clone(),
@@ -70,7 +75,10 @@ impl Profile {
                 .map(|layer| 
                     layer.clone_and_set_layer_pointers(
                         &pointers,
-                        format!("Error in profile \"{}\" > ",self.name)))
+                        err_message_builder
+                            .branch(ErrMessageBuilderNode::OneOfMany {
+                                field: "profile".to_string(), specific_id: self.name.clone() })
+                        ))
                 .collect::<Result<Vec<_>,_>>()?,
             stick_switches_click_thresholds: self.stick_switches_click_thresholds,
             trigger_2_switches_click_thresholds: self.trigger_2_switches_click_thresholds,
@@ -126,13 +134,16 @@ impl Layer {
     pub fn clone_and_set_layer_pointers(
         &self,
         pointers: &Vec<LayerNodeRef>,
-        err_prefix: String) -> Result<Self,String> {
+        err_message_builder: ErrMessageBuilder) -> Result<Self,String> {
         Ok(Self {
             id: self.id.clone(),
             switches: if let Some(key) = &self.switches { 
 				Some(key.clone_and_set_layer_pointers(
                         pointers,
-                        format!("{}layer with id, \"{}\" > ",err_prefix,self.id.clone()))?) } else { None },
+                        err_message_builder
+                            .branch(ErrMessageBuilderNode::OneOfMany {
+                                field: "layer".to_string(), specific_id: self.id.clone() }),
+                        )?) } else { None },
             cardinal_levers: self.cardinal_levers.clone(),
         })
     }
@@ -220,88 +231,128 @@ impl Switches {
     pub fn clone_and_set_layer_pointers(
         &self,
         pointers: &Vec<LayerNodeRef>,
-        err_prefix: String) -> Result<Self,String> {
+        err_message_builder: ErrMessageBuilder) -> Result<Self,String> {
         Ok(Switches {
             south: if let Some(key) = &self.south { 
 				Some(key.clone_and_set_layer_pointers(
                     pointers,
-                    format!("{}south > ",err_prefix))?) } else { None },
+                    err_message_builder
+                        .branch(ErrMessageBuilderNode::Single { field: "south".to_string() })
+                )?) } else { None },
             east: if let Some(key) = &self.east { 
 				Some(key.clone_and_set_layer_pointers(
 					pointers,
-					format!("{}east > ",err_prefix))?) } else { None },
+                    err_message_builder
+                        .branch(ErrMessageBuilderNode::Single { field: "east".to_string() })
+                )?) } else { None },
             north: if let Some(key) = &self.north { 
 				Some(key.clone_and_set_layer_pointers(
 					pointers,
-					format!("{}north > ",err_prefix))?) } else { None },
+                    err_message_builder
+                        .branch(ErrMessageBuilderNode::Single { field: "north".to_string() })
+                )?) } else { None },
             west: if let Some(key) = &self.west { 
 				Some(key.clone_and_set_layer_pointers(
 					pointers,
-					format!("{}west > ",err_prefix))?) } else { None },
+                    err_message_builder
+                        .branch(ErrMessageBuilderNode::Single { field: "west".to_string() })
+                )?) } else { None },
             d_pad_up: if let Some(key) = &self.d_pad_up { 
 				Some(key.clone_and_set_layer_pointers(
 					pointers,
-					format!("{}d_pad_up > ",err_prefix))?) } else { None },
+                    err_message_builder
+                        .branch(ErrMessageBuilderNode::Single { field: "d_pad_up".to_string() })
+                )?) } else { None },
             d_pad_down: if let Some(key) = &self.d_pad_down { 
 				Some(key.clone_and_set_layer_pointers(
 					pointers,
-					format!("{}d_pad_down > ",err_prefix))?) } else { None },
+                    err_message_builder
+                        .branch(ErrMessageBuilderNode::Single { field: "d_pad_down".to_string() })
+                )?) } else { None },
             d_pad_left: if let Some(key) = &self.d_pad_left { 
 				Some(key.clone_and_set_layer_pointers(
 					pointers,
-					format!("{}d_pad_left > ",err_prefix))?) } else { None },
+                    err_message_builder
+                        .branch(ErrMessageBuilderNode::Single { field: "d_pad_left".to_string() })
+                )?) } else { None },
             d_pad_right: if let Some(key) = &self.d_pad_right { 
 				Some(key.clone_and_set_layer_pointers(
 					pointers,
-					format!("{}d_pad_right > ",err_prefix))?) } else { None },
+                    err_message_builder
+                        .branch(ErrMessageBuilderNode::Single { field: "d_pad_right".to_string() })
+                )?) } else { None },
             left_stick_up: if let Some(key) = &self.left_stick_up { 
 				Some(key.clone_and_set_layer_pointers(
 					pointers,
-					format!("{}left_stick_up > ",err_prefix))?) } else { None },
+                    err_message_builder
+                        .branch(ErrMessageBuilderNode::Single { field: "left_stick_up".to_string() })
+                )?) } else { None },
             left_stick_down: if let Some(key) = &self.left_stick_down { 
 				Some(key.clone_and_set_layer_pointers(
 					pointers,
-					format!("{}left_stick_down > ",err_prefix))?) } else { None },
+                    err_message_builder
+                        .branch(ErrMessageBuilderNode::Single { field: "left_stick_down".to_string() })
+                )?) } else { None },
             left_stick_left: if let Some(key) = &self.left_stick_left { 
 				Some(key.clone_and_set_layer_pointers(
 					pointers,
-					format!("{}left_stick_left > ",err_prefix))?) } else { None },
+                    err_message_builder
+                        .branch(ErrMessageBuilderNode::Single { field: "left_stick_left".to_string() })
+                )?) } else { None },
             left_stick_right: if let Some(key) = &self.left_stick_right { 
 				Some(key.clone_and_set_layer_pointers(
 					pointers,
-					format!("{}left_stick_right > ",err_prefix))?) } else { None },
+                    err_message_builder
+                        .branch(ErrMessageBuilderNode::Single { field: "left_stick_right".to_string() })
+                )?) } else { None },
             right_stick_up: if let Some(key) = &self.right_stick_up { 
 				Some(key.clone_and_set_layer_pointers(
 					pointers,
-					format!("{}right_stick_up > ",err_prefix))?) } else { None },
+                    err_message_builder
+                        .branch(ErrMessageBuilderNode::Single { field: "right_stick_up".to_string() })
+                )?) } else { None },
             right_stick_down: if let Some(key) = &self.right_stick_down { 
 				Some(key.clone_and_set_layer_pointers(
 					pointers,
-					format!("{}right_stick_down > ",err_prefix))?) } else { None },
+                    err_message_builder
+                        .branch(ErrMessageBuilderNode::Single { field: "right_stick_down".to_string() })
+                )?) } else { None },
             right_stick_left: if let Some(key) = &self.right_stick_left { 
 				Some(key.clone_and_set_layer_pointers(
 					pointers,
-					format!("{}right_stick_left > ",err_prefix))?) } else { None },
+                    err_message_builder
+                        .branch(ErrMessageBuilderNode::Single { field: "right_stick_left".to_string() })
+                )?) } else { None },
             right_stick_right: if let Some(key) = &self.right_stick_right { 
 				Some(key.clone_and_set_layer_pointers(
 					pointers,
-					format!("{}right_stick_right > ",err_prefix))?) } else { None },
+                    err_message_builder
+                        .branch(ErrMessageBuilderNode::Single { field: "right_stick_right".to_string() })
+                )?) } else { None },
             right_trigger: if let Some(key) = &self.right_trigger { 
 				Some(key.clone_and_set_layer_pointers(
 					pointers,
-					format!("{}right_trigger > ",err_prefix))?) } else { None },
+                    err_message_builder
+                        .branch(ErrMessageBuilderNode::Single { field: "right_trigger".to_string() })
+                )?) } else { None },
             left_trigger: if let Some(key) = &self.left_trigger { 
 				Some(key.clone_and_set_layer_pointers(
 					pointers,
-					format!("{}left_trigger > ",err_prefix))?) } else { None },
+                    err_message_builder
+                        .branch(ErrMessageBuilderNode::Single { field: "left_trigger".to_string() })
+                )?) } else { None },
             right_trigger_2: if let Some(key) = &self.right_trigger_2 { 
 				Some(key.clone_and_set_layer_pointers(
 					pointers,
-					format!("{}right_trigger_2 > ",err_prefix))?) } else { None },
+                    err_message_builder
+                        .branch(ErrMessageBuilderNode::Single { field: "right_trigger_2".to_string() })
+                )?) } else { None },
             left_trigger_2: if let Some(key) = &self.left_trigger_2 { 
 				Some(key.clone_and_set_layer_pointers(
 					pointers,
-					format!("{}left_trigger_2 > ",err_prefix))?) } else { None },
+                    err_message_builder
+                        .branch(ErrMessageBuilderNode::Single { field: "left_trigger_2".to_string() })
+                )?) } else { None },
         })
     }
 
@@ -363,16 +414,18 @@ impl SwitchEventAndReaction {
     }
 
     pub fn clone_and_set_layer_pointers(
-        &self, pointers: &Vec<LayerNodeRef>, err_prefix: String) -> Result<Self,String>{
+        &self, pointers: &Vec<LayerNodeRef>, err_message_builder: ErrMessageBuilder) -> Result<Self,String>{
         Ok(SwitchEventAndReaction {
             on_click: SwitchEventAndReaction
                 ::clone_event_with_layer_pointers_possibly_set(
                     &self.on_click,pointers,
-                    format!("{}on_click > ",err_prefix))?,
+                    err_message_builder
+                        .branch(ErrMessageBuilderNode::Single { field: "on_click".to_string() }))?,
             on_double_click: SwitchEventAndReaction
                 ::clone_event_with_layer_pointers_possibly_set(
                     &self.on_double_click,pointers,
-                    format!("{}on_double_click > ",err_prefix))?,
+                    err_message_builder
+                        .branch(ErrMessageBuilderNode::Single { field: "on_double_click".to_string() }))?,
         })
 
     }
@@ -380,23 +433,29 @@ impl SwitchEventAndReaction {
     fn clone_event_with_layer_pointers_possibly_set(
         event: &Option<SwitchOnClickReaction>,
         pointers: &Vec<LayerNodeRef>,
-        err_prefix: String) -> Result<Option<SwitchOnClickReaction>,String>{
+        err_message_builder: ErrMessageBuilder) -> Result<Option<SwitchOnClickReaction>,String>{
         match event {
             Some(SwitchOnClickReaction::VisitLayer(layer_specifier))
                 => Ok(Some(SwitchOnClickReaction::VisitLayer(
                     layer_specifier.clone_and_set_layer_pointer(
                         pointers,
-                        format!("{}visit_layer: ",err_prefix))?))),
+                        err_message_builder
+                            .branch(ErrMessageBuilderNode::Single { field: "visit_layer".to_string() })
+                        )?))),
             Some(SwitchOnClickReaction::MoveToLayer(layer_specifier))
                 => Ok(Some(SwitchOnClickReaction::MoveToLayer(
                     layer_specifier.clone_and_set_layer_pointer(
                         pointers,
-                        format!("{}move_to_layer: ",err_prefix))?))),
+                        err_message_builder
+                            .branch(ErrMessageBuilderNode::Single { field: "move_to_layer".to_string() })
+                        )?))),
             Some(SwitchOnClickReaction::MoveToOrVisitLayer(layer_specifier))
                 => Ok(Some(SwitchOnClickReaction::MoveToOrVisitLayer(
                     layer_specifier.clone_and_set_layer_pointer(
                         pointers,
-                        format!("{}move_to_or_visit_layer: ",err_prefix))?))),
+                        err_message_builder
+                            .branch(ErrMessageBuilderNode::Single { field: "move_to_or_visit_layer".to_string() })
+                        )?))),
             other => Ok(other.clone()),
         }
     }
@@ -435,7 +494,10 @@ impl LayerSpecifier {
         }
     }
 
-    pub fn clone_and_set_layer_pointer(&self, pointers: &Vec<LayerNodeRef>, err_prefix: String) -> Result<Self,String> {
+    pub fn clone_and_set_layer_pointer(
+        &self,
+        pointers: &Vec<LayerNodeRef>,
+        err_message_builder: ErrMessageBuilder) -> Result<Self,String> {
         let ptr = pointers
             .iter()
             .find(|pointer| pointer.id == self.id);
@@ -446,7 +508,8 @@ impl LayerSpecifier {
             })           
         }
         else {
-            Err(format!("{}No layer found having the id \"{}\"",err_prefix,self.id))
+            Err(err_message_builder
+                .build_message(format!("No layer found having the id \"{}\"",self.id)))
         }
     }
 }

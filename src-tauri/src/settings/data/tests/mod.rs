@@ -32,14 +32,12 @@ fn settings_data_clone_and_set_layer_pointers_gives_the_right_error() {
 
     assert_eq!(
         res.unwrap_err(),
-        "Error in profile \"My PS3 Controller\" > layer with id, \"first-layer-step-1\" > left_trigger > on_double_click > move_to_or_visit_layer: No layer found having the id \"seconda-layer-step-1\"".to_string());
-
-    // TODO: consider changing the format to
-    // Error in
-    // > profile: "My PS3 Controller"
-    //   > layer: "first-layer-step-1"
-    //     > left_trigger
-    //       > on_double_click
-    //         > move_to_or_visit_layer
-    // No layer found having the id "seconda-layer-step-1"
+        format!("{}\n{}\n{}\n{}\n{}\n{}\n{}",
+        "Error in",
+        "> profile: \"My PS3 Controller\"",
+        "   > layer: \"first-layer-step-1\"",
+        "      > left_trigger",
+        "         > on_double_click",
+        "            > move_to_or_visit_layer",
+        "No layer found having the id \"seconda-layer-step-1\"",));
 }
