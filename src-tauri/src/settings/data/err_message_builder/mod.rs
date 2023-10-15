@@ -1,16 +1,17 @@
 #[cfg(test)]
 mod tests;
 
-#[derive(Clone)]
+#[derive(Debug,Clone,PartialEq)]
 pub enum ErrMessageBuilderNode {
     Single{field: String},
     OneOfMany{field: String, specific_id: String},
 }
 
-#[derive(Clone)]
+#[derive(Debug,Clone,PartialEq)]
 pub struct ErrMessageBuilder {
     nodes: Vec<ErrMessageBuilderNode>,
 }
+
 impl ErrMessageBuilder {
     pub fn new() -> Self {
         Self {
