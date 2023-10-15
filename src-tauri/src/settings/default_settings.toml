@@ -5,6 +5,9 @@ default_profile= "default" # The name of the profile to use by default
 name="default"
 [profiles.quick_lookup_window]
 inner_size = {width= 600,height= 400}
+[profiles.quick_lookup_window.source_code]
+js_iife_bundle_file_path="/home/haxwell/.config/joytyping/quick-lookup/build/bundle.js"
+css_file_path="/home/haxwell/.config/joytyping/quick-lookup/build/bundle.css"
 [profiles.stick_switches_click_thresholds]
 left_stick_up = 0.5
 left_stick_down = 0.5
@@ -14,6 +17,9 @@ right_stick_up = 0.5
 right_stick_down = 0.5
 right_stick_left = 0.5
 right_stick_right = 0.5
+[profiles.trigger_2_switches_click_thresholds]
+left_trigger_2 = 0.3
+right_trigger_2 = 0.3
 
 [[profiles.layers]]
 id = "first-layer-step-1"
