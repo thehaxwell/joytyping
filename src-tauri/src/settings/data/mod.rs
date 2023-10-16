@@ -24,6 +24,12 @@ impl SettingsData {
     pub fn validate_and_clone_and_set_layer_pointers(&self) -> Result<Self,String> {
         let err_message_builder = ErrMessageBuilder::new();
 
+        if let Some(dev) = &self.development {
+            dev.validate(
+                err_message_builder
+                    .branch(ErrMessageBuilderNode::Single { field: "development".to_string() }))?;
+        }
+
         Ok(SettingsData { 
             profiles: self.profiles
                 .iter()
@@ -41,6 +47,19 @@ impl SettingsData {
 #[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct Development {
     pub quick_lookup_window: Option<QuickLookupWindow>,
+}
+
+impl Development {
+    pub fn validate(
+        &self,
+        err_message_builder: ErrMessageBuilder) -> Result<(),String> {
+        if let Some(window) = &self.quick_lookup_window {
+            window.validate(
+                err_message_builder
+                    .branch(ErrMessageBuilderNode::Single { field: "quick_lookup_window".to_string() }))?;
+        }
+        Ok(())
+    }
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
@@ -82,6 +101,10 @@ impl Profile {
             .validate(err_message_builder
                 .branch(ErrMessageBuilderNode::Single {
                     field: "trigger_2_switches_click_thresholds".to_string()}))?;
+        self.quick_lookup_window
+            .validate(err_message_builder
+                .branch(ErrMessageBuilderNode::Single {
+                    field: "quick_lookup_window".to_string()}))?;
 
         Ok(Profile {
             name: self.name.clone(),
@@ -108,6 +131,17 @@ pub struct QuickLookupWindow {
     pub source_code: Option<BrowserSourceCode>,
 }
 
+impl QuickLookupWindow {
+    pub fn validate(
+        &self,
+        err_message_builder: ErrMessageBuilder) -> Result<(),String> {
+        self.inner_size.validate(
+            err_message_builder
+                .branch(ErrMessageBuilderNode::Single { field: "inner_size".to_string() }))?;
+        Ok(())
+    }
+}
+
 #[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct BrowserSourceCode {
     pub js_iife_bundle_file_path: String,
@@ -118,6 +152,32 @@ pub struct BrowserSourceCode {
 pub struct HeightAndWidth {
     pub width: f64,
     pub height: f64,
+}
+
+impl HeightAndWidth {
+    pub fn validate(
+        &self,
+        err_message_builder: ErrMessageBuilder) -> Result<(),String> {
+            let thresholds_arr = [
+                (self.height, "height"),
+                (self.width, "width"),
+            ];
+            thresholds_arr
+                .iter()
+                .map(|(threshold,label)|{
+                    if *threshold < 0.0 {
+                        Err(err_message_builder
+                            .branch(ErrMessageBuilderNode::Single { field: label.to_string() })
+                            .build_message(format!(
+                                "value ({}) is lower than the minimum acceptable 0.0",
+                                dbg!(threshold))))
+                    }
+                    else {
+                        Ok(())
+                    }
+                })
+                .collect()
+    }
 }
 
 #[derive(Deserialize, Debug, Clone, Copy, PartialEq)]
@@ -133,7 +193,6 @@ pub struct StickSwitchesClickThresholds {
 }
 
 impl StickSwitchesClickThresholds {
-
     pub fn validate(
         &self,
         err_message_builder: ErrMessageBuilder) -> Result<(),String> {

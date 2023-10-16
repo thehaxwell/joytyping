@@ -64,10 +64,6 @@ impl Settings {
                   self.dependencies
                       .from_str(&settings_str)
                       .map_err(|e|SettingsLoadError::FileNotParsable(e.to_string())))
-        // .and_then(|deserialized|{
-        //     Settings::validate_settings_data(&deserialized)
-        //               .map(|()| deserialized)
-        // })
         .and_then(|data:SettingsData|
                   data.validate_and_clone_and_set_layer_pointers()
                       .map_err(|e:String|SettingsLoadError::FileNotParsable(e)))
@@ -89,10 +85,6 @@ impl Settings {
                 panic!("Default settings file not parsable: {}", e.to_string())
             ,
             Ok(deserialized) => {
-                // if let Err(e) = Settings::validate_settings_data(&deserialized) {
-                //     panic!("Default settings file not parsable: {}", e.to_string());
-                // }
-
                 match deserialized.validate_and_clone_and_set_layer_pointers() {
                     Ok(data) => self.data = Some(data),
                     Err(e) => panic!("Default settings file not parsable: {}", e.to_string()),
@@ -105,44 +97,6 @@ impl Settings {
     pub fn get_data(&self) -> Option<SettingsData> {
         self.data.clone()
     }
-
-    // fn validate_settings_data(data: &SettingsData)
-    //     -> Result<(), SettingsLoadError> {
-    //         let error: Option<SettingsLoadError> = data.profiles.iter().find_map(|p| {
-    //             let thresholds_arr = [
-    //                 (p.stick_switches_click_thresholds.left_stick_up, "left_stick_up"),
-    //                 (p.stick_switches_click_thresholds.left_stick_down, "left_stick_down"),
-    //                 (p.stick_switches_click_thresholds.left_stick_left, "left_stick_left"),
-    //                 (p.stick_switches_click_thresholds.left_stick_right, "left_stick_right"),
-    //                 (p.stick_switches_click_thresholds.right_stick_up, "right_stick_up"),
-    //                 (p.stick_switches_click_thresholds.right_stick_down, "right_stick_down"),
-    //                 (p.stick_switches_click_thresholds.right_stick_left, "right_stick_left"),
-    //                 (p.stick_switches_click_thresholds.right_stick_right, "right_stick_right"),
-    //             ];
-    //
-    //
-    //             let mut idx = -1;
-    //             thresholds_arr.iter().find_map(|t| {
-    //                 idx += 1;
-    //                 if t.0 > 1.0 || t.0 < 0.0 {
-    //                     Some(SettingsLoadError::FileNotParsable(format!(
-    //                         "at \"{}\" profile > stick_switches_click_thresholds: {} is out of bounds",
-    //                         p.name,
-    //                         t.1)))
-    //                 }
-    //                 else {
-    //                     None
-    //                 }
-    //
-    //             })
-    //         });
-    //         if let Some(e) = error {
-    //             Err(e)
-    //         }
-    //         else {
-    //             Ok(())
-    //         }
-    // }
 }
 
 #[derive(Error, Debug, PartialEq)]
