@@ -15,29 +15,30 @@ fn setup_settings_data_toggle_index_in_gamepad(include_index_in_gamepad: bool) -
 }
 
 #[test]
-fn settings_data_clone_and_set_layer_pointers_works() {
+fn settings_data_validate_and_clone_and_set_layer_pointers_works() {
     assert_eq!(
         setup_settings_data_toggle_index_in_gamepad(false)
-            .clone_and_set_layer_pointers().unwrap(), 
+            .validate_and_clone_and_set_layer_pointers().unwrap(), 
             setup_settings_data_toggle_index_in_gamepad(true));
 }
 
 #[test]
-fn settings_data_clone_and_set_layer_pointers_gives_the_right_error() {
+fn settings_data_validate_and_clone_and_set_layer_pointers_gives_the_right_error() {
     let res = setup_settings_data_example(SetupConfig {
        include_index_in_gamepad: false,
        my_ps3_controller_first_layer_step_1_left_trigger_on_double_click_visit_layer_name:
            "seconda-layer-step-1".to_string()
-    }).clone_and_set_layer_pointers();
+    }).validate_and_clone_and_set_layer_pointers();
 
     assert_eq!(
         res.unwrap_err(),
-        format!("{}\n{}\n{}\n{}\n{}\n{}\n{}",
+        format!("{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}",
         "Error in",
-        "> profile: \"My PS3 Controller\"",
-        "   > layer: \"first-layer-step-1\"",
-        "      > left_trigger",
-        "         > on_double_click",
-        "            > move_to_or_visit_layer",
+        "> profiles: \"My PS3 Controller\"",
+        "   > layers: \"first-layer-step-1\"",
+        "      > switches",
+        "         > left_trigger",
+        "            > on_double_click",
+        "               > move_to_or_visit_layer",
         "No layer found having the id \"seconda-layer-step-1\"",));
 }
