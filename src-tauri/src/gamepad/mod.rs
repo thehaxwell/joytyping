@@ -1,6 +1,7 @@
+use enigo::MouseButton;
 use gilrs::Button;
 
-use crate::{settings::data::{SwitchOnClickReaction, KeyboardInput}, quick_lookup_window::QuickLookupWindowTrait};
+use crate::{settings::data::{SwitchOnClickReaction, KeyboardInput, MouseInput}, quick_lookup_window::QuickLookupWindowTrait};
 
 use self::{gilrs_events::{gilrs_wrapper::GilrsEventType, GilrsEventsTrait,stick_switch_interpreter::{StickSwitchButton,StickSwitchEvent}}, layers_navigator::{LayersNavigatorTrait, LayerVisitTrigger}, layers_wrapper::LayersWrapperTrait};
 
@@ -64,6 +65,8 @@ impl Gamepad {
                        .and_then(|s_e_a_r| s_e_a_r.on_click) {
                     Some(SwitchOnClickReaction::Keyboard(keyboard_input)) 
                     => return Some(InputEvent::KeyClick(keyboard_input)),
+                    Some(SwitchOnClickReaction::Mouse(mouse_input)) 
+                    => return Some(InputEvent::MouseDown(mouse_input.button)),
                     Some(SwitchOnClickReaction::MoveToLayer(layer_specifier))
                     => self.layers_navigator.move_to_layer(layer_specifier),
                     Some(SwitchOnClickReaction::VisitLayer(layer_specifier))
@@ -119,6 +122,8 @@ impl Gamepad {
                                             .or_else(|| s_e_a_r.on_click )) {
                     Some(SwitchOnClickReaction::Keyboard(keyboard_input)) 
                     => return Some(InputEvent::KeyClick(keyboard_input)),
+                    Some(SwitchOnClickReaction::Mouse(mouse_input)) 
+                    => return Some(InputEvent::MouseDown(mouse_input.button)),
                     Some(SwitchOnClickReaction::MoveToLayer(layer_specifier))
                     => self.layers_navigator.move_to_layer(layer_specifier),
                     Some(SwitchOnClickReaction::VisitLayer(layer_specifier))
@@ -131,22 +136,37 @@ impl Gamepad {
                 }
             },
             Some(SwitchClickPattern::DoubleClickAndHold(switch)) => {
-                if let Some(s_e_a_r)
-                    = self.layers.get_switch_event_and_reaction(
-                         self.layers_navigator.get_current_layer_index(),
-                         switch.clone()) {
-                    // if on_double_click (or fallback to on_click) is set to
-                    // type out some key, then hold down that key
-                    if let Some(SwitchOnClickReaction::Keyboard(keyboard_input)) 
-                        = s_e_a_r.on_double_click {
-                        return Some(InputEvent::KeyDown(keyboard_input))
-                    }
-                    else if let Some(SwitchOnClickReaction::Keyboard(keyboard_input)) 
-                        = s_e_a_r.on_click {
-                        return Some(InputEvent::KeyDown(keyboard_input))
-                    }
+                match self.layers.get_switch_event_and_reaction(
+                     self.layers_navigator.get_current_layer_index(),
+                     switch.clone())
+                    .and_then(
+                        // if on_double_click (or fallback to on_click) is set to
+                        // type out some key, then hold down that key
+                           |s_e_a_r| s_e_a_r.on_double_click
+                                            .or_else(|| s_e_a_r.on_click )
+                        ) {
+                    Some(SwitchOnClickReaction::Keyboard(keyboard_input)) 
+                        => return Some(InputEvent::KeyDown(keyboard_input)),
+                    _ => (),
 
                 };
+
+                // if let Some(s_e_a_r)
+                //     = self.layers.get_switch_event_and_reaction(
+                //          self.layers_navigator.get_current_layer_index(),
+                //          switch.clone()) {
+                //     // if on_double_click (or fallback to on_click) is set to
+                //     // type out some key, then hold down that key
+                //     if let Some(SwitchOnClickReaction::Keyboard(keyboard_input)) 
+                //         = s_e_a_r.on_double_click {
+                //         return Some(InputEvent::KeyDown(keyboard_input))
+                //     }
+                //     else if let Some(SwitchOnClickReaction::Keyboard(keyboard_input)) 
+                //         = s_e_a_r.on_click {
+                //         return Some(InputEvent::KeyDown(keyboard_input))
+                //     }
+                //
+                // };
 
             },
             Some(SwitchClickPattern::ClickEnd(switch)) => {
@@ -223,6 +243,7 @@ impl Gamepad {
 pub enum InputEvent {
     KeyClick(KeyboardInput),
     KeyDown(KeyboardInput),
+    MouseDown(MouseButton),
     MoveMouseCursor(i32,i32),
     MouseScroll(i32,i32),
     KeyUp,

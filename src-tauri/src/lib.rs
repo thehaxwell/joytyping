@@ -16,7 +16,7 @@ use notify::{Watcher,RecommendedWatcher, RecursiveMode, Config};
 
 use crate::gamepad::switch_click_pattern_detector::SwitchClickPatternDetector;
 use crate::input_controller::keyboard_input_controller::KeyboardInputControllerTrait;
-use crate::input_controller::mouse_input_controller::MouseInputControllerTrait;
+use crate::input_controller::mouse_input_controller::MouseCardinalLeverInputControllerTrait;
 use quick_lookup_window::{QuickLookupWindow, QuickLookupWindowDependenciesImpl};
 
 pub mod settings;
@@ -165,6 +165,7 @@ pub fn start_main_loop(
         let mut keyboard_input_controller = KeyboardInputController::new(Box::new(EnigoWrapper::new()));
         let mut mouse_cursor_input_controller = mouse_input_controller::cursor::Cursor::new(Box::new(EnigoWrapper::new()));
         let mut mouse_scroll_input_controller = mouse_input_controller::scroll::Scroll::new(Box::new(EnigoWrapper::new()));
+        let mut mouse_button_input_controller = mouse_input_controller::button::Button::new(Box::new(EnigoWrapper::new()));
 
 
         'main_loop: loop {
@@ -198,26 +199,27 @@ pub fn start_main_loop(
             mouse_scroll_input_controller.trigger_input();
             while gamepad.next_event() {}
             match gamepad.tick() {
-                Some(gamepad::InputEvent::KeyClick(key))
-                => {
+                Some(gamepad::InputEvent::KeyClick(key)) => {
                     keyboard_input_controller.key_up();
                     keyboard_input_controller.key_click(key);
                 }
-                Some(gamepad::InputEvent::KeyDown(key))
-                => {
+                Some(gamepad::InputEvent::KeyDown(key)) => {
                     keyboard_input_controller.key_up();
                     keyboard_input_controller.key_down(key);
                 }
-                Some(gamepad::InputEvent::KeyUp)
-                => {
-                    keyboard_input_controller.key_up();
+                Some(gamepad::InputEvent::MouseDown(key)) => {
+                    println!("MouseDown({:?})",key);
+                    mouse_button_input_controller.key_up();
+                    mouse_button_input_controller.key_down(key);
                 }
-                Some(gamepad::InputEvent::MoveMouseCursor(x,y))
-                => {
+                Some(gamepad::InputEvent::KeyUp) => {
+                    keyboard_input_controller.key_up();
+                    mouse_button_input_controller.key_up();
+                }
+                Some(gamepad::InputEvent::MoveMouseCursor(x,y)) => {
                     mouse_cursor_input_controller.set_x_and_y_axes(x,y);
                 }
-                Some(gamepad::InputEvent::MouseScroll(x,y))
-                => {
+                Some(gamepad::InputEvent::MouseScroll(x,y)) => {
                     mouse_scroll_input_controller.set_x_and_y_axes(x,y);
                 }
                 None => (),

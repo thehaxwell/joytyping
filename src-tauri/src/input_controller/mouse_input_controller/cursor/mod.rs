@@ -1,6 +1,6 @@
 use crate::input_controller::enigo_wrapper::EnigoTrait;
 
-use super::MouseInputControllerTrait;
+use super::MouseCardinalLeverInputControllerTrait;
 
 #[cfg(test)]
 mod tests;
@@ -23,7 +23,7 @@ impl Cursor {
     }
 }
 
-impl MouseInputControllerTrait for Cursor {
+impl MouseCardinalLeverInputControllerTrait for Cursor {
     fn trigger_input(&mut self) {
         if self.mouse_cursor_x_move != 0
             || self.mouse_cursor_y_move != 0 {

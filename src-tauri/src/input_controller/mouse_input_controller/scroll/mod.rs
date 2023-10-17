@@ -1,6 +1,6 @@
 use crate::input_controller::enigo_wrapper::EnigoTrait;
 
-use super::MouseInputControllerTrait;
+use super::MouseCardinalLeverInputControllerTrait;
 
 #[cfg(test)]
 mod tests;
@@ -23,7 +23,7 @@ impl Scroll {
     }
 }
 
-impl MouseInputControllerTrait for Scroll {
+impl MouseCardinalLeverInputControllerTrait for Scroll {
     fn trigger_input(&mut self) {
         if self.mouse_scroll_x_move != 0 {
             self.enigo.mouse_scroll_x(

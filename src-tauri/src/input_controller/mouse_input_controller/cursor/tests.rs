@@ -1,5 +1,5 @@
 use mockall::predicate::eq;
-use crate::input_controller::{mouse_input_controller::{MouseInputControllerTrait, cursor::Cursor}, enigo_wrapper::MockEnigoTrait};
+use crate::input_controller::{mouse_input_controller::{MouseCardinalLeverInputControllerTrait, cursor::Cursor}, enigo_wrapper::MockEnigoTrait};
 
 #[test]
 fn mouse_cursor_x_and_y(){
