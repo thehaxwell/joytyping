@@ -1,6 +1,6 @@
 use mockall::predicate::eq;
 
-use crate::input_controller::{mouse_input_controller::button::Button, enigo_wrapper::MockEnigoTrait};
+use crate::input_controller::{mouse_input_controller::button::{Button, ButtonTrait}, enigo_wrapper::MockEnigoTrait};
 
 
 #[test]
