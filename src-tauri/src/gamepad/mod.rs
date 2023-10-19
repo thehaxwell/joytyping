@@ -73,7 +73,7 @@ impl Gamepad {
                     => self.layers_navigator.visit_layer(LayerVisitTrigger::Click(switch),layer_specifier),
                     Some(SwitchOnClickReaction::MoveToOrVisitLayer(layer_specifier))
                     => self.layers_navigator.move_to_or_visit_layer(LayerVisitTrigger::Click(switch),layer_specifier),
-                    Some(SwitchOnClickReaction::ShowQuickLookupWindow)
+                    Some(SwitchOnClickReaction::ShowQuickLookupWindowOnHold)
                     => {let _ = self.quick_lookup_window.show_or_open(switch);}
                     _ => ()
                 }
@@ -130,7 +130,7 @@ impl Gamepad {
                     => self.layers_navigator.visit_layer(LayerVisitTrigger::DoubleClick(switch),layer_specifier),
                     Some(SwitchOnClickReaction::MoveToOrVisitLayer(layer_specifier))
                     => self.layers_navigator.move_to_or_visit_layer(LayerVisitTrigger::DoubleClick(switch),layer_specifier),
-                    Some(SwitchOnClickReaction::ShowQuickLookupWindow)
+                    Some(SwitchOnClickReaction::ShowQuickLookupWindowOnHold)
                     => {let _ = self.quick_lookup_window.show_or_open(switch);}
                     _ => ()
                 }

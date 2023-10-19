@@ -1178,7 +1178,7 @@ fn handles_show_quick_lookup_window(){
             current_layer_num: 100_usize,
             new_layer_index,
             source_switch_event_and_reaction: SwitchEventAndReaction {
-                on_click: Some(SwitchOnClickReaction::ShowQuickLookupWindow),
+                on_click: Some(SwitchOnClickReaction::ShowQuickLookupWindowOnHold),
                 on_double_click: None, 
             },
             pattern: SwitchClickPattern::Click(Switch::Button(Button::DPadRight)),
@@ -1192,7 +1192,7 @@ fn handles_show_quick_lookup_window(){
             new_layer_index,
             source_switch_event_and_reaction: SwitchEventAndReaction {
                 on_click: None,
-                on_double_click: Some(SwitchOnClickReaction::ShowQuickLookupWindow),
+                on_double_click: Some(SwitchOnClickReaction::ShowQuickLookupWindowOnHold),
             },
             pattern: SwitchClickPattern::DoubleClick(Switch::Button(Button::South)),
         }
@@ -1205,7 +1205,7 @@ fn handles_show_quick_lookup_window(){
             current_layer_num: 10_usize,
             new_layer_index,
             source_switch_event_and_reaction: SwitchEventAndReaction {
-                on_click: Some(SwitchOnClickReaction::ShowQuickLookupWindow),
+                on_click: Some(SwitchOnClickReaction::ShowQuickLookupWindowOnHold),
                 on_double_click: None, 
             },
             pattern: SwitchClickPattern::DoubleClick(Switch::Button(Button::South)),

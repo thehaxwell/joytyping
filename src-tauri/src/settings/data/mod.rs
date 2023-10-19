@@ -705,7 +705,7 @@ pub enum SwitchOnClickReaction {
     // come back to this layer when the click ends
     MoveToOrVisitLayer(LayerSpecifier),
 
-    ShowQuickLookupWindow,
+    ShowQuickLookupWindowOnHold,
 }
 
 // this struct should allow serde to always accept a string
