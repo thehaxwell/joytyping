@@ -52,6 +52,9 @@ impl GilrsEventsTrait for GilrsEvents {
                 match gilrs_event.event {
                     GilrsEventType::ButtonPressed(button, ) => {
                         match button {
+                            // the Button::Unknown button is useless to us,
+                            // and it was causing issues
+                            Button::Unknown => None,
                             Button::LeftTrigger2 | Button::RightTrigger2 => None,
                             _ => Some(GilrsEvent{
                                 time: gilrs_event.time,
@@ -61,6 +64,9 @@ impl GilrsEventsTrait for GilrsEvents {
                     }
                     GilrsEventType::ButtonReleased(button, ) => {
                         match button {
+                            // the Button::Unknown button is useless to us,
+                            // and it was causing issues
+                            Button::Unknown => None,
                             Button::LeftTrigger2 | Button::RightTrigger2 => None,
                             _ => Some(GilrsEvent{
                                 time: gilrs_event.time,
@@ -91,6 +97,12 @@ impl GilrsEventsTrait for GilrsEvents {
                         })
                     },
                     GilrsEventType::ButtonChanged(button, value) => {
+                        // the Button::Unknown button is useless to us,
+                        // and it was causing issues
+                        if let Button::Unknown = button {
+                            return None;
+                        }
+
                         let trigger_2_switch_event_option = match button {
                             gilrs::Button::LeftTrigger2 
                                 => self.left_trigger_2_switch_interpreter.interpret_move(value),
