@@ -1,8 +1,10 @@
-use crate::settings::data::tests::settings_data_example::setup_settings_data_example;
+use enigo::Key;
+
+use crate::settings::data::{tests::settings_data_example::setup_settings_data_example, Switches, Layer};
 
 use self::settings_data_example::SetupConfig;
 
-use super::SettingsData;
+use super::{SettingsData, SwitchesAdapter, SwitchEventAndReaction, SwitchOnClickReaction, KeyboardInput, LayerSpecifier};
 
 mod settings_data_example;
 
@@ -347,3 +349,428 @@ fn settings_data_validate_and_clone_and_set_layer_pointers_gives_the_right_error
 
 }
 
+
+// -------- Individual structs ------------
+#[test]
+fn layer_get_switches_works(){
+    // left_upper_is_d_pad == true
+    
+    let layer = Layer {
+        id: "layer-id".to_string(),
+        switches: Some(SwitchesAdapter {
+            right_upper_south: Some(SwitchEventAndReaction {
+                on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
+                    key: Key::Layout('I'),
+                    modifiers: vec![
+                    ]})),
+                on_double_click: None, 
+            }),
+            right_upper_east: Some(SwitchEventAndReaction {
+                on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
+                    key: Key::Return,
+                    modifiers: vec![
+                    ]})),
+                on_double_click: None, 
+            }),
+            right_upper_north: Some(SwitchEventAndReaction {
+                on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
+                    key: Key::Layout('E'),
+                    modifiers: vec![
+                    ]})),
+                on_double_click: None, 
+            }),
+            right_upper_west: Some(SwitchEventAndReaction {
+                on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
+                    key: Key::Layout('A'),
+                    modifiers: vec![
+                    ]})),
+                on_double_click: None, 
+            }),
+            left_upper_north: Some(SwitchEventAndReaction {
+                on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
+                    key: Key::Layout('T'),
+                    modifiers: vec![
+                    ]})),
+                on_double_click: None, 
+            }),
+            left_upper_south: Some(SwitchEventAndReaction {
+                on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
+                    key: Key::Layout('N'),
+                    modifiers: vec![
+                    ]})),
+                on_double_click: None, 
+            }),
+            left_upper_west: None,
+            left_upper_east: Some(SwitchEventAndReaction {
+                on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
+                    key: Key::Layout('O'),
+                    modifiers: vec![
+                    ]})),
+                on_double_click: None, 
+            }),
+            left_lower_north: Some(SwitchEventAndReaction {
+                on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
+                    key: Key::Layout('t'),
+                    modifiers: vec![
+                    ]})),
+                on_double_click: None, 
+            }),
+            left_lower_south: Some(SwitchEventAndReaction {
+                on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
+                    key: Key::Layout('n'),
+                    modifiers: vec![
+                    ]})),
+                on_double_click: None, 
+            }),
+            left_lower_west: Some(SwitchEventAndReaction {
+                on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
+                    key: Key::Backspace,
+                    modifiers: vec![
+                    ]})),
+                on_double_click: None, 
+            }),
+            left_lower_east: Some(SwitchEventAndReaction {
+                on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
+                    key: Key::Layout('o'),
+                    modifiers: vec![
+                    ]})),
+                on_double_click: None, 
+            }),
+            right_lower_north: Some(SwitchEventAndReaction {
+                on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
+                    key: Key::Layout('e'),
+                    modifiers: vec![
+                    ]})),
+                on_double_click: None, 
+            }),
+            right_lower_south: Some(SwitchEventAndReaction {
+                on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
+                    key: Key::Layout('i'),
+                    modifiers: vec![
+                    ]})),
+                on_double_click: None, 
+            }),
+            right_lower_west: Some(SwitchEventAndReaction {
+                on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
+                    key: Key::Layout('a'),
+                    modifiers: vec![
+                    ]})),
+                on_double_click: None, 
+            }),
+            right_lower_east: Some(SwitchEventAndReaction {
+                on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
+                    key: Key::Space,
+                    modifiers: vec![
+                    ]})),
+                on_double_click: None, 
+            }),
+            right_trigger: Some(SwitchEventAndReaction {
+                on_click: Some(SwitchOnClickReaction::VisitLayer(LayerSpecifier {
+                    id: "first-layer-step-2".to_string(),
+                    index_in_gamepad: Some(1),
+                })),
+                on_double_click: Some(SwitchOnClickReaction::MoveToOrVisitLayer(LayerSpecifier {
+                    id: "second-layer-step-1".to_string(),
+                    index_in_gamepad: Some(4),
+                })), 
+            }),
+            left_trigger: Some(SwitchEventAndReaction {
+                on_click: Some(SwitchOnClickReaction::VisitLayer(LayerSpecifier {
+                    id: "first-layer-step-3".to_string(),
+                    index_in_gamepad: Some(2),
+                })),
+                on_double_click: Some(SwitchOnClickReaction::MoveToOrVisitLayer(LayerSpecifier {
+                    id: "second-layer-step-1".to_string(),
+                    index_in_gamepad: Some(4),
+                })), 
+            }),
+            left_trigger_2: None,
+            right_trigger_2: None,
+        }),
+        cardinal_levers: None,
+    };
+
+    let res = layer.get_switches(true).unwrap();
+
+    let expected = Switches {
+        south: Some(SwitchEventAndReaction {
+            on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
+                key: Key::Layout('I'),
+                modifiers: vec![
+                ]})),
+            on_double_click: None, 
+        }),
+        east: Some(SwitchEventAndReaction {
+            on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
+                key: Key::Return,
+                modifiers: vec![
+                ]})),
+            on_double_click: None, 
+        }),
+        north: Some(SwitchEventAndReaction {
+            on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
+                key: Key::Layout('E'),
+                modifiers: vec![
+                ]})),
+            on_double_click: None, 
+        }),
+        west: Some(SwitchEventAndReaction {
+            on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
+                key: Key::Layout('A'),
+                modifiers: vec![
+                ]})),
+            on_double_click: None, 
+        }),
+        d_pad_up: Some(SwitchEventAndReaction {
+            on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
+                key: Key::Layout('T'),
+                modifiers: vec![
+                ]})),
+            on_double_click: None, 
+        }),
+        d_pad_down: Some(SwitchEventAndReaction {
+            on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
+                key: Key::Layout('N'),
+                modifiers: vec![
+                ]})),
+            on_double_click: None, 
+        }),
+        d_pad_left: None,
+        d_pad_right: Some(SwitchEventAndReaction {
+            on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
+                key: Key::Layout('O'),
+                modifiers: vec![
+                ]})),
+            on_double_click: None, 
+        }),
+        left_stick_up: Some(SwitchEventAndReaction {
+            on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
+                key: Key::Layout('t'),
+                modifiers: vec![
+                ]})),
+            on_double_click: None, 
+        }),
+        left_stick_down: Some(SwitchEventAndReaction {
+            on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
+                key: Key::Layout('n'),
+                modifiers: vec![
+                ]})),
+            on_double_click: None, 
+        }),
+        left_stick_left: Some(SwitchEventAndReaction {
+            on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
+                key: Key::Backspace,
+                modifiers: vec![
+                ]})),
+            on_double_click: None, 
+        }),
+        left_stick_right: Some(SwitchEventAndReaction {
+            on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
+                key: Key::Layout('o'),
+                modifiers: vec![
+                ]})),
+            on_double_click: None, 
+        }),
+        right_stick_up: Some(SwitchEventAndReaction {
+            on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
+                key: Key::Layout('e'),
+                modifiers: vec![
+                ]})),
+            on_double_click: None, 
+        }),
+        right_stick_down: Some(SwitchEventAndReaction {
+            on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
+                key: Key::Layout('i'),
+                modifiers: vec![
+                ]})),
+            on_double_click: None, 
+        }),
+        right_stick_left: Some(SwitchEventAndReaction {
+            on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
+                key: Key::Layout('a'),
+                modifiers: vec![
+                ]})),
+            on_double_click: None, 
+        }),
+        right_stick_right: Some(SwitchEventAndReaction {
+            on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
+                key: Key::Space,
+                modifiers: vec![
+                ]})),
+            on_double_click: None, 
+        }),
+        right_trigger: Some(SwitchEventAndReaction {
+            on_click: Some(SwitchOnClickReaction::VisitLayer(LayerSpecifier {
+                id: "first-layer-step-2".to_string(),
+                index_in_gamepad: Some(1),
+            })),
+            on_double_click: Some(SwitchOnClickReaction::MoveToOrVisitLayer(LayerSpecifier {
+                id: "second-layer-step-1".to_string(),
+                index_in_gamepad: Some(4),
+            })), 
+        }),
+        left_trigger: Some(SwitchEventAndReaction {
+            on_click: Some(SwitchOnClickReaction::VisitLayer(LayerSpecifier {
+                id: "first-layer-step-3".to_string(),
+                index_in_gamepad: Some(2),
+            })),
+            on_double_click: Some(SwitchOnClickReaction::MoveToOrVisitLayer(LayerSpecifier {
+                id: "second-layer-step-1".to_string(),
+                index_in_gamepad: Some(4),
+            })), 
+        }),
+        left_trigger_2: None,
+        right_trigger_2: None,
+    };
+
+    assert_eq!(res, expected);
+
+
+    // left_upper_is_d_pad == false
+
+    let res = layer.get_switches(false).unwrap();
+
+    let expected = Switches {
+        south: Some(SwitchEventAndReaction {
+            on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
+                key: Key::Layout('I'),
+                modifiers: vec![
+                ]})),
+            on_double_click: None, 
+        }),
+        east: Some(SwitchEventAndReaction {
+            on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
+                key: Key::Return,
+                modifiers: vec![
+                ]})),
+            on_double_click: None, 
+        }),
+        north: Some(SwitchEventAndReaction {
+            on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
+                key: Key::Layout('E'),
+                modifiers: vec![
+                ]})),
+            on_double_click: None, 
+        }),
+        west: Some(SwitchEventAndReaction {
+            on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
+                key: Key::Layout('A'),
+                modifiers: vec![
+                ]})),
+            on_double_click: None, 
+        }),
+        d_pad_up: Some(SwitchEventAndReaction {
+            on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
+                key: Key::Layout('t'),
+                modifiers: vec![
+                ]})),
+            on_double_click: None, 
+        }),
+        d_pad_down: Some(SwitchEventAndReaction {
+            on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
+                key: Key::Layout('n'),
+                modifiers: vec![
+                ]})),
+            on_double_click: None, 
+        }),
+        d_pad_left: Some(SwitchEventAndReaction {
+            on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
+                key: Key::Backspace,
+                modifiers: vec![
+                ]})),
+            on_double_click: None, 
+        }),
+        d_pad_right: Some(SwitchEventAndReaction {
+            on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
+                key: Key::Layout('o'),
+                modifiers: vec![
+                ]})),
+            on_double_click: None, 
+        }),
+        left_stick_up: Some(SwitchEventAndReaction {
+            on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
+                key: Key::Layout('T'),
+                modifiers: vec![
+                ]})),
+            on_double_click: None, 
+        }),
+        left_stick_down: Some(SwitchEventAndReaction {
+            on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
+                key: Key::Layout('N'),
+                modifiers: vec![
+                ]})),
+            on_double_click: None, 
+        }),
+        left_stick_left: None,
+        left_stick_right: Some(SwitchEventAndReaction {
+            on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
+                key: Key::Layout('O'),
+                modifiers: vec![
+                ]})),
+            on_double_click: None, 
+        }),
+        right_stick_up: Some(SwitchEventAndReaction {
+            on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
+                key: Key::Layout('e'),
+                modifiers: vec![
+                ]})),
+            on_double_click: None, 
+        }),
+        right_stick_down: Some(SwitchEventAndReaction {
+            on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
+                key: Key::Layout('i'),
+                modifiers: vec![
+                ]})),
+            on_double_click: None, 
+        }),
+        right_stick_left: Some(SwitchEventAndReaction {
+            on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
+                key: Key::Layout('a'),
+                modifiers: vec![
+                ]})),
+            on_double_click: None, 
+        }),
+        right_stick_right: Some(SwitchEventAndReaction {
+            on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
+                key: Key::Space,
+                modifiers: vec![
+                ]})),
+            on_double_click: None, 
+        }),
+        right_trigger: Some(SwitchEventAndReaction {
+            on_click: Some(SwitchOnClickReaction::VisitLayer(LayerSpecifier {
+                id: "first-layer-step-2".to_string(),
+                index_in_gamepad: Some(1),
+            })),
+            on_double_click: Some(SwitchOnClickReaction::MoveToOrVisitLayer(LayerSpecifier {
+                id: "second-layer-step-1".to_string(),
+                index_in_gamepad: Some(4),
+            })), 
+        }),
+        left_trigger: Some(SwitchEventAndReaction {
+            on_click: Some(SwitchOnClickReaction::VisitLayer(LayerSpecifier {
+                id: "first-layer-step-3".to_string(),
+                index_in_gamepad: Some(2),
+            })),
+            on_double_click: Some(SwitchOnClickReaction::MoveToOrVisitLayer(LayerSpecifier {
+                id: "second-layer-step-1".to_string(),
+                index_in_gamepad: Some(4),
+            })), 
+        }),
+        left_trigger_2: None,
+        right_trigger_2: None,
+    };
+    assert_eq!(res, expected);
+
+
+    // switches not set
+
+    let layer = Layer {
+        id: "layer-id".to_string(),
+        switches: None,
+        cardinal_levers: None,
+    };
+
+    assert!(layer.get_switches(true).is_none());
+    assert!(layer.get_switches(false).is_none());
+}

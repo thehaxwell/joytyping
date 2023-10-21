@@ -74,6 +74,7 @@ pub struct Profile {
     pub layers: Vec<Layer>,
     pub stick_switches_click_thresholds: StickSwitchesClickThresholds,
     pub trigger_2_switches_click_thresholds: Trigger2SwitchesClickThresholds,
+    pub left_upper_is_d_pad: bool,
 }
 
 impl Profile {
@@ -121,6 +122,7 @@ impl Profile {
                 .collect::<Result<Vec<_>,_>>()?,
             stick_switches_click_thresholds: self.stick_switches_click_thresholds,
             trigger_2_switches_click_thresholds: self.trigger_2_switches_click_thresholds,
+            left_upper_is_d_pad: self.left_upper_is_d_pad,
         })
     }
 }
@@ -273,7 +275,7 @@ impl Trigger2SwitchesClickThresholds {
 #[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct Layer {
     pub id: String,
-    pub switches: Option<Switches>,
+    pub switches: Option<SwitchesAdapter>,
     // pub levers
     pub cardinal_levers: Option<CardinalLevers>,
 }
@@ -304,10 +306,99 @@ impl Layer {
         })
     }
 
+    pub fn get_switches(&self,left_upper_is_d_pad: bool) -> Option<Switches> {
+        if let Some(switches) = self.switches.clone() {
+            Some(Switches {
+                south: switches.right_upper_south,
+                east: switches.right_upper_east,
+                north: switches.right_upper_north,
+                west: switches.right_upper_west,
+                d_pad_up: if left_upper_is_d_pad {
+					 switches.left_upper_north.clone() } else { switches.left_lower_north.clone() },
+                d_pad_down: if left_upper_is_d_pad {
+					 switches.left_upper_south.clone() } else { switches.left_lower_south.clone() },
+                d_pad_left: if left_upper_is_d_pad {
+					 switches.left_upper_west.clone() } else { switches.left_lower_west.clone() },
+                d_pad_right: if left_upper_is_d_pad {
+					 switches.left_upper_east.clone() } else { switches.left_lower_east.clone() },
+                left_stick_up: if left_upper_is_d_pad {
+					 switches.left_lower_north.clone() } else { switches.left_upper_north.clone() },
+                left_stick_down: if left_upper_is_d_pad {
+					 switches.left_lower_south.clone() } else { switches.left_upper_south.clone() },
+                left_stick_left: if left_upper_is_d_pad {
+					 switches.left_lower_west.clone() } else { switches.left_upper_west.clone() },
+                left_stick_right: if left_upper_is_d_pad {
+					 switches.left_lower_east.clone() } else { switches.left_upper_east.clone() },
+                right_stick_up: switches.right_lower_north,
+                right_stick_down: switches.right_lower_south,
+                right_stick_left: switches.right_lower_west,
+                right_stick_right: switches.right_lower_east,
+                right_trigger: switches.right_trigger,
+                left_trigger: switches.left_trigger,
+                right_trigger_2: switches.right_trigger_2,
+                left_trigger_2: switches.left_trigger_2,
+            })
+        }
+        else {
+            None
+        }
+    }
+}
+
+#[derive(Debug,PartialEq)]
+pub struct Switches {
+	pub south: Option<SwitchEventAndReaction>,
+	pub east: Option<SwitchEventAndReaction>,
+	pub north: Option<SwitchEventAndReaction>,
+	pub west: Option<SwitchEventAndReaction>,
+	pub d_pad_up: Option<SwitchEventAndReaction>,
+	pub d_pad_down: Option<SwitchEventAndReaction>,
+	pub d_pad_left: Option<SwitchEventAndReaction>,
+	pub d_pad_right: Option<SwitchEventAndReaction>,
+	pub left_stick_up: Option<SwitchEventAndReaction>,
+	pub left_stick_down: Option<SwitchEventAndReaction>,
+	pub left_stick_left: Option<SwitchEventAndReaction>,
+	pub left_stick_right: Option<SwitchEventAndReaction>,
+	pub right_stick_up: Option<SwitchEventAndReaction>,
+	pub right_stick_down: Option<SwitchEventAndReaction>,
+	pub right_stick_left: Option<SwitchEventAndReaction>,
+	pub right_stick_right: Option<SwitchEventAndReaction>,
+	pub right_trigger: Option<SwitchEventAndReaction>,
+	pub left_trigger: Option<SwitchEventAndReaction>,
+	pub right_trigger_2: Option<SwitchEventAndReaction>,
+	pub left_trigger_2: Option<SwitchEventAndReaction>,
+}
+
+impl Switches {
     pub fn get_switch_event_and_reaction(
         &self, switch: Switch) -> Option<SwitchEventAndReaction> {
-        self.switches.clone().and_then(
-            |switches| switches.get_switch_event_and_reaction(switch))
+        match switch {
+            Switch::Button(button) => match button {
+                Button::North => self.north.clone(),
+                Button::South => self.south.clone(),
+                Button::East => self.east.clone(),
+                Button::West => self.west.clone(),
+                Button::DPadUp => self.d_pad_up.clone(),
+                Button::DPadDown => self.d_pad_down.clone(),
+                Button::DPadRight => self.d_pad_right.clone(),
+                Button::DPadLeft => self.d_pad_left.clone(),
+                Button::LeftTrigger => self.left_trigger.clone(),
+                Button::RightTrigger => self.right_trigger.clone(),
+                Button::LeftTrigger2 => self.left_trigger_2.clone(),
+                Button::RightTrigger2 => self.right_trigger_2.clone(),
+                _ => None
+            },
+            Switch::StickSwitchButton(button) => match button {
+                StickSwitchButton::LeftStickUp => self.left_stick_up.clone(),
+                StickSwitchButton::LeftStickDown => self.left_stick_down.clone(),
+                StickSwitchButton::LeftStickRight => self.left_stick_right.clone(),
+                StickSwitchButton::LeftStickLeft => self.left_stick_left.clone(),
+                StickSwitchButton::RightStickUp => self.right_stick_up.clone(),
+                StickSwitchButton::RightStickDown => self.right_stick_down.clone(),
+                StickSwitchButton::RightStickRight => self.right_stick_right.clone(),
+                StickSwitchButton::RightStickLeft => self.right_stick_left.clone(),
+            }
+        }
     }
 }
 
@@ -404,48 +495,48 @@ impl MouseControl {
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
-pub struct Switches {
-	pub south: Option<SwitchEventAndReaction>,
-	pub east: Option<SwitchEventAndReaction>,
-	pub north: Option<SwitchEventAndReaction>,
-	pub west: Option<SwitchEventAndReaction>,
-	pub d_pad_up: Option<SwitchEventAndReaction>,
-	pub d_pad_down: Option<SwitchEventAndReaction>,
-	pub d_pad_left: Option<SwitchEventAndReaction>,
-	pub d_pad_right: Option<SwitchEventAndReaction>,
-	pub left_stick_up: Option<SwitchEventAndReaction>,
-	pub left_stick_down: Option<SwitchEventAndReaction>,
-	pub left_stick_left: Option<SwitchEventAndReaction>,
-	pub left_stick_right: Option<SwitchEventAndReaction>,
-	pub right_stick_up: Option<SwitchEventAndReaction>,
-	pub right_stick_down: Option<SwitchEventAndReaction>,
-	pub right_stick_left: Option<SwitchEventAndReaction>,
-	pub right_stick_right: Option<SwitchEventAndReaction>,
+pub struct SwitchesAdapter {
+	pub right_upper_south: Option<SwitchEventAndReaction>,
+	pub right_upper_east: Option<SwitchEventAndReaction>,
+	pub right_upper_north: Option<SwitchEventAndReaction>,
+	pub right_upper_west: Option<SwitchEventAndReaction>,
+	pub left_upper_north: Option<SwitchEventAndReaction>,
+	pub left_upper_south: Option<SwitchEventAndReaction>,
+	pub left_upper_west: Option<SwitchEventAndReaction>,
+	pub left_upper_east: Option<SwitchEventAndReaction>,
+	pub left_lower_north: Option<SwitchEventAndReaction>,
+	pub left_lower_south: Option<SwitchEventAndReaction>,
+	pub left_lower_west: Option<SwitchEventAndReaction>,
+	pub left_lower_east: Option<SwitchEventAndReaction>,
+	pub right_lower_north: Option<SwitchEventAndReaction>,
+	pub right_lower_south: Option<SwitchEventAndReaction>,
+	pub right_lower_west: Option<SwitchEventAndReaction>,
+	pub right_lower_east: Option<SwitchEventAndReaction>,
 	pub right_trigger: Option<SwitchEventAndReaction>,
 	pub left_trigger: Option<SwitchEventAndReaction>,
 	pub right_trigger_2: Option<SwitchEventAndReaction>,
 	pub left_trigger_2: Option<SwitchEventAndReaction>,
 }
 
-impl Switches {
+impl SwitchesAdapter {
     pub fn get_ids_pointing_to_layers(&self) -> Vec<String> {
         [
-            &self.south,
-            &self.east,
-            &self.north,
-            &self.west,
-            &self.d_pad_up,
-            &self.d_pad_down,
-            &self.d_pad_left,
-            &self.d_pad_right,
-            &self.left_stick_up,
-            &self.left_stick_down,
-            &self.left_stick_left,
-            &self.left_stick_right,
-            &self.right_stick_up,
-            &self.right_stick_down,
-            &self.right_stick_left,
-            &self.right_stick_right,
+            &self.right_upper_south,
+            &self.right_upper_east,
+            &self.right_upper_north,
+            &self.right_upper_west,
+            &self.left_upper_north,
+            &self.left_upper_south,
+            &self.left_upper_west,
+            &self.left_upper_east,
+            &self.left_lower_north,
+            &self.left_lower_south,
+            &self.left_lower_west,
+            &self.left_lower_east,
+            &self.right_lower_north,
+            &self.right_lower_south,
+            &self.right_lower_west,
+            &self.right_lower_east,
             &self.right_trigger,
             &self.left_trigger,
             &self.right_trigger_2,
@@ -461,102 +552,102 @@ impl Switches {
         &self,
         pointers: &Vec<LayerNodeRef>,
         err_message_builder: ErrMessageBuilder) -> Result<Self,String> {
-        Ok(Switches {
-            south: if let Some(key) = &self.south { 
+        Ok(SwitchesAdapter {
+            right_upper_south: if let Some(key) = &self.right_upper_south { 
 				Some(key.validate_and_clone_and_set_layer_pointers(
                     pointers,
                     err_message_builder
-                        .branch(ErrMessageBuilderNode::Single { field: "south".to_string() })
+                        .branch(ErrMessageBuilderNode::Single { field: "right_upper_south".to_string() })
                 )?) } else { None },
-            east: if let Some(key) = &self.east { 
+            right_upper_east: if let Some(key) = &self.right_upper_east { 
 				Some(key.validate_and_clone_and_set_layer_pointers(
 					pointers,
                     err_message_builder
-                        .branch(ErrMessageBuilderNode::Single { field: "east".to_string() })
+                        .branch(ErrMessageBuilderNode::Single { field: "right_upper_east".to_string() })
                 )?) } else { None },
-            north: if let Some(key) = &self.north { 
+            right_upper_north: if let Some(key) = &self.right_upper_north { 
 				Some(key.validate_and_clone_and_set_layer_pointers(
 					pointers,
                     err_message_builder
-                        .branch(ErrMessageBuilderNode::Single { field: "north".to_string() })
+                        .branch(ErrMessageBuilderNode::Single { field: "right_upper_north".to_string() })
                 )?) } else { None },
-            west: if let Some(key) = &self.west { 
+            right_upper_west: if let Some(key) = &self.right_upper_west { 
 				Some(key.validate_and_clone_and_set_layer_pointers(
 					pointers,
                     err_message_builder
-                        .branch(ErrMessageBuilderNode::Single { field: "west".to_string() })
+                        .branch(ErrMessageBuilderNode::Single { field: "right_upper_west".to_string() })
                 )?) } else { None },
-            d_pad_up: if let Some(key) = &self.d_pad_up { 
+            left_upper_north: if let Some(key) = &self.left_upper_north { 
 				Some(key.validate_and_clone_and_set_layer_pointers(
 					pointers,
                     err_message_builder
-                        .branch(ErrMessageBuilderNode::Single { field: "d_pad_up".to_string() })
+                        .branch(ErrMessageBuilderNode::Single { field: "left_upper_north".to_string() })
                 )?) } else { None },
-            d_pad_down: if let Some(key) = &self.d_pad_down { 
+            left_upper_south: if let Some(key) = &self.left_upper_south { 
 				Some(key.validate_and_clone_and_set_layer_pointers(
 					pointers,
                     err_message_builder
-                        .branch(ErrMessageBuilderNode::Single { field: "d_pad_down".to_string() })
+                        .branch(ErrMessageBuilderNode::Single { field: "left_upper_south".to_string() })
                 )?) } else { None },
-            d_pad_left: if let Some(key) = &self.d_pad_left { 
+            left_upper_west: if let Some(key) = &self.left_upper_west { 
 				Some(key.validate_and_clone_and_set_layer_pointers(
 					pointers,
                     err_message_builder
-                        .branch(ErrMessageBuilderNode::Single { field: "d_pad_left".to_string() })
+                        .branch(ErrMessageBuilderNode::Single { field: "left_upper_west".to_string() })
                 )?) } else { None },
-            d_pad_right: if let Some(key) = &self.d_pad_right { 
+            left_upper_east: if let Some(key) = &self.left_upper_east { 
 				Some(key.validate_and_clone_and_set_layer_pointers(
 					pointers,
                     err_message_builder
-                        .branch(ErrMessageBuilderNode::Single { field: "d_pad_right".to_string() })
+                        .branch(ErrMessageBuilderNode::Single { field: "left_upper_east".to_string() })
                 )?) } else { None },
-            left_stick_up: if let Some(key) = &self.left_stick_up { 
+            left_lower_north: if let Some(key) = &self.left_lower_north { 
 				Some(key.validate_and_clone_and_set_layer_pointers(
 					pointers,
                     err_message_builder
-                        .branch(ErrMessageBuilderNode::Single { field: "left_stick_up".to_string() })
+                        .branch(ErrMessageBuilderNode::Single { field: "left_lower_north".to_string() })
                 )?) } else { None },
-            left_stick_down: if let Some(key) = &self.left_stick_down { 
+            left_lower_south: if let Some(key) = &self.left_lower_south { 
 				Some(key.validate_and_clone_and_set_layer_pointers(
 					pointers,
                     err_message_builder
-                        .branch(ErrMessageBuilderNode::Single { field: "left_stick_down".to_string() })
+                        .branch(ErrMessageBuilderNode::Single { field: "left_lower_south".to_string() })
                 )?) } else { None },
-            left_stick_left: if let Some(key) = &self.left_stick_left { 
+            left_lower_west: if let Some(key) = &self.left_lower_west { 
 				Some(key.validate_and_clone_and_set_layer_pointers(
 					pointers,
                     err_message_builder
-                        .branch(ErrMessageBuilderNode::Single { field: "left_stick_left".to_string() })
+                        .branch(ErrMessageBuilderNode::Single { field: "left_lower_west".to_string() })
                 )?) } else { None },
-            left_stick_right: if let Some(key) = &self.left_stick_right { 
+            left_lower_east: if let Some(key) = &self.left_lower_east { 
 				Some(key.validate_and_clone_and_set_layer_pointers(
 					pointers,
                     err_message_builder
-                        .branch(ErrMessageBuilderNode::Single { field: "left_stick_right".to_string() })
+                        .branch(ErrMessageBuilderNode::Single { field: "left_lower_east".to_string() })
                 )?) } else { None },
-            right_stick_up: if let Some(key) = &self.right_stick_up { 
+            right_lower_north: if let Some(key) = &self.right_lower_north { 
 				Some(key.validate_and_clone_and_set_layer_pointers(
 					pointers,
                     err_message_builder
-                        .branch(ErrMessageBuilderNode::Single { field: "right_stick_up".to_string() })
+                        .branch(ErrMessageBuilderNode::Single { field: "right_lower_north".to_string() })
                 )?) } else { None },
-            right_stick_down: if let Some(key) = &self.right_stick_down { 
+            right_lower_south: if let Some(key) = &self.right_lower_south { 
 				Some(key.validate_and_clone_and_set_layer_pointers(
 					pointers,
                     err_message_builder
-                        .branch(ErrMessageBuilderNode::Single { field: "right_stick_down".to_string() })
+                        .branch(ErrMessageBuilderNode::Single { field: "right_lower_south".to_string() })
                 )?) } else { None },
-            right_stick_left: if let Some(key) = &self.right_stick_left { 
+            right_lower_west: if let Some(key) = &self.right_lower_west { 
 				Some(key.validate_and_clone_and_set_layer_pointers(
 					pointers,
                     err_message_builder
-                        .branch(ErrMessageBuilderNode::Single { field: "right_stick_left".to_string() })
+                        .branch(ErrMessageBuilderNode::Single { field: "right_lower_west".to_string() })
                 )?) } else { None },
-            right_stick_right: if let Some(key) = &self.right_stick_right { 
+            right_lower_east: if let Some(key) = &self.right_lower_east { 
 				Some(key.validate_and_clone_and_set_layer_pointers(
 					pointers,
                     err_message_builder
-                        .branch(ErrMessageBuilderNode::Single { field: "right_stick_right".to_string() })
+                        .branch(ErrMessageBuilderNode::Single { field: "right_lower_east".to_string() })
                 )?) } else { None },
             right_trigger: if let Some(key) = &self.right_trigger { 
 				Some(key.validate_and_clone_and_set_layer_pointers(
@@ -583,37 +674,6 @@ impl Switches {
                         .branch(ErrMessageBuilderNode::Single { field: "left_trigger_2".to_string() })
                 )?) } else { None },
         })
-    }
-
-    pub fn get_switch_event_and_reaction(
-        &self, switch: Switch) -> Option<SwitchEventAndReaction> {
-        match switch {
-            Switch::Button(button) => match button {
-                Button::North => self.north.clone(),
-                Button::South => self.south.clone(),
-                Button::East => self.east.clone(),
-                Button::West => self.west.clone(),
-                Button::DPadUp => self.d_pad_up.clone(),
-                Button::DPadDown => self.d_pad_down.clone(),
-                Button::DPadRight => self.d_pad_right.clone(),
-                Button::DPadLeft => self.d_pad_left.clone(),
-                Button::LeftTrigger => self.left_trigger.clone(),
-                Button::RightTrigger => self.right_trigger.clone(),
-                Button::LeftTrigger2 => self.left_trigger_2.clone(),
-                Button::RightTrigger2 => self.right_trigger_2.clone(),
-                _ => None
-            },
-            Switch::StickSwitchButton(button) => match button {
-                StickSwitchButton::LeftStickUp => self.left_stick_up.clone(),
-                StickSwitchButton::LeftStickDown => self.left_stick_down.clone(),
-                StickSwitchButton::LeftStickRight => self.left_stick_right.clone(),
-                StickSwitchButton::LeftStickLeft => self.left_stick_left.clone(),
-                StickSwitchButton::RightStickUp => self.right_stick_up.clone(),
-                StickSwitchButton::RightStickDown => self.right_stick_down.clone(),
-                StickSwitchButton::RightStickRight => self.right_stick_right.clone(),
-                StickSwitchButton::RightStickLeft => self.right_stick_left.clone(),
-            }
-        }
     }
 }
 

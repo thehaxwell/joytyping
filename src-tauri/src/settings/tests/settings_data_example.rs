@@ -11,7 +11,7 @@ pub fn setup_settings_data_example() -> SettingsData {
             },
             js_bundle_file_path: Some("path/to/file/bundle.js".to_string()),
         },
-        stick_switches_click_thresholds: StickSwitchesClickThresholds {
+        stick_switches_click_thresholds: StickSwitchesAdapterClickThresholds {
             left_stick_up: 0.5,
             left_stick_down: 0.5,
             left_stick_left: 0.5,
@@ -25,7 +25,7 @@ pub fn setup_settings_data_example() -> SettingsData {
         Layer {
           id: String::from("first-layer-step-1"),
           cardinal_levers: None,
-          switches: Some(Switches {
+          switches: Some(SwitchesAdapter {
             d_pad_left: None,
             south: Some(SwitchEventAndReaction{
               on_click_and_hold: None,
@@ -283,7 +283,7 @@ pub fn setup_settings_data_example() -> SettingsData {
         Layer {
           id: String::from("first-layer-step-2"),
           cardinal_levers: None,
-          switches: Some(Switches {
+          switches: Some(SwitchesAdapter {
             right_trigger: None,
             south: Some(SwitchEventAndReaction{
               on_click_and_hold: None,
@@ -513,7 +513,7 @@ pub fn setup_settings_data_example() -> SettingsData {
         Layer {
           id: String::from("first-layer-step-3"),
           cardinal_levers: None,
-          switches: Some(Switches {
+          switches: Some(SwitchesAdapter {
             left_trigger: None,
             south: Some(SwitchEventAndReaction{
               on_click_and_hold: None,
@@ -743,7 +743,7 @@ pub fn setup_settings_data_example() -> SettingsData {
         Layer {
           id: String::from("first-layer-step-4"),
           cardinal_levers: None,
-          switches: Some(Switches {
+          switches: Some(SwitchesAdapter {
               d_pad_down: None,
               d_pad_right: None,
               left_stick_down: None,
@@ -865,7 +865,7 @@ pub fn setup_settings_data_example() -> SettingsData {
         Layer {
           id: String::from("second-layer-step-1"),
           cardinal_levers: None,
-          switches: Some(Switches {
+          switches: Some(SwitchesAdapter {
             south: Some(SwitchEventAndReaction{
               on_click_and_hold: None,
               on_double_click: None,
@@ -1135,7 +1135,7 @@ pub fn setup_settings_data_example() -> SettingsData {
         Layer {
           id: String::from("second-layer-step-2"),
           cardinal_levers: None,
-          switches: Some(Switches {
+          switches: Some(SwitchesAdapter {
             right_trigger: None,
             south: Some(SwitchEventAndReaction{
               on_click_and_hold: None,
@@ -1365,7 +1365,7 @@ pub fn setup_settings_data_example() -> SettingsData {
         Layer {
           id: String::from("second-layer-step-3"),
           cardinal_levers: None,
-          switches: Some(Switches {
+          switches: Some(SwitchesAdapter {
             left_trigger: None,
             right_stick_down: None,
             right_stick_left: None,
@@ -1548,7 +1548,7 @@ pub fn setup_settings_data_example() -> SettingsData {
         },
         Layer {
           id: String::from("second-layer-step-4"),
-          switches: Some(Switches {
+          switches: Some(SwitchesAdapter {
 	        east: None,
 	        north: None,
 	        d_pad_up: None,

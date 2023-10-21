@@ -517,7 +517,7 @@ fn process_current_potential_visit_works() {
 #[test]
 fn build_layer_visits_works() {
     let layers_and_their_available_layer_visits 
-        = LayersNavigator::build_layer_visits(setup_haxwell_layout_layers_with_only_visits());
+        = LayersNavigator::build_layer_visits(setup_haxwell_layout_layers_with_only_visits(),true);
 
     let expected = setup_haxwell_layout_layers_and_their_available_layer_visits();
     assert_eq!(layers_and_their_available_layer_visits[0], expected[0]);
@@ -590,7 +590,7 @@ fn scenario_double_click_to_go_from_layer_0_to_4() {
        layer_visits: Vec::new(),
        potential_layer_visit: None,
        layers_and_their_available_layer_visits:
-           LayersNavigator::build_layer_visits(setup_haxwell_layout_layers_with_only_visits()),
+           LayersNavigator::build_layer_visits(setup_haxwell_layout_layers_with_only_visits(),true),
     });
 
     let switch = Switch::Button(Button::RightTrigger);
@@ -665,7 +665,7 @@ fn scenario_double_click_to_go_from_layer_4_to_0() {
        layer_visits: Vec::new(),
        potential_layer_visit: None,
        layers_and_their_available_layer_visits:
-           LayersNavigator::build_layer_visits(setup_haxwell_layout_layers_with_only_visits()),
+           LayersNavigator::build_layer_visits(setup_haxwell_layout_layers_with_only_visits(),true),
     });
 
     let switch = Switch::Button(Button::RightTrigger);

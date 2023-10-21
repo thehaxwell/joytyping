@@ -16,6 +16,7 @@ pub struct SetupConfig {
 pub fn setup_settings_data_example(config: SetupConfig) -> SettingsData {
     let ps4_controller_profile = Profile{
         name: "My PS3 Controller".to_string(),
+        left_upper_is_d_pad: true,
         quick_lookup_window: QuickLookupWindow{
             inner_size: HeightAndWidth{
                 height: config.my_ps3_controller_quick_lookup_window_inner_size_height,
@@ -43,107 +44,107 @@ pub fn setup_settings_data_example(config: SetupConfig) -> SettingsData {
         layers: vec![
             Layer {
                 id: "first-layer-step-1".to_string(),
-                switches: Some(Switches {
-                    south: Some(SwitchEventAndReaction {
+                switches: Some(SwitchesAdapter {
+                    right_upper_south: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('I'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    east: Some(SwitchEventAndReaction {
+                    right_upper_east: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Return,
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    north: Some(SwitchEventAndReaction {
+                    right_upper_north: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('E'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    west: Some(SwitchEventAndReaction {
+                    right_upper_west: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('A'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    d_pad_up: Some(SwitchEventAndReaction {
+                    left_upper_north: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('T'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    d_pad_down: Some(SwitchEventAndReaction {
+                    left_upper_south: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('N'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    d_pad_left: None,
-                    d_pad_right: Some(SwitchEventAndReaction {
+                    left_upper_west: None,
+                    left_upper_east: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('O'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    left_stick_up: Some(SwitchEventAndReaction {
+                    left_lower_north: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('t'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    left_stick_down: Some(SwitchEventAndReaction {
+                    left_lower_south: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('n'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    left_stick_left: Some(SwitchEventAndReaction {
+                    left_lower_west: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Backspace,
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    left_stick_right: Some(SwitchEventAndReaction {
+                    left_lower_east: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('o'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    right_stick_up: Some(SwitchEventAndReaction {
+                    right_lower_north: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('e'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    right_stick_down: Some(SwitchEventAndReaction {
+                    right_lower_south: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('i'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    right_stick_left: Some(SwitchEventAndReaction {
+                    right_lower_west: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('a'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    right_stick_right: Some(SwitchEventAndReaction {
+                    right_lower_east: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Space,
                             modifiers: vec![
@@ -182,113 +183,113 @@ pub fn setup_settings_data_example(config: SetupConfig) -> SettingsData {
             },
             Layer {
                 id: "first-layer-step-2".to_string(),
-                switches: Some(Switches {
-                    south: Some(SwitchEventAndReaction {
+                switches: Some(SwitchesAdapter {
+                    right_upper_south: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('U'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    east: Some(SwitchEventAndReaction {
+                    right_upper_east: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('S'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    north: Some(SwitchEventAndReaction {
+                    right_upper_north: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('H'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    west: Some(SwitchEventAndReaction {
+                    right_upper_west: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('D'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    d_pad_up: Some(SwitchEventAndReaction {
+                    left_upper_north: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('L'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    d_pad_down: Some(SwitchEventAndReaction {
+                    left_upper_south: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('M'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    d_pad_left: Some(SwitchEventAndReaction {
+                    left_upper_west: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('R'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    d_pad_right: Some(SwitchEventAndReaction {
+                    left_upper_east: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('C'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    left_stick_up: Some(SwitchEventAndReaction {
+                    left_lower_north: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('l'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    left_stick_down: Some(SwitchEventAndReaction {
+                    left_lower_south: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('m'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    left_stick_left: Some(SwitchEventAndReaction {
+                    left_lower_west: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('r'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    left_stick_right: Some(SwitchEventAndReaction {
+                    left_lower_east: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('c'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    right_stick_up: Some(SwitchEventAndReaction {
+                    right_lower_north: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('h'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    right_stick_down: Some(SwitchEventAndReaction {
+                    right_lower_south: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('u'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    right_stick_left: Some(SwitchEventAndReaction {
+                    right_lower_west: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('d'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    right_stick_right: Some(SwitchEventAndReaction {
+                    right_lower_east: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('s'),
                             modifiers: vec![
@@ -311,113 +312,113 @@ pub fn setup_settings_data_example(config: SetupConfig) -> SettingsData {
             },
             Layer {
                 id: "first-layer-step-3".to_string(),
-                switches: Some(Switches {
-                    south: Some(SwitchEventAndReaction {
+                switches: Some(SwitchesAdapter {
+                    right_upper_south: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('V'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    east: Some(SwitchEventAndReaction {
+                    right_upper_east: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('F'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    north: Some(SwitchEventAndReaction {
+                    right_upper_north: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('G'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    west: Some(SwitchEventAndReaction {
+                    right_upper_west: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('Y'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    d_pad_up: Some(SwitchEventAndReaction {
+                    left_upper_north: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('W'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    d_pad_down: Some(SwitchEventAndReaction {
+                    left_upper_south: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('K'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    d_pad_left: Some(SwitchEventAndReaction {
+                    left_upper_west: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('P'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    d_pad_right: Some(SwitchEventAndReaction {
+                    left_upper_east: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('B'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    left_stick_up: Some(SwitchEventAndReaction {
+                    left_lower_north: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('w'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    left_stick_down: Some(SwitchEventAndReaction {
+                    left_lower_south: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('k'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    left_stick_left: Some(SwitchEventAndReaction {
+                    left_lower_west: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('p'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    left_stick_right: Some(SwitchEventAndReaction {
+                    left_lower_east: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('b'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    right_stick_up: Some(SwitchEventAndReaction {
+                    right_lower_north: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('g'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    right_stick_down: Some(SwitchEventAndReaction {
+                    right_lower_south: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('v'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    right_stick_left: Some(SwitchEventAndReaction {
+                    right_lower_west: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('y'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    right_stick_right: Some(SwitchEventAndReaction {
+                    right_lower_east: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('f'),
                             modifiers: vec![
@@ -440,65 +441,65 @@ pub fn setup_settings_data_example(config: SetupConfig) -> SettingsData {
             },
             Layer {
                 id: "first-layer-step-4".to_string(),
-                switches: Some(Switches {
-                    south: None,
-                    east: Some(SwitchEventAndReaction {
+                switches: Some(SwitchesAdapter {
+                    right_upper_south: None,
+                    right_upper_east: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('X'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    north: Some(SwitchEventAndReaction {
+                    right_upper_north: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('Q'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    west: None,
-                    d_pad_up: Some(SwitchEventAndReaction {
+                    right_upper_west: None,
+                    left_upper_north: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('Z'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    d_pad_down: None,
-                    d_pad_left: Some(SwitchEventAndReaction {
+                    left_upper_south: None,
+                    left_upper_west: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('J'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    d_pad_right: None,
-                    left_stick_up: Some(SwitchEventAndReaction {
+                    left_upper_east: None,
+                    left_lower_north: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('z'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    left_stick_down: None,
-                    left_stick_left: Some(SwitchEventAndReaction {
+                    left_lower_south: None,
+                    left_lower_west: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('j'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    left_stick_right: None,
-                    right_stick_up: Some(SwitchEventAndReaction {
+                    left_lower_east: None,
+                    right_lower_north: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('q'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    right_stick_down: None,
-                    right_stick_left: None,
-                    right_stick_right: Some(SwitchEventAndReaction {
+                    right_lower_south: None,
+                    right_lower_west: None,
+                    right_lower_east: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('x'),
                             modifiers: vec![
@@ -514,113 +515,113 @@ pub fn setup_settings_data_example(config: SetupConfig) -> SettingsData {
             },
             Layer {
                 id: "second-layer-step-1".to_string(),
-                switches: Some(Switches {
-                    south: Some(SwitchEventAndReaction {
+                switches: Some(SwitchesAdapter {
+                    right_upper_south: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('&'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    east: Some(SwitchEventAndReaction {
+                    right_upper_east: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('^'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    north: Some(SwitchEventAndReaction {
+                    right_upper_north: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('%'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    west: Some(SwitchEventAndReaction {
+                    right_upper_west: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('*'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    d_pad_up: Some(SwitchEventAndReaction {
+                    left_upper_north: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('!'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    d_pad_down: Some(SwitchEventAndReaction {
+                    left_upper_south: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('#'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    d_pad_left: Some(SwitchEventAndReaction {
+                    left_upper_west: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('$'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    d_pad_right: Some(SwitchEventAndReaction {
+                    left_upper_east: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('@'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    left_stick_up: Some(SwitchEventAndReaction {
+                    left_lower_north: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('1'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    left_stick_down: Some(SwitchEventAndReaction {
+                    left_lower_south: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('3'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    left_stick_left: Some(SwitchEventAndReaction {
+                    left_lower_west: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('4'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    left_stick_right: Some(SwitchEventAndReaction {
+                    left_lower_east: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('2'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    right_stick_up: Some(SwitchEventAndReaction {
+                    right_lower_north: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('5'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    right_stick_down: Some(SwitchEventAndReaction {
+                    right_lower_south: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('7'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    right_stick_left: Some(SwitchEventAndReaction {
+                    right_lower_west: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('8'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    right_stick_right: Some(SwitchEventAndReaction {
+                    right_lower_east: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('6'),
                             modifiers: vec![
@@ -658,113 +659,113 @@ pub fn setup_settings_data_example(config: SetupConfig) -> SettingsData {
             },
             Layer {
                 id: "second-layer-step-2".to_string(),
-                switches: Some(Switches {
-                    south: Some(SwitchEventAndReaction {
+                switches: Some(SwitchesAdapter {
+                    right_upper_south: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('}'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    east: Some(SwitchEventAndReaction {
+                    right_upper_east: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout(':'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    north: Some(SwitchEventAndReaction {
+                    right_upper_north: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('"'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    west: Some(SwitchEventAndReaction {
+                    right_upper_west: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('{'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    d_pad_up: Some(SwitchEventAndReaction {
+                    left_upper_north: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('('),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    d_pad_down: Some(SwitchEventAndReaction {
+                    left_upper_south: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('>'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    d_pad_left: Some(SwitchEventAndReaction {
+                    left_upper_west: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('<'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    d_pad_right: Some(SwitchEventAndReaction {
+                    left_upper_east: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('('),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    left_stick_up: Some(SwitchEventAndReaction {
+                    left_lower_north: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('9'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    left_stick_down: Some(SwitchEventAndReaction {
+                    left_lower_south: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('.'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    left_stick_left: Some(SwitchEventAndReaction {
+                    left_lower_west: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout(','),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    left_stick_right: Some(SwitchEventAndReaction {
+                    left_lower_east: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('0'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    right_stick_up: Some(SwitchEventAndReaction {
+                    right_lower_north: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('\''),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    right_stick_down: Some(SwitchEventAndReaction {
+                    right_lower_south: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout(']'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    right_stick_left: Some(SwitchEventAndReaction {
+                    right_lower_west: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('['),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    right_stick_right: Some(SwitchEventAndReaction {
+                    right_lower_east: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout(';'),
                             modifiers: vec![
@@ -787,16 +788,16 @@ pub fn setup_settings_data_example(config: SetupConfig) -> SettingsData {
             },
             Layer {
                 id: "second-layer-step-3".to_string(),
-                switches: Some(Switches {
-                    south: None,
-                    east: Some(SwitchEventAndReaction {
+                switches: Some(SwitchesAdapter {
+                    right_upper_south: None,
+                    right_upper_east: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('|'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    north: Some(SwitchEventAndReaction {
+                    right_upper_north: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Tab,
                             modifiers: vec![
@@ -804,73 +805,73 @@ pub fn setup_settings_data_example(config: SetupConfig) -> SettingsData {
                             ]})),
                         on_double_click: None, 
                     }),
-                    west: None,
-                    d_pad_up: Some(SwitchEventAndReaction {
+                    right_upper_west: None,
+                    left_upper_north: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('_'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    d_pad_down: Some(SwitchEventAndReaction {
+                    left_upper_south: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('+'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    d_pad_left: Some(SwitchEventAndReaction {
+                    left_upper_west: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('~'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    d_pad_right: Some(SwitchEventAndReaction {
+                    left_upper_east: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('?'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    left_stick_up: Some(SwitchEventAndReaction {
+                    left_lower_north: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('-'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    left_stick_down: Some(SwitchEventAndReaction {
+                    left_lower_south: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('='),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    left_stick_left: Some(SwitchEventAndReaction {
+                    left_lower_west: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('`'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    left_stick_right: Some(SwitchEventAndReaction {
+                    left_lower_east: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('/'),
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    right_stick_up: Some(SwitchEventAndReaction {
+                    right_lower_north: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Tab,
                             modifiers: vec![
                             ]})),
                         on_double_click: None, 
                     }),
-                    right_stick_down: None,
-                    right_stick_left: None,
-                    right_stick_right: Some(SwitchEventAndReaction {
+                    right_lower_south: None,
+                    right_lower_west: None,
+                    right_lower_east: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
                             key: Key::Layout('\\'),
                             modifiers: vec![
@@ -893,31 +894,31 @@ pub fn setup_settings_data_example(config: SetupConfig) -> SettingsData {
             },
             Layer {
                 id: "second-layer-step-4".to_string(),
-                switches: Some(Switches {
-                    south: Some(SwitchEventAndReaction {
+                switches: Some(SwitchesAdapter {
+                    right_upper_south: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Mouse(
                             MouseInput{button: MouseButton::Left})),
                         on_double_click: None, 
                     }),
-                    east: Some(SwitchEventAndReaction {
+                    right_upper_east: Some(SwitchEventAndReaction {
                         on_click: Some(SwitchOnClickReaction::Mouse(
                             MouseInput{button: MouseButton::Right})),
                         on_double_click: None, 
                     }),
-                    north: None,
-                    west: None,
-                    d_pad_up: None,
-                    d_pad_down: None,
-                    d_pad_left: None,
-                    d_pad_right: None,
-                    left_stick_up: None,
-                    left_stick_down: None,
-                    left_stick_left: None,
-                    left_stick_right: None,
-                    right_stick_up: None,
-                    right_stick_down: None,
-                    right_stick_left: None,
-                    right_stick_right: None,
+                    right_upper_north: None,
+                    right_upper_west: None,
+                    left_upper_north: None,
+                    left_upper_south: None,
+                    left_upper_west: None,
+                    left_upper_east: None,
+                    left_lower_north: None,
+                    left_lower_south: None,
+                    left_lower_west: None,
+                    left_lower_east: None,
+                    right_lower_north: None,
+                    right_lower_south: None,
+                    right_lower_west: None,
+                    right_lower_east: None,
                     right_trigger: None,
                     left_trigger: None,
                     left_trigger_2: None,

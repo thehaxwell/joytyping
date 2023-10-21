@@ -44,23 +44,23 @@ pub struct LayersNavigator {
 }
 
 impl LayersNavigator {
-    pub fn new(layers: Vec<Layer>) -> Self {
+    pub fn new(layers: Vec<Layer>,left_upper_is_d_pad: bool) -> Self {
         Self {
             current_layer_index: 0,
             consumable_current_layer_index: None,
             latest_move_to_index: 0,
             layer_visits: Vec::new(),
             potential_layer_visit: None,
-            layers_and_their_available_layer_visits: LayersNavigator::build_layer_visits(layers),
+            layers_and_their_available_layer_visits: LayersNavigator::build_layer_visits(layers,left_upper_is_d_pad),
         }
     }
 
-    fn build_layer_visits(layers: Vec<Layer>) -> Vec<AvailableLayerVisitsFromLayer> {
+    fn build_layer_visits(layers: Vec<Layer>,left_upper_is_d_pad: bool) -> Vec<AvailableLayerVisitsFromLayer> {
         layers
             .iter()
             .enumerate()
             .filter_map(|(index,layer)| 
-                if let Some(switches) = &layer.switches {
+                if let Some(switches) = &layer.get_switches(left_upper_is_d_pad) {
                     let layer_visits: Vec<LayerVisit> = [
                             (Switch::Button(Button::South),&switches.south),
                             (Switch::Button(Button::East),&switches.east),
