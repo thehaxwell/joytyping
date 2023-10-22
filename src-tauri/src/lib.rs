@@ -1,5 +1,6 @@
 use std::sync::mpsc;
 
+use app_data_directory_manager::{AppDataDirectoryManager, AppDataDirectoryDependenciesImpl};
 use gamepad::cardinal_levers_move_detector::{CardinalLeversMoveDetector, self};
 use gamepad::gilrs_events::GilrsEvents;
 use gamepad::gilrs_events::gilrs_wrapper::GilrsWrapper;
@@ -17,10 +18,12 @@ use notify::{Watcher,RecommendedWatcher, RecursiveMode, Config};
 use crate::gamepad::switch_click_pattern_detector::SwitchClickPatternDetector;
 use quick_lookup_window::{QuickLookupWindow, QuickLookupWindowDependenciesImpl};
 
+//TODO: see if we can remove the pub from these
 pub mod settings;
 pub mod gamepad;
 pub mod input_controller;
 pub mod quick_lookup_window;
+pub mod app_data_directory_manager;
 
 pub fn start_main_loop(
     end_signal_mpsc_receiver: mpsc::Receiver<MainLoopInterruption>,
@@ -35,7 +38,10 @@ pub fn start_main_loop(
 
         let mut settings = Settings::new(
             Box::new(SettingsDependenciesImpl),
-            "/home/haxwell/.config/joytyping/joytyping.toml".to_string());
+            // "/home/haxwell/.config/joytyping/joytyping.toml".to_string(),
+            Box::new(AppDataDirectoryManager::new(
+                Box::new(AppDataDirectoryDependenciesImpl))),
+            );
 
         if let Err(e) = settings.load() {
            let _ = settings_error_display_window.open_and_show(e);
