@@ -221,6 +221,10 @@ impl QuickLookupWindowTrait for QuickLookupWindow {
                     self.quick_lookup_window_settings.inner_size.width,
                     self.quick_lookup_window_settings.inner_size.height)
                 .center()
+                .decorations(false)
+                .always_on_top(true)
+                .skip_taskbar(true)
+                .focused(false)
                 .build()?;
 
             Ok(())
