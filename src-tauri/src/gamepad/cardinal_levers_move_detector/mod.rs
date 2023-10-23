@@ -145,9 +145,29 @@ impl CardinalLeversMoveDetectorTrait for CardinalLeversMoveDetector {
     }
 }
 
-fn calc(mouse_control: &MouseControl, value: f32) -> i32 {
-    if value.abs() >= mouse_control.deadzone_upper_limit.abs() {
-       (value * mouse_control.scale_factor).round() as i32
-    } else { 0 }
+// fn calc(mouse_control: &MouseControl, value: f32) -> i32 {
+fn calc(_mouse_control: &MouseControl, value: f32) -> i32 {
+    //TODO: figure out a better way to do this
+    // if value.abs() >= mouse_control.deadzone_upper_limit.abs() {
+    //    // BEFORE
+    //    // (value * mouse_control.scale_factor).round() as i32
+    //
+    //    // AFTER
+    //    (
+    //       // exponential graph that intersects 0,0 and 1,1
+    //       (2_f32.powf(value) - 1.0)
+    //       // multiplying the result steepens the graph,
+    //       // while it still starts from 0,0
+    //       * mouse_control.scale_factor
+    //    ).round() as i32
+    // } else { 0 }
+
+    let mult = if value > 0.0 { 1 }
+    else if value < 0.0 { -1 }
+    else { 0 };
+    // mult * 6_f32.powf(5_f32*value.abs()-3_f32) as i32
+    // mult * 3_f32.powf(5_f32*value.abs()-3_f32) as i32
+    // mult * 1.5_f32.powf(6.5_f32*value.abs()-3_f32) as i32
+    mult * 1.5_f32.powf(10_f32*value.abs()-3_f32) as i32
 }
 
