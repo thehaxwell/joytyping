@@ -168,6 +168,7 @@ fn calc(_mouse_control: &MouseControl, value: f32) -> i32 {
     // mult * 6_f32.powf(5_f32*value.abs()-3_f32) as i32
     // mult * 3_f32.powf(5_f32*value.abs()-3_f32) as i32
     // mult * 1.5_f32.powf(6.5_f32*value.abs()-3_f32) as i32
-    mult * 1.5_f32.powf(10_f32*value.abs()-3_f32) as i32
+    // mult * 1.5_f32.powf(10_f32*value.abs()-3_f32) as i32
+    mult * 1.5_f32.powf(11_f32*value.abs()-3_f32) as i32
 }
 
