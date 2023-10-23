@@ -114,10 +114,10 @@ pub fn start_main_loop(
             };
 
         match quick_lookup_window.load_startup_script() {
-            Err(e) => {
-                match e {
-                    _ => {
-                        println!("Error!");
+            Err(err) => {
+                match err {
+                    e => {
+                        println!("load_startup_script error: {}",e);
                     }
                 }
             },
