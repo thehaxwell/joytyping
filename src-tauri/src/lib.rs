@@ -99,6 +99,8 @@ pub fn start_main_loop(
                     handle.clone(),
                     Box::new(QuickLookupWindowDependenciesImpl),
                     dev_quick_lookup_window_settings,
+                    Box::new(AppDataDirectoryManager::new(
+                        Box::new(AppDataDirectoryDependenciesImpl))),
                 )
             }
             else {
@@ -106,6 +108,8 @@ pub fn start_main_loop(
                     handle.clone(),
                     Box::new(QuickLookupWindowDependenciesImpl),
                     active_profile.quick_lookup_window,
+                    Box::new(AppDataDirectoryManager::new(
+                        Box::new(AppDataDirectoryDependenciesImpl))),
                 )
             };
 

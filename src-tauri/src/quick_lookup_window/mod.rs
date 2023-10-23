@@ -3,9 +3,11 @@
 //     fn open_window(&self, window_name: &str) -> Result<(), String>;
 // }
 
+use std::path::PathBuf;
+
 use tauri::Manager;
 
-use crate::{settings, gamepad::Switch};
+use crate::{settings, gamepad::Switch, app_data_directory_manager::AppDataDirectoryManagerTrait};
 
 use thiserror::Error;
 
@@ -16,12 +18,12 @@ const DEFAULT_QUICK_LOOKUP_INIT_SCRIPT: &str = include_str!("default_startup_scr
 
 #[cfg_attr(test, automock)]
 pub trait QuickLookupWindowDependencies {
-    fn read_to_string(&self, path: &str) -> Result<String, std::io::Error>;
+    fn read_to_string(&self, path: PathBuf) -> Result<String, std::io::Error>;
 }
 
 pub struct QuickLookupWindowDependenciesImpl;
 impl QuickLookupWindowDependencies for QuickLookupWindowDependenciesImpl {
-    fn read_to_string(&self, path: &str) -> Result<String, std::io::Error> {
+    fn read_to_string(&self, path: PathBuf) -> Result<String, std::io::Error> {
         std::fs::read_to_string(path)
     }
 }
@@ -41,6 +43,7 @@ pub struct QuickLookupWindow {
     quick_lookup_window_settings: settings::data::QuickLookupWindow,
     current_state: QuickLookupWindowState,
     current_layer: usize,
+    app_data_directory_manager: Box<dyn AppDataDirectoryManagerTrait>,
 }
 
 impl QuickLookupWindow {
@@ -48,6 +51,7 @@ impl QuickLookupWindow {
        tauri_app_handle: tauri::AppHandle,
        dependencies: Box<dyn QuickLookupWindowDependencies>,
        quick_lookup_window_settings: settings::data::QuickLookupWindow,
+       app_data_directory_manager: Box<dyn AppDataDirectoryManagerTrait>,
        ) -> Self {
         Self { 
             tauri_app_handle,
@@ -56,14 +60,45 @@ impl QuickLookupWindow {
             quick_lookup_window_settings,
             current_state: QuickLookupWindowState::Hidden,
             current_layer: 0,
+            app_data_directory_manager,
         }
     }
 
     fn load_css(&mut self) -> Result<Option<String>, StartupScriptLoadError> {
+        // if let Some(css_path) 
+        //     = self.quick_lookup_window_settings.source_code.clone()
+        //         .and_then(|src| src.css_file_path) {
+        //     match self.dependencies.read_to_string(&css_path) {
+        //         Err(e) => {
+        //             self.initialization_script = DEFAULT_QUICK_LOOKUP_INIT_SCRIPT.to_string();
+        //             return Err(get_file_load_error(e.kind(), "js_bundle_file_path".to_string()))
+        //         },
+        //         Ok(rollup_script_str) => {
+        //             Ok(Some(format!("\
+        //                 var styleSheet = document.createElement(\"style\");\n\
+        //                 styleSheet.innerText = `{rollup_script_str}`;\n\
+        //                 document.head.appendChild(styleSheet);")))
+        //         }
+        //     }
+        // }
+        // else {
+        //     Ok(None)
+        // }
+
         if let Some(css_path) 
             = self.quick_lookup_window_settings.source_code.clone()
-                .and_then(|src| src.css_file_path) {
-            match self.dependencies.read_to_string(&css_path) {
+                .and_then(|src| src.css_file_path)
+                .and_then(|css_file_path|{
+                    match self.app_data_directory_manager
+                        .get_app_data_directory() {
+                            Ok(mut path) => {
+                                path.push(css_file_path);
+                                Some(path)
+                            }
+                            Err(e) => None
+                        }
+                }) {
+            match self.dependencies.read_to_string(css_path) {
                 Err(e) => {
                     self.initialization_script = DEFAULT_QUICK_LOOKUP_INIT_SCRIPT.to_string();
                     return Err(get_file_load_error(e.kind(), "js_bundle_file_path".to_string()))
@@ -82,9 +117,35 @@ impl QuickLookupWindow {
     }
 
     fn load_js(&mut self) -> Result<Option<String>, StartupScriptLoadError> {
-        if let Some(source_code) 
-            = &self.quick_lookup_window_settings.source_code {
-            match self.dependencies.read_to_string(&source_code.js_iife_bundle_file_path) {
+        // if let Some(source_code) 
+        //     = &self.quick_lookup_window_settings.source_code {
+        //     match self.dependencies.read_to_string(&source_code.js_iife_bundle_file_path) {
+        //         Err(e) => {
+        //             self.initialization_script = DEFAULT_QUICK_LOOKUP_INIT_SCRIPT.to_string();
+        //             return Err(get_file_load_error(e.kind(), "js_bundle_file_path".to_string()))
+        //         },
+        //         Ok(rollup_script_str) => {
+        //             Ok(Some(rollup_script_str))
+        //         }
+        //     }
+        // }
+        // else {
+        //     Ok(None)
+        // }
+
+        if let Some(js_iife_bundle_file_path) 
+            = self.quick_lookup_window_settings.source_code.clone()
+                .and_then(|src|{
+                    match self.app_data_directory_manager
+                        .get_app_data_directory() {
+                            Ok(mut path) => {
+                                path.push(src.js_iife_bundle_file_path);
+                                Some(path)
+                            }
+                            Err(e) => None
+                        }
+                }) {
+            match self.dependencies.read_to_string(js_iife_bundle_file_path) {
                 Err(e) => {
                     self.initialization_script = DEFAULT_QUICK_LOOKUP_INIT_SCRIPT.to_string();
                     return Err(get_file_load_error(e.kind(), "js_bundle_file_path".to_string()))
