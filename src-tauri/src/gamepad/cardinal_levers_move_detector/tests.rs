@@ -148,9 +148,9 @@ fn calc_utility_fn_works() {
     assert_eq!(calc(&MouseControl { deadzone_upper_limit: 0.0, scale_factor: 10.0 },
         0.1), 1);
     assert_eq!(calc(&MouseControl { deadzone_upper_limit: 0.0, scale_factor: 10.0 },
-        0.3), 2);
+        0.3), 3);
     assert_eq!(calc(&MouseControl { deadzone_upper_limit: 0.0, scale_factor: 10.0 },
-        0.7), 2);
+        0.7), 7);
     assert_eq!(calc(&MouseControl { deadzone_upper_limit: 0.0, scale_factor: 10.0 },
         1.0), 10);
 
@@ -192,7 +192,7 @@ fn axis_changed_works_for_left_stick_x() {
         cardinal_levers_move_detector
             .axis_changed(gilrs::ev::Axis::LeftStickX,-1.0);
 
-        assert_eq!(cardinal_levers_move_detector.current_left_stick_x.unwrap(),-3);
+        assert_eq!(cardinal_levers_move_detector.current_left_stick_x.unwrap(),-5);
         assert_eq!(cardinal_levers_move_detector.current_left_stick_y.unwrap(),
             *result_current_left_stick_y);
 
@@ -230,7 +230,7 @@ fn axis_changed_works_for_left_stick_y() {
 
         assert_eq!(cardinal_levers_move_detector.current_left_stick_x.unwrap(),
             *result_current_left_stick_x);
-        assert_eq!(cardinal_levers_move_detector.current_left_stick_y.unwrap(),3);
+        assert_eq!(cardinal_levers_move_detector.current_left_stick_y.unwrap(),5);
 
         assert!(cardinal_levers_move_detector.current_right_stick_x.is_none());
         assert!(cardinal_levers_move_detector.current_right_stick_y.is_none());
@@ -269,7 +269,7 @@ fn axis_changed_works_for_right_stick_x() {
         assert!(cardinal_levers_move_detector.current_left_stick_x.is_none());
         assert!(cardinal_levers_move_detector.current_left_stick_y.is_none());
 
-        assert_eq!(cardinal_levers_move_detector.current_right_stick_x.unwrap(),-3);
+        assert_eq!(cardinal_levers_move_detector.current_right_stick_x.unwrap(),-5);
         assert_eq!(cardinal_levers_move_detector.current_right_stick_y.unwrap(),
             *result_current_right_stick_y);
 
@@ -306,7 +306,7 @@ fn axis_changed_works_for_right_stick_y() {
         assert!(cardinal_levers_move_detector.current_left_stick_y.is_none());
         assert_eq!(cardinal_levers_move_detector.current_right_stick_x.unwrap(),
             *result_current_right_stick_x);
-        assert_eq!(cardinal_levers_move_detector.current_right_stick_y.unwrap(),3);
+        assert_eq!(cardinal_levers_move_detector.current_right_stick_y.unwrap(),5);
 
         assert_eq!(cardinal_levers_move_detector.left_stick_at_rest_counter, 0);
         assert_eq!(cardinal_levers_move_detector.right_stick_at_rest_counter, 0);
