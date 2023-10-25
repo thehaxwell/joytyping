@@ -54,9 +54,13 @@ impl InputController {
             InputEvent::KeyUp => {
                 self.keyboard_input_controller.key_up();
                 self.mouse_button_input_controller.key_up();
+                self.mouse_cursor_input_controller.end_boost();
             }
             InputEvent::MoveMouseCursor(x,y) => {
                 self.mouse_cursor_input_controller.set_x_and_y_axes(x,y);
+            }
+            InputEvent::BoostMouseCursor(multiplier) => {
+                self.mouse_cursor_input_controller.start_boost(multiplier);
             }
             InputEvent::MouseScroll(x,y) => {
                 self.mouse_scroll_input_controller.set_x_and_y_axes(x,y);

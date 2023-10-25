@@ -7,7 +7,9 @@ use crate::{gamepad::{switch_click_pattern_detector::{MockSwitchClickPatternDete
 use super::super::{gilrs_events::stick_switch_interpreter::StickSwitchButton, layers_wrapper::MockLayersWrapperTrait, layers_navigator::LayerVisitTrigger};
 
 fn setup_handles_keyboard_input_events(
-    layer_num: usize, source_switch_event_and_reaction: SwitchEventAndReaction,pattern: SwitchClickPattern) -> Option<InputEvent> {
+    layer_num: usize,
+    source_switch_event_and_reaction: SwitchEventAndReaction,
+    pattern: SwitchClickPattern) -> Option<InputEvent> {
         let mut mock_switch_click_pattern_detector = MockSwitchClickPatternDetectorTrait::new();
         let mut mock_layers_wrapper = MockLayersWrapperTrait::new();
         let mock_gilrs_events = MockGilrsEventsTrait::new();
@@ -1381,4 +1383,493 @@ fn processes_mouse_move_events(){
             mouse_input_event: None,
         }
     ).is_none());
+}
+
+fn setup_handles_boost_mouse_by_multiplier_events(
+    layer_num: usize,
+    source_switch_event_and_reaction: SwitchEventAndReaction,
+    pattern: SwitchClickPattern) -> Option<InputEvent> {
+        let mut mock_switch_click_pattern_detector = MockSwitchClickPatternDetectorTrait::new();
+        let mut mock_layers_wrapper = MockLayersWrapperTrait::new();
+        let mock_gilrs_events = MockGilrsEventsTrait::new();
+        let mut mock_layers_navigator = MockLayersNavigatorTrait::new();
+        let mock_quick_lookup_window = MockQuickLookupWindowTrait::new();
+        let mock_mouse_cardinal_levers_move_detector 
+            = cardinal_levers_move_detector::mouse::MockMouseTrait::new();
+
+        mock_switch_click_pattern_detector
+            .expect_tick()
+            .times(1)
+            .return_const(Some(pattern.clone()));
+
+        mock_layers_navigator
+            .expect_process_current_potential_visit()
+            .times(1)
+            .with(eq(pattern.clone()))
+            .return_const(());
+
+        let switch = match pattern {
+            SwitchClickPattern::Click(sw) => sw,
+            SwitchClickPattern::ClickAndHold(sw) => sw,
+            SwitchClickPattern::DoubleClick(sw) => sw,
+            SwitchClickPattern::DoubleClickAndHold(sw) => sw,
+            SwitchClickPattern::ClickEnd(sw) => sw,
+        };
+
+        mock_layers_wrapper
+            .expect_get_switch_event_and_reaction()
+            .times(1)
+            .with(eq(layer_num),eq(switch))
+            .return_const(
+                Some(source_switch_event_and_reaction));
+
+        mock_layers_navigator
+            .expect_get_current_layer_index()
+            .times(1)
+            .return_const(layer_num);
+
+        let mut gamepad = Gamepad {
+           gilrs_events: Box::new(mock_gilrs_events),
+           layers: Box::new(mock_layers_wrapper),
+           switch_click_pattern_detector: Box::new(mock_switch_click_pattern_detector),
+           layers_navigator: Box::new(mock_layers_navigator),
+           quick_lookup_window: Box::new(mock_quick_lookup_window),
+           mouse_cardinal_levers_move_detector: 
+               Box::new(mock_mouse_cardinal_levers_move_detector),
+        };
+
+        gamepad.tick()
+}
+
+#[test]
+fn handles_boost_mouse_by_multiplier_events(){
+   assert_eq!(
+       setup_handles_boost_mouse_by_multiplier_events(
+           0_usize,
+           SwitchEventAndReaction {
+                on_click: Some(SwitchOnClickReaction::BoostMouseCursorByMultiplier(3)),
+                on_double_click: None, 
+            },
+           SwitchClickPattern::Click(Switch::Button(Button::South)),).unwrap(),
+        InputEvent::BoostMouseCursor(3));
+
+   assert_eq!(
+       setup_handles_boost_mouse_by_multiplier_events(
+           2_usize,
+           SwitchEventAndReaction {
+                on_click: Some(SwitchOnClickReaction::BoostMouseCursorByMultiplier(100)),
+                on_double_click: None, 
+            },
+           SwitchClickPattern::Click(Switch::Button(Button::South)),).unwrap(),
+        InputEvent::BoostMouseCursor(100));
+
+   assert_eq!(
+       setup_handles_boost_mouse_by_multiplier_events(
+           99_usize,
+           SwitchEventAndReaction {
+                on_click: Some(SwitchOnClickReaction::BoostMouseCursorByMultiplier(99999)),
+                on_double_click: None, 
+            },
+           SwitchClickPattern::Click(Switch::Button(Button::South)),).unwrap(),
+        InputEvent::BoostMouseCursor(99999));
+
+
+
+   // ----------------
+   // different SwitchClickPattern::Click triggering switches
+   // ----------------
+   assert_eq!(
+       setup_handles_boost_mouse_by_multiplier_events(
+           0_usize,
+           SwitchEventAndReaction {
+                on_click: Some(SwitchOnClickReaction::BoostMouseCursorByMultiplier(3)),
+                on_double_click: None, 
+            },
+           SwitchClickPattern::Click(Switch::Button(Button::LeftTrigger2)),).unwrap(),
+        InputEvent::BoostMouseCursor(3));
+
+   assert_eq!(
+       setup_handles_boost_mouse_by_multiplier_events(
+           2_usize,
+           SwitchEventAndReaction {
+                on_click: Some(SwitchOnClickReaction::BoostMouseCursorByMultiplier(100)),
+                on_double_click: None, 
+            },
+           SwitchClickPattern::Click(Switch::StickSwitchButton(StickSwitchButton::LeftStickUp)),).unwrap(),
+        InputEvent::BoostMouseCursor(100));
+
+   assert_eq!(
+       setup_handles_boost_mouse_by_multiplier_events(
+           99_usize,
+           SwitchEventAndReaction {
+                on_click: Some(SwitchOnClickReaction::BoostMouseCursorByMultiplier(99999)),
+                on_double_click: None, 
+            },
+           SwitchClickPattern::Click(Switch::StickSwitchButton(StickSwitchButton::LeftStickLeft)),).unwrap(),
+        InputEvent::BoostMouseCursor(99999));
+
+    // -------------
+    // DoubleClick count as Click if on_double_click wasn't set
+    // -------------
+   assert_eq!(
+       setup_handles_boost_mouse_by_multiplier_events(
+           0_usize,
+           SwitchEventAndReaction {
+                on_click: Some(SwitchOnClickReaction::BoostMouseCursorByMultiplier(3)),
+                on_double_click: None, 
+            },
+           SwitchClickPattern::DoubleClick(Switch::Button(Button::South)),).unwrap(),
+        InputEvent::BoostMouseCursor(3));
+
+   assert_eq!(
+       setup_handles_boost_mouse_by_multiplier_events(
+           2_usize,
+           SwitchEventAndReaction {
+                on_click: Some(SwitchOnClickReaction::BoostMouseCursorByMultiplier(100)),
+                on_double_click: None, 
+            },
+           SwitchClickPattern::DoubleClick(Switch::Button(Button::South)),).unwrap(),
+        InputEvent::BoostMouseCursor(100));
+
+   assert_eq!(
+       setup_handles_boost_mouse_by_multiplier_events(
+           99_usize,
+           SwitchEventAndReaction {
+                on_click: Some(SwitchOnClickReaction::BoostMouseCursorByMultiplier(99999)),
+                on_double_click: None, 
+            },
+           SwitchClickPattern::DoubleClick(Switch::Button(Button::South)),).unwrap(),
+        InputEvent::BoostMouseCursor(99999));
+
+
+    // -------------
+    // DoubleClick triggers on_double_click key_click when it's set
+    // -------------
+
+   assert_eq!(
+       setup_handles_boost_mouse_by_multiplier_events(
+           0_usize,
+           SwitchEventAndReaction {
+                on_click: None,
+                on_double_click: Some(SwitchOnClickReaction::BoostMouseCursorByMultiplier(3)), 
+            },
+           SwitchClickPattern::DoubleClick(Switch::Button(Button::South)),).unwrap(),
+        InputEvent::BoostMouseCursor(3));
+
+   assert_eq!(
+       setup_handles_boost_mouse_by_multiplier_events(
+           2_usize,
+           SwitchEventAndReaction {
+                on_click: None,
+                on_double_click: Some(SwitchOnClickReaction::BoostMouseCursorByMultiplier(100)), 
+            },
+           SwitchClickPattern::DoubleClick(Switch::Button(Button::South)),).unwrap(),
+        InputEvent::BoostMouseCursor(100));
+
+   assert_eq!(
+       setup_handles_boost_mouse_by_multiplier_events(
+           99_usize,
+           SwitchEventAndReaction {
+                on_click: None,
+                on_double_click: Some(SwitchOnClickReaction::BoostMouseCursorByMultiplier(99999)), 
+            },
+           SwitchClickPattern::DoubleClick(Switch::Button(Button::South)),).unwrap(),
+        InputEvent::BoostMouseCursor(99999));
+
+				//        // ----------------
+				//        // SwitchClickPattern::ClickAndHold triggers Keydown
+				//        // ----------------
+				//         let keyboard_input = KeyboardInput{
+				//             key: Key::Layout('I'),
+				//             modifiers: vec![]
+				//         };
+				//        assert_eq!(
+				//            setup_handles_keyboard_input_events(
+				//                0_usize,
+				//                SwitchEventAndReaction {
+				// 	on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
+				//                     on_double_click: None, 
+				// },
+				//                SwitchClickPattern::ClickAndHold(Switch::Button(Button::LeftTrigger2)),).unwrap(),
+				//             InputEvent::KeyDown(keyboard_input.clone()));
+				//       
+				//         let keyboard_input = KeyboardInput{
+				//             key: Key::Layout('*'),
+				//             modifiers: vec![]
+				//         };
+				//        assert_eq!(
+				//            setup_handles_keyboard_input_events(
+				//                1_usize,
+				//                SwitchEventAndReaction {
+				// 	on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
+				//                     on_double_click: None, 
+				// },
+				//                SwitchClickPattern::ClickAndHold(Switch::StickSwitchButton(StickSwitchButton::RightStickDown)),).unwrap(),
+				//             InputEvent::KeyDown(keyboard_input.clone()));
+				//       
+				//         let keyboard_input = KeyboardInput{
+				//             key: Key::Tab,
+				//             modifiers: vec![]
+				//         };
+				//        assert_eq!(
+				//            setup_handles_keyboard_input_events(
+				//                2_usize,
+				//                SwitchEventAndReaction {
+				// 	on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
+				//                     on_double_click: None, 
+				// },
+				//                SwitchClickPattern::ClickAndHold(Switch::StickSwitchButton(StickSwitchButton::LeftStickDown)),).unwrap(),
+				//             InputEvent::KeyDown(keyboard_input.clone()));
+				//       
+				//         let keyboard_input = KeyboardInput{
+				//             key: Key::Tab,
+				//             modifiers: vec![Key::Shift]
+				//         };
+				//        assert_eq!(
+				//            setup_handles_keyboard_input_events(
+				//                10_usize,
+				//                SwitchEventAndReaction {
+				// 	on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
+				//                     on_double_click: None, 
+				// },
+				//                SwitchClickPattern::ClickAndHold(Switch::Button(Button::Start)),).unwrap(),
+				//             InputEvent::KeyDown(keyboard_input.clone()));
+				//       
+				//         let keyboard_input = KeyboardInput{
+				//             key: Key::Layout('a'),
+				//             modifiers: vec![Key::Control, Key::Shift]
+				//         };
+				//        assert_eq!(
+				//            setup_handles_keyboard_input_events(
+				//                100_usize,
+				//                SwitchEventAndReaction {
+				// 	on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
+				//                     on_double_click: None, 
+				// },
+				//                SwitchClickPattern::ClickAndHold(Switch::Button(Button::DPadRight)),).unwrap(),
+				//             InputEvent::KeyDown(keyboard_input.clone()));
+				//       
+				//       
+				//        // ----------------
+				//        // SwitchClickPattern::ClickAndHold triggers Keydown
+				//        // ----------------
+				//         let keyboard_input = KeyboardInput{
+				//             key: Key::Layout('I'),
+				//             modifiers: vec![]
+				//         };
+				//        assert_eq!(
+				//            setup_handles_keyboard_input_events(
+				//                0_usize,
+				//                SwitchEventAndReaction {
+				// 	on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
+				//                     on_double_click: None, 
+				// },
+				//                SwitchClickPattern::ClickAndHold(Switch::Button(Button::LeftTrigger2)),).unwrap(),
+				//             InputEvent::KeyDown(keyboard_input.clone()));
+				//       
+				//         let keyboard_input = KeyboardInput{
+				//             key: Key::Layout('*'),
+				//             modifiers: vec![]
+				//         };
+				//        assert_eq!(
+				//            setup_handles_keyboard_input_events(
+				//                1_usize,
+				//                SwitchEventAndReaction {
+				// 	on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
+				//                     on_double_click: None, 
+				// },
+				//                SwitchClickPattern::ClickAndHold(Switch::StickSwitchButton(StickSwitchButton::RightStickDown)),).unwrap(),
+				//             InputEvent::KeyDown(keyboard_input.clone()));
+				//       
+				//         let keyboard_input = KeyboardInput{
+				//             key: Key::Tab,
+				//             modifiers: vec![]
+				//         };
+				//        assert_eq!(
+				//            setup_handles_keyboard_input_events(
+				//                2_usize,
+				//                SwitchEventAndReaction {
+				// 	on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
+				//                     on_double_click: None, 
+				// },
+				//                SwitchClickPattern::ClickAndHold(Switch::StickSwitchButton(StickSwitchButton::LeftStickDown)),).unwrap(),
+				//             InputEvent::KeyDown(keyboard_input.clone()));
+				//       
+				//         let keyboard_input = KeyboardInput{
+				//             key: Key::Tab,
+				//             modifiers: vec![Key::Shift]
+				//         };
+				//        assert_eq!(
+				//            setup_handles_keyboard_input_events(
+				//                10_usize,
+				//                SwitchEventAndReaction {
+				// 	on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
+				//                     on_double_click: None, 
+				// },
+				//                SwitchClickPattern::ClickAndHold(Switch::Button(Button::Start)),).unwrap(),
+				//             InputEvent::KeyDown(keyboard_input.clone()));
+				//       
+				//         let keyboard_input = KeyboardInput{
+				//             key: Key::Layout('a'),
+				//             modifiers: vec![Key::Control, Key::Shift]
+				//         };
+				//        assert_eq!(
+				//            setup_handles_keyboard_input_events(
+				//                100_usize,
+				//                SwitchEventAndReaction {
+				// 	on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
+				//                     on_double_click: None, 
+				// },
+				//                SwitchClickPattern::ClickAndHold(Switch::Button(Button::DPadRight)),).unwrap(),
+				//             InputEvent::KeyDown(keyboard_input.clone()));
+				//       
+				//       
+				//        // ----------------
+				//        // SwitchClickPattern::DoubleClickAndHold triggers Keydown
+				//        // ----------------
+				//         let keyboard_input = KeyboardInput{
+				//             key: Key::Layout('I'),
+				//             modifiers: vec![]
+				//         };
+				//        assert_eq!(
+				//            setup_handles_keyboard_input_events(
+				//                0_usize,
+				//                SwitchEventAndReaction {
+				// 	on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
+				//                     on_double_click: None, 
+				// },
+				//                SwitchClickPattern::DoubleClickAndHold(Switch::Button(Button::LeftTrigger2)),).unwrap(),
+				//             InputEvent::KeyDown(keyboard_input.clone()));
+				//       
+				//         let keyboard_input = KeyboardInput{
+				//             key: Key::Layout('*'),
+				//             modifiers: vec![]
+				//         };
+				//        assert_eq!(
+				//            setup_handles_keyboard_input_events(
+				//                1_usize,
+				//                SwitchEventAndReaction {
+				// 	on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
+				//                     on_double_click: None, 
+				// },
+				//                SwitchClickPattern::DoubleClickAndHold(Switch::StickSwitchButton(StickSwitchButton::RightStickDown)),).unwrap(),
+				//             InputEvent::KeyDown(keyboard_input.clone()));
+				//       
+				//         let keyboard_input = KeyboardInput{
+				//             key: Key::Tab,
+				//             modifiers: vec![]
+				//         };
+				//        assert_eq!(
+				//            setup_handles_keyboard_input_events(
+				//                2_usize,
+				//                SwitchEventAndReaction {
+				// 	on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
+				//                     on_double_click: None, 
+				// },
+				//                SwitchClickPattern::DoubleClickAndHold(Switch::StickSwitchButton(StickSwitchButton::LeftStickDown)),).unwrap(),
+				//             InputEvent::KeyDown(keyboard_input.clone()));
+				//       
+				//         let keyboard_input = KeyboardInput{
+				//             key: Key::Tab,
+				//             modifiers: vec![Key::Shift]
+				//         };
+				//        assert_eq!(
+				//            setup_handles_keyboard_input_events(
+				//                10_usize,
+				//                SwitchEventAndReaction {
+				// 	on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
+				//                     on_double_click: None, 
+				// },
+				//                SwitchClickPattern::DoubleClickAndHold(Switch::Button(Button::Start)),).unwrap(),
+				//             InputEvent::KeyDown(keyboard_input.clone()));
+				//       
+				//         let keyboard_input = KeyboardInput{
+				//             key: Key::Layout('a'),
+				//             modifiers: vec![Key::Control, Key::Shift]
+				//         };
+				//        assert_eq!(
+				//            setup_handles_keyboard_input_events(
+				//                100_usize,
+				//                SwitchEventAndReaction {
+				// 	on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
+				//                     on_double_click: None, 
+				// },
+				//                SwitchClickPattern::DoubleClickAndHold(Switch::Button(Button::DPadRight)),).unwrap(),
+				//             InputEvent::KeyDown(keyboard_input.clone()));
+				//
+				//
+				//         // -------------
+				//         // DoubleClick triggers on_double_click key_click when it's set
+				//         // -------------
+				//         let keyboard_input = KeyboardInput{
+				//             key: Key::Layout('I'),
+				//             modifiers: vec![]
+				//         };
+				//        assert_eq!(
+				//            setup_handles_keyboard_input_events(
+				//                0_usize,
+				//                SwitchEventAndReaction {
+				// 	on_click: None,
+				//                     on_double_click: Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())), 
+				// },
+				//                SwitchClickPattern::DoubleClick(Switch::Button(Button::LeftTrigger2)),).unwrap(),
+				//             InputEvent::KeyClick(keyboard_input.clone()));
+				//       
+				//         let keyboard_input = KeyboardInput{
+				//             key: Key::Layout('*'),
+				//             modifiers: vec![]
+				//         };
+				//        assert_eq!(
+				//            setup_handles_keyboard_input_events(
+				//                1_usize,
+				//                SwitchEventAndReaction {
+				// 	on_click: None,
+				//                     on_double_click: Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())), 
+				// },
+				//                SwitchClickPattern::DoubleClick(Switch::StickSwitchButton(StickSwitchButton::RightStickDown)),).unwrap(),
+				//             InputEvent::KeyClick(keyboard_input.clone()));
+				//       
+				//         let keyboard_input = KeyboardInput{
+				//             key: Key::Tab,
+				//             modifiers: vec![]
+				//         };
+				//        assert_eq!(
+				//            setup_handles_keyboard_input_events(
+				//                2_usize,
+				//                SwitchEventAndReaction {
+				// 	on_click: None,
+				//                     on_double_click: Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())), 
+				// },
+				//                SwitchClickPattern::DoubleClick(Switch::StickSwitchButton(StickSwitchButton::LeftStickDown)),).unwrap(),
+				//             InputEvent::KeyClick(keyboard_input.clone()));
+				//       
+				//         let keyboard_input = KeyboardInput{
+				//             key: Key::Tab,
+				//             modifiers: vec![Key::Shift]
+				//         };
+				//        assert_eq!(
+				//            setup_handles_keyboard_input_events(
+				//                10_usize,
+				//                SwitchEventAndReaction {
+				// 	on_click: None,
+				//                     on_double_click: Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())), 
+				// },
+				//                SwitchClickPattern::DoubleClick(Switch::Button(Button::Start)),).unwrap(),
+				//             InputEvent::KeyClick(keyboard_input.clone()));
+				//       
+				//         let keyboard_input = KeyboardInput{
+				//             key: Key::Layout('a'),
+				//             modifiers: vec![Key::Control, Key::Shift]
+				//         };
+				//        assert_eq!(
+				//            setup_handles_keyboard_input_events(
+				//                100_usize,
+				//                SwitchEventAndReaction {
+				// 	on_click: None,
+				//                     on_double_click: Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())), 
+				// },
+				//                SwitchClickPattern::DoubleClick(Switch::Button(Button::DPadRight)),).unwrap(),
+				//             InputEvent::KeyClick(keyboard_input.clone()));
+       
+       
 }

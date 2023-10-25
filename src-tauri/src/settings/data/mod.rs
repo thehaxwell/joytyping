@@ -766,6 +766,8 @@ pub enum SwitchOnClickReaction {
     MoveToOrVisitLayer(LayerSpecifier),
 
     ShowQuickLookupWindowOnHold,
+
+    BoostMouseCursorByMultiplier(u32),
 }
 
 // this struct should allow serde to always accept a string

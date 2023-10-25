@@ -75,6 +75,8 @@ impl Gamepad {
                     => self.layers_navigator.move_to_or_visit_layer(LayerVisitTrigger::Click(switch),layer_specifier),
                     Some(SwitchOnClickReaction::ShowQuickLookupWindowOnHold)
                     => {let _ = self.quick_lookup_window.show_or_open(switch);}
+                    Some(SwitchOnClickReaction::BoostMouseCursorByMultiplier(mul))
+                    => return Some(InputEvent::BoostMouseCursor(mul)),
                     _ => ()
                 }
 
@@ -132,6 +134,8 @@ impl Gamepad {
                     => self.layers_navigator.move_to_or_visit_layer(LayerVisitTrigger::DoubleClick(switch),layer_specifier),
                     Some(SwitchOnClickReaction::ShowQuickLookupWindowOnHold)
                     => {let _ = self.quick_lookup_window.show_or_open(switch);}
+                    Some(SwitchOnClickReaction::BoostMouseCursorByMultiplier(mul))
+                    => return Some(InputEvent::BoostMouseCursor(mul)),
                     _ => ()
                 }
             },
@@ -247,6 +251,7 @@ pub enum InputEvent {
     MoveMouseCursor(i32,i32),
     MouseScroll(i32,i32),
     KeyUp,
+    BoostMouseCursor(u32),
 }
 
 #[derive(Debug,Clone,PartialEq)]
