@@ -131,6 +131,7 @@ impl Profile {
 pub struct QuickLookupWindow {
     pub inner_size: HeightAndWidth,
     pub source_code: Option<BrowserSourceCode>,
+    pub theme: Option<QuickLookupWindowTheme>,
 }
 
 impl QuickLookupWindow {
@@ -142,6 +143,13 @@ impl QuickLookupWindow {
                 .branch(ErrMessageBuilderNode::Single { field: "inner_size".to_string() }))?;
         Ok(())
     }
+}
+
+#[derive(Deserialize, Debug, Clone, PartialEq)]
+#[serde(rename_all = "snake_case")]
+pub enum QuickLookupWindowTheme {
+    Light,
+    Dark,
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]

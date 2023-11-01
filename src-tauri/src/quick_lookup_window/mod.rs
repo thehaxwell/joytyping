@@ -7,7 +7,7 @@ use std::path::PathBuf;
 
 use tauri::Manager;
 
-use crate::{settings, gamepad::Switch, app_data_directory_manager::AppDataDirectoryManagerTrait};
+use crate::{settings::{self, data::QuickLookupWindowTheme}, gamepad::Switch, app_data_directory_manager::AppDataDirectoryManagerTrait};
 
 use thiserror::Error;
 
@@ -211,8 +211,14 @@ impl QuickLookupWindowTrait for QuickLookupWindow {
             )
             // start by injecting the current_layer
             // in-case it was set while the window didn't exist
-            .initialization_script(format!("window.__START_LAYER__= {};{}", 
+            .initialization_script(format!("window.__START_LAYER__= {};document.documentElement.setAttribute('data-theme','{}');{}", 
                                            self.current_layer,
+                                           match self.quick_lookup_window_settings.theme {
+                                               Some(QuickLookupWindowTheme::Light) => "light",
+                                               Some(QuickLookupWindowTheme::Dark) => "dark",
+                                               None => "light" //TODO: get the theme from the
+                                                               //system in this case
+                                           },
                                            self.initialization_script).as_str())
             .title("Joytyping Quick Lookup");
 
