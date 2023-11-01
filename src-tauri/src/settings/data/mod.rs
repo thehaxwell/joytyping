@@ -24,12 +24,6 @@ impl SettingsData {
     pub fn validate_and_clone_and_set_layer_pointers(&self) -> Result<Self,String> {
         let err_message_builder = ErrMessageBuilder::new();
 
-        if let Some(dev) = &self.development {
-            dev.validate(
-                err_message_builder
-                    .branch(ErrMessageBuilderNode::Single { field: "development".to_string() }))?;
-        }
-
         Ok(SettingsData { 
             profiles: self.profiles
                 .iter()
@@ -39,7 +33,15 @@ impl SettingsData {
                             field: "profiles".to_string(), specific_id: profile.name.clone() })))
                 .collect::<Result<Vec<_>,_>>()?,
             global: self.global.clone(),
-            development: self.development.clone(),
+            development:
+                if let Some(dev) = &self.development {
+                    Some(dev.validate_and_clone(
+                        err_message_builder
+                            .branch(ErrMessageBuilderNode::Single { field: "development".to_string() }))?)
+                }
+                else {
+                    None
+                },
         })    
     }
 }
@@ -50,15 +52,26 @@ pub struct Development {
 }
 
 impl Development {
-    pub fn validate(
+    pub fn validate_and_clone(
         &self,
-        err_message_builder: ErrMessageBuilder) -> Result<(),String> {
-        if let Some(window) = &self.quick_lookup_window {
-            window.validate(
-                err_message_builder
-                    .branch(ErrMessageBuilderNode::Single { field: "quick_lookup_window".to_string() }))?;
-        }
-        Ok(())
+        err_message_builder: ErrMessageBuilder) -> Result<Self,String> {
+        // if let Some(window) = &self.quick_lookup_window {
+        //     window.validate(
+        //         err_message_builder
+        //             .branch(ErrMessageBuilderNode::Single { field: "quick_lookup_window".to_string() }))?;
+        // }
+        Ok(Development {
+            quick_lookup_window: 
+                if let Some(window) = &self.quick_lookup_window {
+                    Some(window.validate_and_clone(
+                        err_message_builder
+                            .branch(ErrMessageBuilderNode::Single {
+                                field: "quick_lookup_window".to_string() }))?)
+                }
+                else {
+                    None
+                },
+        })
     }
 }
 
@@ -102,14 +115,14 @@ impl Profile {
             .validate(err_message_builder
                 .branch(ErrMessageBuilderNode::Single {
                     field: "trigger_2_switches_click_thresholds".to_string()}))?;
-        self.quick_lookup_window
-            .validate(err_message_builder
-                .branch(ErrMessageBuilderNode::Single {
-                    field: "quick_lookup_window".to_string()}))?;
 
         Ok(Profile {
             name: self.name.clone(),
-            quick_lookup_window: self.quick_lookup_window.clone(),
+            quick_lookup_window:
+                self.quick_lookup_window
+                    .validate_and_clone(err_message_builder
+                        .branch(ErrMessageBuilderNode::Single {
+                            field: "quick_lookup_window".to_string()}))?,
             layers: self.layers
                 .iter()
                 .map(|layer| 
@@ -135,13 +148,28 @@ pub struct QuickLookupWindow {
 }
 
 impl QuickLookupWindow {
-    pub fn validate(
+    pub fn validate_and_clone(
         &self,
-        err_message_builder: ErrMessageBuilder) -> Result<(),String> {
+        err_message_builder: ErrMessageBuilder) -> Result<Self,String> {
         self.inner_size.validate(
             err_message_builder
                 .branch(ErrMessageBuilderNode::Single { field: "inner_size".to_string() }))?;
-        Ok(())
+        Ok(QuickLookupWindow { 
+            inner_size: self.inner_size.clone(),
+            source_code: self.source_code.clone(),
+            // if the theme isn't specified then default to the
+            // system setting
+            theme: if let Some(th) = &self.theme {
+                    Some(th.clone())
+                }
+                else {
+                    Some(match dark_light::detect() {
+                        dark_light::Mode::Dark => QuickLookupWindowTheme::Dark,
+                        dark_light::Mode::Light => QuickLookupWindowTheme::Light,
+                        dark_light::Mode::Default => QuickLookupWindowTheme::Dark,
+                    })
+                }
+        })
     }
 }
 

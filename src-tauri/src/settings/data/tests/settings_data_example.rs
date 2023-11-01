@@ -18,7 +18,7 @@ pub fn setup_settings_data_example(config: SetupConfig) -> SettingsData {
         name: "My PS3 Controller".to_string(),
         left_upper_is_d_pad: true,
         quick_lookup_window: QuickLookupWindow{
-            theme: None,
+            theme: Some(QuickLookupWindowTheme::Light),
             inner_size: HeightAndWidth{
                 height: config.my_ps3_controller_quick_lookup_window_inner_size_height,
                 width: config.my_ps3_controller_quick_lookup_window_inner_size_width,
@@ -949,7 +949,7 @@ pub fn setup_settings_data_example(config: SetupConfig) -> SettingsData {
         global: Global{default_profile:"My PS3 Controller".to_string()},
         development: Some(Development {
             quick_lookup_window: Some(QuickLookupWindow{
-                theme: None,
+                theme: Some(QuickLookupWindowTheme::Light),
                 inner_size: HeightAndWidth{
                     height: config.development_quick_lookup_window_inner_size_height,
                     width: 30.0,

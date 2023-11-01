@@ -204,7 +204,7 @@ impl QuickLookupWindowTrait for QuickLookupWindow {
         if let Some(win) = window {
             win.show()
         } else {
-            let window = tauri::WindowBuilder::new(
+            let _window = tauri::WindowBuilder::new(
                 &self.tauri_app_handle,
                 WINDOW_LABEL, /* the unique window label */
                 tauri::WindowUrl::App("quick-lookup.html".into())
@@ -216,13 +216,10 @@ impl QuickLookupWindowTrait for QuickLookupWindow {
                                            match self.quick_lookup_window_settings.theme {
                                                Some(QuickLookupWindowTheme::Light) => "light",
                                                Some(QuickLookupWindowTheme::Dark) => "dark",
-                                               None => "light" //TODO: get the theme from the
-                                                               //system in this case
+                                               None => "light",
                                            },
                                            self.initialization_script).as_str())
-            .title("Joytyping Quick Lookup");
-
-            window
+            .title("Joytyping Quick Lookup")
                 .inner_size(
                     self.quick_lookup_window_settings.inner_size.width,
                     self.quick_lookup_window_settings.inner_size.height)
