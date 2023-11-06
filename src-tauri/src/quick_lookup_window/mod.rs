@@ -9,6 +9,9 @@ use self::files::{FilesTrait, StartupScriptLoadError};
 
 pub mod files;
 
+#[cfg(test)]
+mod tests;
+
 const DEFAULT_QUICK_LOOKUP_INIT_SCRIPT: &str = include_str!("default_startup_script.js");
 
 #[cfg_attr(test, automock)]
