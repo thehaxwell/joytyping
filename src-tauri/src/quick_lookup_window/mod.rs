@@ -1,13 +1,7 @@
-// pub trait TauriAppHandleTrait {
-//
-//     fn open_window(&self, window_name: &str) -> Result<(), String>;
-// }
-
 use std::path::PathBuf;
 
-use tauri::Manager;
-
 use crate::{settings::{self, data::QuickLookupWindowTheme}, gamepad::Switch, app_data_directory_manager::AppDataDirectoryManagerTrait};
+use crate::tauri_app_handle_wrapper::{self,TauriAppHandleTrait};
 
 use thiserror::Error;
 
@@ -37,7 +31,7 @@ pub trait QuickLookupWindowTrait {
 
 const WINDOW_LABEL: &str = "quick-lookup";
 pub struct QuickLookupWindow {
-    tauri_app_handle: tauri::AppHandle,
+    tauri_app_handle: Box<dyn TauriAppHandleTrait>,
     dependencies: Box<dyn QuickLookupWindowDependencies>,
     initialization_script: String,
     quick_lookup_window_settings: settings::data::QuickLookupWindow,
@@ -48,7 +42,7 @@ pub struct QuickLookupWindow {
 
 impl QuickLookupWindow {
     pub fn new(
-       tauri_app_handle: tauri::AppHandle,
+       tauri_app_handle: Box<dyn TauriAppHandleTrait>,
        dependencies: Box<dyn QuickLookupWindowDependencies>,
        quick_lookup_window_settings: settings::data::QuickLookupWindow,
        app_data_directory_manager: Box<dyn AppDataDirectoryManagerTrait>,
@@ -204,31 +198,27 @@ impl QuickLookupWindowTrait for QuickLookupWindow {
         if let Some(win) = window {
             win.show()
         } else {
-            let _window = tauri::WindowBuilder::new(
-                &self.tauri_app_handle,
-                WINDOW_LABEL, /* the unique window label */
-                tauri::WindowUrl::App("quick-lookup.html".into())
-            )
-            // start by injecting the current_layer
-            // in-case it was set while the window didn't exist
-            .initialization_script(format!("window.__START_LAYER__= {};document.documentElement.setAttribute('data-theme','{}');{}", 
-                                           self.current_layer,
-                                           match self.quick_lookup_window_settings.theme {
-                                               Some(QuickLookupWindowTheme::Light) => "light",
-                                               Some(QuickLookupWindowTheme::Dark) => "dark",
-                                               None => "light",
-                                           },
-                                           self.initialization_script).as_str())
-            .title("Joytyping Quick Lookup")
-                .inner_size(
-                    self.quick_lookup_window_settings.inner_size.width,
-                    self.quick_lookup_window_settings.inner_size.height)
-                .center()
-                .decorations(false)
-                .always_on_top(true)
-                .skip_taskbar(true)
-                .focused(false)
-                .build()?;
+            self.tauri_app_handle.create_window(
+                tauri_app_handle_wrapper::CreateWindowArgs{
+                    label: WINDOW_LABEL,
+                    url: tauri::WindowUrl::App("quick-lookup.html".into()),
+                    initialization_script: Some(format!(
+                       "window.__START_LAYER__= {};document.documentElement.setAttribute('data-theme','{}');{}", 
+                       self.current_layer,
+                       match self.quick_lookup_window_settings.theme {
+                           Some(QuickLookupWindowTheme::Light) => "light",
+                           Some(QuickLookupWindowTheme::Dark) => "dark",
+                           None => "light",
+                       },
+                       self.initialization_script).as_str()),
+                    title: Some("Joytyping Quick Lookup"),
+                    inner_size: Some(self.quick_lookup_window_settings.inner_size.clone()),
+                    center: Some(()),
+                    decorations: Some(false),
+                    always_on_top: Some(true),
+                    skip_taskbar: Some(true),
+                    focused: Some(false)
+                })?;
 
             Ok(())
         }

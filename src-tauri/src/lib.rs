@@ -14,6 +14,7 @@ use input_controller::mouse_input_controller;
 use settings::error_display_window::ErrorDisplayWindow;
 use settings::{Settings,SettingsDependenciesImpl};
 use notify::{Watcher,RecommendedWatcher, RecursiveMode, Config};
+use crate::tauri_app_handle_wrapper::TauriAppHandleWrapper;
 
 use crate::gamepad::switch_click_pattern_detector::SwitchClickPatternDetector;
 use quick_lookup_window::{QuickLookupWindow, QuickLookupWindowDependenciesImpl};
@@ -24,12 +25,14 @@ pub mod gamepad;
 pub mod input_controller;
 pub mod quick_lookup_window;
 pub mod app_data_directory_manager;
+pub mod tauri_app_handle_wrapper;
 
 pub fn start_main_loop(
     end_signal_mpsc_receiver: mpsc::Receiver<MainLoopInterruption>,
     handle: tauri::AppHandle
     ){
-    let mut settings_error_display_window = ErrorDisplayWindow::new(handle.clone());
+    let mut settings_error_display_window = ErrorDisplayWindow::new(
+        Box::new(TauriAppHandleWrapper::new(handle.clone())));
 
 
     'main_loop_initializer_loop: loop {
@@ -85,45 +88,31 @@ pub fn start_main_loop(
         // NOTE: this next line doesn't work if it's in a nested scope(idk why)
         let mut watcher = RecommendedWatcher::new(tx, Config::default()).unwrap();
 
+        let tauri_app_handle_wrapper = TauriAppHandleWrapper::new(handle.clone());
+
+
         let mut quick_lookup_window 
-            = if let Some(dev_quick_lookup_window_settings) 
+         = QuickLookupWindow::new(
+            Box::new(tauri_app_handle_wrapper),
+            Box::new(QuickLookupWindowDependenciesImpl),
+            if let Some(dev_quick_lookup_window_settings) 
                 = settings_data.development.and_then(|dev| dev.quick_lookup_window){
         
                 if let Some(source_code) = &dev_quick_lookup_window_settings.source_code {
                     watcher
                         .watch(source_code.js_iife_bundle_file_path.as_ref(), RecursiveMode::Recursive)
-                        .unwrap();
+                        .unwrap(); // TODO: handle these errors
                 }
-        
-                QuickLookupWindow::new(
-                    handle.clone(),
-                    Box::new(QuickLookupWindowDependenciesImpl),
-                    dev_quick_lookup_window_settings,
-                    Box::new(AppDataDirectoryManager::new(
-                        Box::new(AppDataDirectoryDependenciesImpl))),
-                )
-            }
-            else {
-                QuickLookupWindow::new(
-                    handle.clone(),
-                    Box::new(QuickLookupWindowDependenciesImpl),
-                    active_profile.quick_lookup_window,
-                    Box::new(AppDataDirectoryManager::new(
-                        Box::new(AppDataDirectoryDependenciesImpl))),
-                )
-            };
-
-        match quick_lookup_window.load_startup_script() {
-            Err(err) => {
-                match err {
-                    e => {
-                        println!("load_startup_script error: {}",e);
-                    }
-                }
+                dev_quick_lookup_window_settings
+            } else {
+                active_profile.quick_lookup_window
             },
-            Ok(_) => {
-                println!("quick lookup window external script");
-            }
+            Box::new(AppDataDirectoryManager::new(
+                Box::new(AppDataDirectoryDependenciesImpl))),
+        );
+        
+        if let Err(e) = quick_lookup_window.load_startup_script() {
+           let _ = settings_error_display_window.open_and_show(e);
         }
 
         let mut gamepad = gamepad::Gamepad::new(
