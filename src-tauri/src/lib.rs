@@ -108,27 +108,6 @@ pub fn start_main_loop(
             watcher.watch(path, RecursiveMode::Recursive)
         });
 
-
-        // let mut quick_lookup_window 
-        //  = QuickLookupWindow::new(
-        //     Box::new(tauri_app_handle_wrapper),
-        //     Box::new(QuickLookupWindowDependenciesImpl),
-        //     if let Some(dev_quick_lookup_window_settings) 
-        //         = settings_data.development.and_then(|dev| dev.quick_lookup_window){
-        //
-        //         if let Some(source_code) = &dev_quick_lookup_window_settings.source_code {
-        //             watcher
-        //                 .watch(source_code.js_iife_bundle_file_path.as_ref(), RecursiveMode::Recursive)
-        //                 .unwrap(); // TODO: handle these errors
-        //         }
-        //         dev_quick_lookup_window_settings
-        //     } else {
-        //         active_profile.quick_lookup_window
-        //     },
-        //     Box::new(AppDataDirectoryManager::new(
-        //         Box::new(AppDataDirectoryDependenciesImpl))),
-        // );
-        
         if let Err(e) = quick_lookup_window.load_startup_script() {
            let _ = settings_error_display_window.open_and_show(e);
         }
