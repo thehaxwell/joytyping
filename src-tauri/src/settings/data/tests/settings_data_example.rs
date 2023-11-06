@@ -23,10 +23,10 @@ pub fn setup_settings_data_example(config: SetupConfig) -> SettingsData {
                 height: config.my_ps3_controller_quick_lookup_window_inner_size_height,
                 width: config.my_ps3_controller_quick_lookup_window_inner_size_width,
             },
-            source_code: Some(BrowserSourceCode{
+            source_code: BrowserSourceCode{
                 js_iife_bundle_file_path: "path/to/file/bundle.js".to_string(),
                 css_file_path: None,
-            })
+            }
         },
         stick_switches_click_thresholds: StickSwitchesClickThresholds {
             left_stick_up: 0.5,
@@ -954,10 +954,10 @@ pub fn setup_settings_data_example(config: SetupConfig) -> SettingsData {
                     height: config.development_quick_lookup_window_inner_size_height,
                     width: 30.0,
                 },
-                source_code: Some(BrowserSourceCode{
+                source_code: BrowserSourceCode{
                     js_iife_bundle_file_path: "path/to/file/bundle.js".to_string(),
                     css_file_path: None,
-                })
+                }
             }) 
         }),
     }

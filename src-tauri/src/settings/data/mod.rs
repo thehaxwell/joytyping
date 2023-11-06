@@ -143,7 +143,7 @@ impl Profile {
 #[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct QuickLookupWindow {
     pub inner_size: HeightAndWidth,
-    pub source_code: Option<BrowserSourceCode>,
+    pub source_code: BrowserSourceCode,
     pub theme: Option<QuickLookupWindowTheme>,
 }
 
