@@ -8,28 +8,6 @@ use tauri::{CustomMenuItem, SystemTrayMenu, SystemTrayMenuItem, SystemTrayEvent}
 use tauri::Manager;
 use joytyping::{start_main_loop, MainLoopInterruption};
 
-// Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-#[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
-}
-
-#[tauri::command]
-async fn open_quick_lookup_window(handle: tauri::AppHandle) {
-  tauri::WindowBuilder::new(
-    &handle,
-    "external", /* the unique window label */
-            tauri::WindowUrl::App("#/quick-lookup".into())
-
-  ).build().unwrap();
-}
-
-#[tauri::command]
-async fn close_quick_lookup_window(handle: tauri::AppHandle) {
-  let docs_window = handle.get_window("external").unwrap();
-    docs_window.close().unwrap();
-}
-
 fn main() {
     let (end_signal_mpsc_sender,end_signal_mpsc_receiver) = mpsc::sync_channel(0);
     let end_signal_mpsc_sender_1 = end_signal_mpsc_sender.clone();
@@ -66,7 +44,6 @@ fn main() {
           }
           _ => {}
         })
-        .invoke_handler(tauri::generate_handler![greet,open_quick_lookup_window,close_quick_lookup_window])
         .setup(|app| {
             let handle = app.app_handle();
 
