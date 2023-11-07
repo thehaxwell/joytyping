@@ -1,17 +1,14 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
-use std::sync::mpsc;
+// use std::sync::mpsc;
 
 use tauri::SystemTray;
 use tauri::{CustomMenuItem, SystemTrayMenu, SystemTrayMenuItem, SystemTrayEvent};
 
 use tauri::Manager;
-use joytyping::{start_main_loop, MainLoopInterruption};
+use joytyping::start_main_loop;
 
 fn main() {
-    let (end_signal_mpsc_sender,end_signal_mpsc_receiver) = mpsc::sync_channel(0);
-    let end_signal_mpsc_sender_1 = end_signal_mpsc_sender.clone();
-
     let reload = CustomMenuItem::new("reload".to_string(), "Reload Settings");
     let quit = CustomMenuItem::new("quit".to_string(), "Quit");
     let tray_menu = SystemTrayMenu::new()
@@ -23,21 +20,19 @@ fn main() {
 
     tauri::Builder::default()
         .system_tray(system_tray)
-        .on_system_tray_event(move |_app, event| match event {
+        .on_system_tray_event(move |app_handle, event| match event {
           SystemTrayEvent::MenuItemClick { id, .. } => {
             match id.as_str() {
               "quit" => {
-                if let Ok(_) = end_signal_mpsc_sender_1.send(MainLoopInterruption::Terminate){
-                    std::process::exit(0);
-                }
-                else {
-                    panic!("Failed to quit!");
-                }
+                // end the main loop thread(s)
+                app_handle.trigger_global("main-loop-interruption",Some("MainLoopInterruption::Terminate".to_string()));
+                // end this thread
+                // TODO: figure out how to make the 
+                // following execute AFTER start_main_loop() returns
+                std::process::exit(0); 
               }
               "reload" => {
-                if let Err(e) = end_signal_mpsc_sender_1.send(MainLoopInterruption::ReInitiailze){
-                    panic!("Failed to reload settings: {}",e);
-                }
+                app_handle.trigger_global("main-loop-interruption",Some("MainLoopInterruption::ReInitiailze".to_string()))
               }
               _ => {}
             }
@@ -48,7 +43,7 @@ fn main() {
             let handle = app.app_handle();
 
             std::thread::spawn( move || {
-                start_main_loop(end_signal_mpsc_receiver, handle);
+                start_main_loop(handle);
             });
 
             Ok(())

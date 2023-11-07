@@ -1,4 +1,4 @@
-use std::sync::mpsc;
+use std::sync::mpsc::{self, TryRecvError};
 
 use app_data_directory_manager::{AppDataDirectoryManager, AppDataDirectoryDependenciesImpl};
 use gamepad::cardinal_levers_move_detector::{CardinalLeversMoveDetector, self};
@@ -16,6 +16,7 @@ use settings::error_display_window::ErrorDisplayWindow;
 use settings::{Settings,SettingsDependenciesImpl};
 use notify::{Watcher,RecommendedWatcher, RecursiveMode, Config};
 use crate::tauri_app_handle_wrapper::TauriAppHandleWrapper;
+use tauri::Manager;
 
 use crate::gamepad::switch_click_pattern_detector::SwitchClickPatternDetector;
 use quick_lookup_window::QuickLookupWindow;
@@ -29,7 +30,6 @@ pub mod app_data_directory_manager;
 pub mod tauri_app_handle_wrapper;
 
 pub fn start_main_loop(
-    end_signal_mpsc_receiver: mpsc::Receiver<MainLoopInterruption>,
     handle: tauri::AppHandle
     ){
     let mut settings_error_display_window = ErrorDisplayWindow::new(
@@ -163,7 +163,7 @@ pub fn start_main_loop(
             Box::new(mouse_input_controller::button::Button::new(Box::new(EnigoWrapper::new()))),
         );
 
-
+        let mut interrupt_event_reciever = MainLoopInterruptionEventReciever::new(handle.clone());
         'main_loop: loop {
             // slow this loop down a little
             std::thread::sleep(std::time::Duration::from_millis(10));
@@ -178,16 +178,16 @@ pub fn start_main_loop(
                 }
             }
 
-            match end_signal_mpsc_receiver.try_recv() {
+            match interrupt_event_reciever.try_recv() {
+                Err(_) => (),
                 Ok(MainLoopInterruption::ReInitiailze) => {
                     println!("Restarting");
                     break 'main_loop;
                 }
-                Ok(MainLoopInterruption::Terminate) | Err(mpsc::TryRecvError::Disconnected) => {
+                Ok(MainLoopInterruption::Terminate) => {
                     println!("Terminating.");
                     break 'main_loop_initializer_loop;
                 }
-                Err(mpsc::TryRecvError::Empty) => {}
             }
 
             input_controller.trigger_input();
@@ -209,4 +209,35 @@ pub enum LeftOrRight {
 pub enum MainLoopInterruption {
     Terminate,
     ReInitiailze,
+}
+
+struct MainLoopInterruptionEventReciever {
+    reciever: std::sync::mpsc::Receiver<MainLoopInterruption>,
+}
+
+impl MainLoopInterruptionEventReciever {
+    fn new(handle: tauri::AppHandle) -> Self {
+        let (tx, rx) = std::sync::mpsc::channel();
+
+        handle.once_global("main-loop-interruption", move |event| {
+            match event.payload() {
+                Some("MainLoopInterruption::ReInitiailze") => {
+                    let _ = tx.send(MainLoopInterruption::ReInitiailze);
+                },
+                Some("MainLoopInterruption::Terminate") => {
+                    let _ = tx.send(MainLoopInterruption::Terminate);
+                }
+                Some(other) => panic!("{}",other),
+                _ => (),
+            };
+        });
+
+        Self {
+            reciever: rx
+        }
+    }
+
+    fn try_recv(&mut self) -> Result<MainLoopInterruption,TryRecvError> {
+        self.reciever.try_recv()
+    }
 }
