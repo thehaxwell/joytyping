@@ -1,4 +1,4 @@
-use std::sync::mpsc::{self, TryRecvError};
+use std::sync::mpsc::TryRecvError;
 
 use app_data_directory_manager::{AppDataDirectoryManager, AppDataDirectoryDependenciesImpl};
 use gamepad::cardinal_levers_move_detector::{CardinalLeversMoveDetector, self};
@@ -49,6 +49,7 @@ pub fn start_main_loop(
 
         if let Err(e) = settings.load() {
            let _ = settings_error_display_window.open_and_show(e);
+           break 'main_loop_initializer_loop;
         }
 
         let mut settings_data = settings.get_data().unwrap();

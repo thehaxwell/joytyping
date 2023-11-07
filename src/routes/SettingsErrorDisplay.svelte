@@ -1,4 +1,5 @@
 <script>
+  import { invoke } from '@tauri-apps/api/tauri'
   // __ERROR_MESSAGE__ is initialized through
   // https://docs.rs/tauri/latest/tauri/window/struct.WindowBuilder.html#method.initialization_script
 
@@ -13,6 +14,10 @@
   let message = window.__ERROR_MESSAGE__;
 
   let lines = message.split("\n");
+
+  function startMainLoop() {
+    invoke('start_main_loop_command');
+  }
 </script>
 
 <h1>Failed to load settings file</h1>
@@ -25,7 +30,7 @@
 </div>
 {/if}
 
-Resorting to <a href="https://docs.joytyping.com/default-settings">the Joytyping Default Settings</a>
+<button on:click={startMainLoop}>Reload</button>
 
 <style>
 .data {

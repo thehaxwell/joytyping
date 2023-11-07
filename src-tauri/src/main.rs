@@ -8,6 +8,13 @@ use tauri::{CustomMenuItem, SystemTrayMenu, SystemTrayMenuItem, SystemTrayEvent}
 use tauri::Manager;
 use joytyping::start_main_loop;
 
+#[tauri::command]
+fn start_main_loop_command(handle: tauri::AppHandle) {
+    std::thread::spawn( move || {
+        start_main_loop(handle);
+    });
+}
+
 fn main() {
     let reload = CustomMenuItem::new("reload".to_string(), "Reload Settings");
     let quit = CustomMenuItem::new("quit".to_string(), "Quit");
@@ -19,6 +26,7 @@ fn main() {
     let system_tray = SystemTray::new().with_menu(tray_menu);
 
     tauri::Builder::default()
+        .invoke_handler(tauri::generate_handler![start_main_loop_command])
         .system_tray(system_tray)
         .on_system_tray_event(move |app_handle, event| match event {
           SystemTrayEvent::MenuItemClick { id, .. } => {
