@@ -42,6 +42,10 @@ pub fn setup_settings_data_example(config: SetupConfig) -> SettingsData {
             left_trigger_2: 0.3,
             right_trigger_2: config.my_ps3_controller_stick_switches_click_thresholds_right_trigger_2, 
         },
+        switch_click_event_thresholds: SwitchClickEventThresholds {
+            minimum_milliseconds_down_for_click_and_hold: 500,
+            maximum_milliseconds_between_clicks_for_double_click: 500,
+        },
         layers: vec![
             Layer {
                 id: "first-layer-step-1".to_string(),

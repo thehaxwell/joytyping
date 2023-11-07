@@ -148,7 +148,7 @@ pub fn start_main_loop(
                 )),
             )),
             Box::new(LayersWrapper::new(active_profile.layers.clone(),active_profile.left_upper_is_d_pad)),
-            Box::new(SwitchClickPatternDetector::new()),
+            Box::new(SwitchClickPatternDetector::new(active_profile.switch_click_event_thresholds)),
             Box::new(LayersNavigator::new(active_profile.layers,active_profile.left_upper_is_d_pad)),
             Box::new(quick_lookup_window),
             Box::new(cardinal_levers_move_detector::mouse::Mouse::new(

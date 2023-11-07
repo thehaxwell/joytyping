@@ -8,6 +8,8 @@ use gilrs::Button;
 // use crate::settings::data::SwitchEventAndReaction;
 // use crate::settings::data::SwitchOnClickReaction;
 
+use crate::settings::data::SwitchClickEventThresholds;
+
 use super::SwitchClickPatternDetector;
 use super::SwitchClickPatternDetectorTrait;
 use super::LatestSwitchEvent;
@@ -26,9 +28,15 @@ fn assert_latest_switch_events_are_equal(
 
 #[test]
 fn click_and_hold_works() {
+    let minimum_key_down_time_to_register_as_click_and_hold_in_milliseconds
+        = std::time::Duration::from_millis(500);
+
     let mut switch_click_pattern_detector = SwitchClickPatternDetector{
         latest_switch_event: None,
         latest_switch_click_pattern: None,
+        minimum_key_down_time_to_register_as_click_and_hold_in_milliseconds,
+        maximum_time_between_clicks_to_register_as_double_click_in_milliseconds: 
+            std::time::Duration::from_millis(10),
     };
 
     switch_click_pattern_detector.button_pressed(
@@ -57,7 +65,7 @@ fn click_and_hold_works() {
 
     // NEXT: don't call button_released to count as click-and-hold
     
-    std::thread::sleep(std::time::Duration::from_millis(500));
+    std::thread::sleep(minimum_key_down_time_to_register_as_click_and_hold_in_milliseconds);
 
     assert_latest_switch_events_are_equal(
         switch_click_pattern_detector.latest_switch_event.clone().unwrap(),
@@ -87,9 +95,15 @@ fn click_and_hold_works() {
 
 #[test]
 fn double_click_works() {
+    let maximum_time_between_clicks_to_register_as_double_click_in_milliseconds
+        = std::time::Duration::from_millis(500);
+
     let mut switch_click_pattern_detector = SwitchClickPatternDetector{
         latest_switch_event: None,
         latest_switch_click_pattern: None,
+        minimum_key_down_time_to_register_as_click_and_hold_in_milliseconds:
+            std::time::Duration::from_millis(100),
+        maximum_time_between_clicks_to_register_as_double_click_in_milliseconds, 
     };
 
     switch_click_pattern_detector.button_pressed(
@@ -196,9 +210,15 @@ fn double_click_works() {
 
 #[test]
 fn double_click_and_hold_works() {
+    let minimum_key_down_time_to_register_as_click_and_hold_in_milliseconds
+        = std::time::Duration::from_millis(500);
+
     let mut switch_click_pattern_detector = SwitchClickPatternDetector{
         latest_switch_event: None,
         latest_switch_click_pattern: None,
+        minimum_key_down_time_to_register_as_click_and_hold_in_milliseconds,
+        maximum_time_between_clicks_to_register_as_double_click_in_milliseconds:
+            std::time::Duration::from_millis(100),
     };
 
     switch_click_pattern_detector.button_pressed(
@@ -279,7 +299,7 @@ fn double_click_and_hold_works() {
     
     // NEXT: don't call button_released to count as double-click-and-hold
     
-    std::thread::sleep(std::time::Duration::from_millis(500));
+    std::thread::sleep(minimum_key_down_time_to_register_as_click_and_hold_in_milliseconds);
 
     assert_latest_switch_events_are_equal(
         switch_click_pattern_detector.latest_switch_event.clone().unwrap(),
@@ -304,6 +324,10 @@ fn tick_consumes_the_latest_switch_event() {
             Switch::Button(Button::East)),
             is_consumed: false,
         }),
+        minimum_key_down_time_to_register_as_click_and_hold_in_milliseconds:
+            std::time::Duration::from_millis(100),
+        maximum_time_between_clicks_to_register_as_double_click_in_milliseconds:
+            std::time::Duration::from_millis(100),
     };
 
     assert_eq!(switch_click_pattern_detector.tick().unwrap(),
@@ -322,19 +346,29 @@ fn tick_consumes_the_latest_switch_event() {
 
 #[test]
 fn new_correcly_initializes_objects() {
-    assert_eq!(SwitchClickPatternDetector::new(),
+    assert_eq!(SwitchClickPatternDetector::new(
+            SwitchClickEventThresholds {
+                minimum_milliseconds_down_for_click_and_hold: 100,
+                maximum_milliseconds_between_clicks_for_double_click: 100 }),
         SwitchClickPatternDetector{
             latest_switch_click_pattern: None,
             latest_switch_event: None,
+            minimum_key_down_time_to_register_as_click_and_hold_in_milliseconds:
+                std::time::Duration::from_millis(100),
+            maximum_time_between_clicks_to_register_as_double_click_in_milliseconds:
+                std::time::Duration::from_millis(100),
         });
 }
 
 #[test]
 fn double_clicks_are_mutually_exclusive() {
-    assert!(true);
     let mut switch_click_pattern_detector = SwitchClickPatternDetector{
         latest_switch_event: None,
         latest_switch_click_pattern: None,
+        minimum_key_down_time_to_register_as_click_and_hold_in_milliseconds:
+            std::time::Duration::from_millis(100),
+        maximum_time_between_clicks_to_register_as_double_click_in_milliseconds:
+            std::time::Duration::from_millis(100),
     };
 
     // this loop tests that only every second click 

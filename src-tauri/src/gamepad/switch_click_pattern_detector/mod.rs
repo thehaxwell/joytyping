@@ -2,7 +2,7 @@ use std::time::{Duration, Instant};
 
 use gilrs::Button;
 
-use crate::gamepad::gilrs_events::stick_switch_interpreter::StickSwitchButton;
+use crate::{gamepad::gilrs_events::stick_switch_interpreter::StickSwitchButton, settings::data::SwitchClickEventThresholds};
 
 #[cfg(test)]
 use mockall::{automock, predicate::*};
@@ -12,8 +12,6 @@ use super::Switch;
 #[cfg(test)]
 mod tests;
 
-const CLICK_HOLD_INTERVAL_THRESHOLD: Duration = Duration::from_millis(500);
-const DOUBLE_CLICK_INTERVAL_THRESHOLD: Duration = Duration::from_millis(500);
 
 #[cfg_attr(test, automock)]
 pub trait SwitchClickPatternDetectorTrait {
@@ -48,11 +46,11 @@ pub trait SwitchClickPatternDetectorTrait {
 // -> on_click: 
 // key_down (fires immediately)
 // -> on_click_and_hold: 
-// {on_click} > no key_up for CLICK_HOLD_INTERVAL_THRESHOLD
+// {on_click} > no key_up for minimum_key_down_time_to_register_as_click_and_hold_in_milliseconds
 // -> on_double_click: 
-// {on_click} > key_up within 5ms > key_down within DOUBLE_CLICK_INTERVAL_THRESHOLD
+// {on_click} > key_up within 5ms > key_down within maximum_time_between_clicks_to_register_as_double_click_in_milliseconds
 // -> on_double_click_and_hold:
-// {on_double_click} > no key_up for CLICK_HOLD_INTERVAL_THRESHOLD
+// {on_double_click} > no key_up for minimum_key_down_time_to_register_as_click_and_hold_in_milliseconds
 //
 // The event is stored in a one-space queue where
 // the event will be returned by calling tick.
@@ -71,13 +69,21 @@ pub trait SwitchClickPatternDetectorTrait {
 pub struct SwitchClickPatternDetector {
     latest_switch_click_pattern: Option<SwitchClickPatternWrapper>,
     latest_switch_event: Option<LatestSwitchEvent>,
+    minimum_key_down_time_to_register_as_click_and_hold_in_milliseconds: Duration,
+    maximum_time_between_clicks_to_register_as_double_click_in_milliseconds: Duration,
 }
 
 impl SwitchClickPatternDetector {
-    pub fn new() -> Self {
+    pub fn new(
+        switch_click_event_thresholds: SwitchClickEventThresholds,
+        ) -> Self {
         Self {
             latest_switch_click_pattern: None,
             latest_switch_event: None,
+            minimum_key_down_time_to_register_as_click_and_hold_in_milliseconds:
+                Duration::from_millis(switch_click_event_thresholds.minimum_milliseconds_down_for_click_and_hold),
+            maximum_time_between_clicks_to_register_as_double_click_in_milliseconds:
+                Duration::from_millis(switch_click_event_thresholds.maximum_milliseconds_between_clicks_for_double_click),
         }
     }
 
@@ -95,7 +101,7 @@ impl SwitchClickPatternDetector {
         if let Some(LatestSwitchEvent { switch: sw, instant, event_type })
             = &self.latest_switch_event {
                 if switch == sw.clone() 
-                && instant.elapsed() < DOUBLE_CLICK_INTERVAL_THRESHOLD 
+                && instant.elapsed() < self.maximum_time_between_clicks_to_register_as_double_click_in_milliseconds 
                 // prevent chaining double-clicks
                 && *event_type != SwitchEventType::KeyUpAfterDoubleClick 
                 {
@@ -181,7 +187,7 @@ impl SwitchClickPatternDetectorTrait for SwitchClickPatternDetector {
             match event_type {
                 SwitchEventType::KeyDownIntoClick
                     => {
-                        if instant.elapsed() > CLICK_HOLD_INTERVAL_THRESHOLD 
+                        if instant.elapsed() > self.minimum_key_down_time_to_register_as_click_and_hold_in_milliseconds 
                         && !self.latest_switch_click_pattern_is_consumed_click_and_hold(){
                             self.latest_switch_click_pattern 
                                 = Some(SwitchClickPatternWrapper::new(
@@ -191,7 +197,7 @@ impl SwitchClickPatternDetectorTrait for SwitchClickPatternDetector {
                 }
                 SwitchEventType::KeyDownIntoDoubleClick
                     => {
-                        if instant.elapsed() > CLICK_HOLD_INTERVAL_THRESHOLD 
+                        if instant.elapsed() > self.minimum_key_down_time_to_register_as_click_and_hold_in_milliseconds 
                         && !self.latest_switch_click_pattern_is_consumed_double_click_and_hold(){
                             self.latest_switch_click_pattern 
                                 = Some(SwitchClickPatternWrapper::new(

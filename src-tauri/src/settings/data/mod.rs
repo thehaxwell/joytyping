@@ -88,6 +88,16 @@ pub struct Profile {
     pub stick_switches_click_thresholds: StickSwitchesClickThresholds,
     pub trigger_2_switches_click_thresholds: Trigger2SwitchesClickThresholds,
     pub left_upper_is_d_pad: bool,
+    #[serde(default = "default_switch_click_event_thresholds")]
+    pub switch_click_event_thresholds: SwitchClickEventThresholds,
+}
+fn default_switch_click_event_thresholds() -> SwitchClickEventThresholds {
+    SwitchClickEventThresholds {
+        minimum_milliseconds_down_for_click_and_hold:
+            default_switch_click_event_threshold_milliseconds(),
+        maximum_milliseconds_between_clicks_for_double_click: 
+            default_switch_click_event_threshold_milliseconds(),
+    }
 }
 
 impl Profile {
@@ -136,9 +146,19 @@ impl Profile {
             stick_switches_click_thresholds: self.stick_switches_click_thresholds,
             trigger_2_switches_click_thresholds: self.trigger_2_switches_click_thresholds,
             left_upper_is_d_pad: self.left_upper_is_d_pad,
+            switch_click_event_thresholds: self.switch_click_event_thresholds.clone(),
         })
     }
 }
+
+#[derive(Deserialize, Debug, Clone, PartialEq)]
+pub struct SwitchClickEventThresholds {
+    #[serde(default = "default_switch_click_event_threshold_milliseconds")]
+    pub minimum_milliseconds_down_for_click_and_hold: u64,
+    #[serde(default = "default_switch_click_event_threshold_milliseconds")]
+    pub maximum_milliseconds_between_clicks_for_double_click: u64,
+}
+fn default_switch_click_event_threshold_milliseconds() -> u64 {500}
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct QuickLookupWindow {
