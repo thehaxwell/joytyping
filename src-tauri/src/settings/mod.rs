@@ -12,8 +12,6 @@ pub mod data;
 
 pub mod error_display_window;
 
-const JOYTYPING_DEFAULT_SETTINGS: &str = include_str!("default_settings.toml");
-
 #[cfg_attr(test, automock)]
 pub trait SettingsDependencies {
     fn read_to_string(&self, path: PathBuf) -> Result<String, std::io::Error>;
@@ -92,25 +90,9 @@ impl Settings {
                     Ok(())
                 }
                 Err(e) => {
-                    self.load_default();
                     Err(e)
                 }
             }
-    }
-
-    pub fn load_default(&mut self) {
-        match self.dependencies.from_str(JOYTYPING_DEFAULT_SETTINGS){
-            Err(e) => 
-                panic!("Default settings file not parsable: {}", e.to_string())
-            ,
-            Ok(deserialized) => {
-                match deserialized.validate_and_clone_and_set_layer_pointers() {
-                    Ok(data) => self.data = Some(data),
-                    Err(e) => panic!("Default settings file not parsable: {}", e.to_string()),
-                };
-                
-            }
-        }
     }
 
     pub fn get_data(&self) -> Option<SettingsData> {
