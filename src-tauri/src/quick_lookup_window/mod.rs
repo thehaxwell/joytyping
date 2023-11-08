@@ -12,7 +12,6 @@ pub mod files;
 #[cfg(test)]
 mod tests;
 
-const DEFAULT_QUICK_LOOKUP_INIT_SCRIPT: &str = include_str!("default_startup_script.js");
 
 #[cfg_attr(test, automock)]
 pub trait QuickLookupWindowTrait {
@@ -27,7 +26,7 @@ pub struct QuickLookupWindow {
     current_state: QuickLookupWindowState,
     current_layer: usize,
     files: Box<dyn FilesTrait>,
-    initialization_script: String,
+    initialization_script: Option<String>,
     quick_lookup_window_settings: settings::data::QuickLookupWindow,
     restart_on_change_file_path: Option<String>,
 }
@@ -42,7 +41,7 @@ impl QuickLookupWindow {
         Self { 
             tauri_app_handle,
             current_state: QuickLookupWindowState::Hidden,
-            initialization_script: DEFAULT_QUICK_LOOKUP_INIT_SCRIPT.to_string(),
+            initialization_script: None,
             current_layer: 0,
             files,
             quick_lookup_window_settings: 
@@ -58,12 +57,8 @@ impl QuickLookupWindow {
     /// If reading or parsing the file fails, load the default startup script.
     pub fn load_startup_script(&mut self) -> Result<(), StartupScriptLoadError> {
         self.files.load_and_get_code(self.quick_lookup_window_settings.source_code.clone())
-            .map_err(|err|{
-                self.initialization_script = DEFAULT_QUICK_LOOKUP_INIT_SCRIPT.to_string();
-                err
-            })
             .and_then(|init_script|{
-                self.initialization_script = init_script;
+                self.initialization_script = Some(init_script);
                 if let Some(win) 
                     = self.tauri_app_handle.get_window(WINDOW_LABEL) {
                         if let Ok(()) = win.close() {
@@ -95,15 +90,20 @@ impl QuickLookupWindowTrait for QuickLookupWindow {
                 tauri_app_handle_wrapper::CreateWindowArgs{
                     label: WINDOW_LABEL,
                     url: tauri::WindowUrl::App("quick-lookup.html".into()),
-                    initialization_script: Some(format!(
-                       "window.__START_LAYER__= {};document.documentElement.setAttribute('data-theme','{}');{}", 
-                       self.current_layer,
-                       match self.quick_lookup_window_settings.theme {
-                           Some(QuickLookupWindowTheme::Light) => "light",
-                           Some(QuickLookupWindowTheme::Dark) => "dark",
-                           None => "light",
-                       },
-                       self.initialization_script).as_str()),
+                    initialization_script: 
+                        if let Some(init_script) = &self.initialization_script {
+                            Some(format!(
+                               "window.__START_LAYER__= {};document.documentElement.setAttribute('data-theme','{}');{}", 
+                               self.current_layer,
+                               match self.quick_lookup_window_settings.theme {
+                                   Some(QuickLookupWindowTheme::Light) => "light",
+                                   Some(QuickLookupWindowTheme::Dark) => "dark",
+                                   None => "light",
+                               },
+                               init_script))
+                        } else {
+                            None
+                        },
                     title: Some("Joytyping Quick Lookup"),
                     inner_size: Some(self.quick_lookup_window_settings.inner_size.clone()),
                     center: Some(()),

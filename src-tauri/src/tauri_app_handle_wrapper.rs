@@ -39,7 +39,7 @@ impl TauriAppHandleTrait for TauriAppHandleWrapper {
         );
 
         if let Some(script) = args.initialization_script {
-            builder = builder.initialization_script(script);
+            builder = builder.initialization_script(&script);
         }
         if let Some(title) = args.title {
             builder = builder.title(title);
@@ -69,7 +69,7 @@ impl TauriAppHandleTrait for TauriAppHandleWrapper {
 pub struct CreateWindowArgs<'a> {
     pub label: &'a str,
     pub url: WindowUrl,
-    pub initialization_script: Option<&'a str>,
+    pub initialization_script: Option<String>,
     pub title: Option<&'a str>,
     pub inner_size: Option<HeightAndWidth>,
     pub center: Option<()>,
