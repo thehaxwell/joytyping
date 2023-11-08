@@ -76,7 +76,7 @@ impl QuickLookupWindow {
         Ok(())
     }
 
-    pub fn watch<F : FnOnce(&std::path::Path) -> Result<(),notify::Error>> (&self,func: F) {
+    pub fn conditionally_call_watcher<F : FnOnce(&std::path::Path) -> Result<(),notify::Error>>(&self,func: F) {
         if let Some(path) 
             = &self.restart_on_change_file_path {
             let _ = func(path.as_ref());

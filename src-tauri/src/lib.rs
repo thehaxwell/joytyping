@@ -42,7 +42,6 @@ pub fn start_main_loop(
 
         let mut settings = Settings::new(
             Box::new(SettingsDependenciesImpl),
-            // "/home/haxwell/.config/joytyping/joytyping.toml".to_string(),
             Box::new(AppDataDirectoryManager::new(
                 Box::new(AppDataDirectoryDependenciesImpl))),
             );
@@ -90,12 +89,9 @@ pub fn start_main_loop(
         // NOTE: this next line doesn't work if it's in a nested scope(idk why)
         let mut watcher = RecommendedWatcher::new(tx, Config::default()).unwrap();
 
-        let tauri_app_handle_wrapper = TauriAppHandleWrapper::new(handle.clone());
-
-
         let mut quick_lookup_window 
          = QuickLookupWindow::new(
-            Box::new(tauri_app_handle_wrapper),
+            Box::new(TauriAppHandleWrapper::new(handle.clone())),
            settings_data.development.and_then(|dev| dev.quick_lookup_window),
            active_profile.quick_lookup_window,
             Box::new(quick_lookup_window::files::Files::new(
@@ -105,12 +101,13 @@ pub fn start_main_loop(
             )),
         );
 
-        quick_lookup_window.watch(|path|{
+        quick_lookup_window.conditionally_call_watcher(|path|{
             watcher.watch(path, RecursiveMode::Recursive)
         });
 
         if let Err(e) = quick_lookup_window.load_startup_script() {
            let _ = settings_error_display_window.open_and_show(e);
+           break 'main_loop_initializer_loop;
         }
 
         let mut gamepad = gamepad::Gamepad::new(
