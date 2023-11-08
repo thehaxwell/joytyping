@@ -70,10 +70,22 @@ impl QuickLookupWindow {
         Ok(())
     }
 
-    pub fn conditionally_call_watcher<F : FnOnce(&std::path::Path) -> Result<(),notify::Error>>(&self,func: F) {
+    pub fn conditionally_call_watcher<F>(&self,func: F) -> Result<(),String> 
+        where F: FnOnce(&std::path::Path) -> Result<(),notify::Error> {
         if let Some(path) 
             = &self.restart_on_change_file_path {
-            let _ = func(path.as_ref());
+            func(path.as_ref())
+                .map_err(|e|
+                    format!("{}\n{}\n{}\n{}\n{}\n{}",
+                    "Error in",
+                    "> development",
+                    "   > quick_lookup_window",
+                    "      > source_code",
+                    "         > js_iife_bundle_file_path",
+                    e.to_string(),))
+        }
+        else {
+            Ok(())
         }
     }
 }

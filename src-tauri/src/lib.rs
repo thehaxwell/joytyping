@@ -101,9 +101,13 @@ pub fn start_main_loop(
             )),
         );
 
-        quick_lookup_window.conditionally_call_watcher(|path|{
-            watcher.watch(path, RecursiveMode::Recursive)
-        });
+        if let Err(e) 
+            = quick_lookup_window.conditionally_call_watcher(|path|{
+                watcher.watch(path, RecursiveMode::Recursive)
+            }) {
+               let _ = settings_error_display_window.open_and_show(e);
+               break 'main_loop_initializer_loop;
+            }
 
         if let Err(e) = quick_lookup_window.load_startup_script() {
            let _ = settings_error_display_window.open_and_show(e);
