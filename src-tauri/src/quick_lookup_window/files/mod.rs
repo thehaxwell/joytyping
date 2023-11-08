@@ -53,7 +53,7 @@ impl Files {
                                 path.push(css_file_path);
                                 Some(path)
                             }
-                            Err(e) => None
+                            Err(_e) => None
                         }
                 }) {
             match self.dependencies.read_to_string(css_path) {
@@ -77,7 +77,7 @@ impl Files {
         self.app_data_directory_manager
             .get_app_data_directory()
             // TODO: get a more sensible error
-            .map_err(|e| StartupScriptLoadError::FileNotReadable("js_iife_bundle_file_path".to_string()))
+            .map_err(|_e| StartupScriptLoadError::FileNotReadable("js_iife_bundle_file_path".to_string()))
             .and_then(|mut path|{
                 path.push(js_iife_bundle_file_path);
                 match self.dependencies.read_to_string(path) {

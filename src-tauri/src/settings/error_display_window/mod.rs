@@ -1,6 +1,6 @@
 use crate::tauri_app_handle_wrapper::{self,TauriAppHandleTrait};
 
-use super::{SettingsLoadError, data::HeightAndWidth};
+use super::data::HeightAndWidth;
 
 const WINDOW_LABEL: &str = "settings-error";
 pub struct ErrorDisplayWindow {

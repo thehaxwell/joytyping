@@ -1,5 +1,4 @@
-
-use crate::{settings::{self, data::QuickLookupWindowTheme}, gamepad::Switch, app_data_directory_manager::AppDataDirectoryManagerTrait};
+use crate::{settings::{self, data::QuickLookupWindowTheme}, gamepad::Switch};
 use crate::tauri_app_handle_wrapper::{self,TauriAppHandleTrait};
 
 #[cfg(test)]
