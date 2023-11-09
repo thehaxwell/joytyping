@@ -24,7 +24,7 @@ mod tests;
 #[cfg_attr(test, automock)]
 pub trait FilesTrait {
   fn load_and_get_code(
-      &mut self, source_code: settings::data::BrowserSourceCode) -> Result<String,StartupScriptLoadError>;
+      &self, source_code: settings::data::BrowserSourceCode) -> Result<String,StartupScriptLoadError>;
 }
 
 pub struct Files {
@@ -43,63 +43,52 @@ impl Files {
         }
     }
 
-    fn load_css(&mut self, css_file_path_opt: Option<String>) -> Result<Option<String>, StartupScriptLoadError> {
-        if let Some(css_path) 
-            = css_file_path_opt
-                .and_then(|css_file_path|{
-                    match self.app_data_directory_manager
-                        .get_app_data_directory() {
-                            Ok(mut path) => {
-                                path.push(css_file_path);
-                                Some(path)
-                            }
-                            Err(_e) => None
-                        }
-                }) {
-            match self.dependencies.read_to_string(css_path) {
-                Err(e) => {
-                    return Err(get_file_load_error(e.kind(), "js_bundle_file_path".to_string()))
-                },
-                Ok(rollup_script_str) => {
+    fn load_css(&self, css_file_path_opt: Option<String>) -> Result<Option<String>, StartupScriptLoadError> {
+        if let Some(css_file_path) = css_file_path_opt {
+            self.app_data_directory_manager
+                .get_app_data_directory()
+                .map_err(|()|StartupScriptLoadError::FileNotFound("todo".to_string()))
+                .and_then(|mut path|{
+                    path.push(css_file_path);
+                    self.dependencies.read_to_string(path)
+                        .map_err(|e|get_file_load_error(e.kind(), "css_file_path".to_string()))
+                })
+                .and_then(|rollup_script_str| {
                     Ok(Some(format!("\
                         var styleSheet = document.createElement(\"style\");\n\
                         styleSheet.innerText = `{rollup_script_str}`;\n\
                         document.head.appendChild(styleSheet);")))
-                }
-            }
+                })
         }
         else {
             Ok(None)
         }
     }
 
-    fn load_js(&mut self, js_iife_bundle_file_path: String) -> Result<String, StartupScriptLoadError> {
+    fn load_js(&self, js_iife_bundle_file_path: String) -> Result<String, StartupScriptLoadError> {
         self.app_data_directory_manager
             .get_app_data_directory()
-            // TODO: get a more sensible error
-            .map_err(|_e| StartupScriptLoadError::FileNotReadable("js_iife_bundle_file_path".to_string()))
+            .map_err(|()| StartupScriptLoadError::FileNotFound("js_iife_bundle_file_path".to_string()))
             .and_then(|mut path|{
                 path.push(js_iife_bundle_file_path);
-                match self.dependencies.read_to_string(path) {
-                    Err(e) => {
-                        Err(get_file_load_error(e.kind(), "js_iife_bundle_file_path".to_string()))
-                    },
-                    Ok(rollup_script_str) => {
-                        Ok(rollup_script_str)
-                    }
-                }
+                self.dependencies.read_to_string(path)
+                    .map_err(|e|get_file_load_error(e.kind(), "css_file_path".to_string()))
             }) 
     }
 }
 
 impl FilesTrait for Files {
   fn load_and_get_code(
-      &mut self, source_code: settings::data::BrowserSourceCode) -> Result<String,StartupScriptLoadError> {
-    let js_str = self.load_js(source_code.js_iife_bundle_file_path)?;
-    let mut init_script = String::from("window.addEventListener(\"load\", (event) => {");
-    if let Some(css_str) = self.load_css(source_code.css_file_path)? { init_script.push_str(&css_str) };
-    init_script.push_str(&js_str); 
-    init_script.push_str("});");
+      &self, source_code: settings::data::BrowserSourceCode
+      ) -> Result<String,StartupScriptLoadError> {
+
+    let mut init_script 
+        = String::from("window.addEventListener(\"load\", (event) => {");
+    if let Some(css_str) = self.load_css(source_code.css_file_path)? {
+        init_script.push_str(&css_str) 
+    };
+        init_script.push_str(&self.load_js(source_code.js_iife_bundle_file_path)?); 
+        init_script.push_str("});");
     Ok(init_script)
   }
 }
