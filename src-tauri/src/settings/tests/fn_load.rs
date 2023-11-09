@@ -133,6 +133,7 @@ fn interprets_dependencies_read_to_string_error() {
     assert!(settings.data.is_none());
 }
 
+// TODO: figure out how to make this test run
 // #[test]
 // fn interprets_dependencies_from_str_error() {
 //     let mut mock_app_data_directory_manager = MockAppDataDirectoryManagerTrait::new();
