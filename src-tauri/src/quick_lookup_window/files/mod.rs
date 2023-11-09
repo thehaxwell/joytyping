@@ -47,7 +47,7 @@ impl Files {
         if let Some(css_file_path) = css_file_path_opt {
             self.app_data_directory_manager
                 .get_app_data_directory()
-                .map_err(|()|StartupScriptLoadError::FileNotFound("todo".to_string()))
+                .map_err(|()|StartupScriptLoadError::FileNotFound("css_file_path".to_string()))
                 .and_then(|mut path|{
                     path.push(css_file_path);
                     self.dependencies.read_to_string(path)
@@ -72,7 +72,7 @@ impl Files {
             .and_then(|mut path|{
                 path.push(js_iife_bundle_file_path);
                 self.dependencies.read_to_string(path)
-                    .map_err(|e|get_file_load_error(e.kind(), "css_file_path".to_string()))
+                    .map_err(|e|get_file_load_error(e.kind(), "js_iife_bundle_file_path".to_string()))
             }) 
     }
 }
