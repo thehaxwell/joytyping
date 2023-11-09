@@ -94,7 +94,7 @@ impl FilesTrait for Files {
 }
 
 
-#[derive(Error, Debug)]
+#[derive(Error, Debug, PartialEq)]
 pub enum StartupScriptLoadError {
     #[error("{0} file not found")]
     FileNotFound(String),
