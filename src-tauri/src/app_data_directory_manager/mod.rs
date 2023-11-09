@@ -62,7 +62,6 @@ impl AppDataDirectoryManagerTrait for AppDataDirectoryManager {
                 Ok(path)
             },
             None => {
-                println!("home_dir() didn't work!");
                 Err(())
             }
         }
