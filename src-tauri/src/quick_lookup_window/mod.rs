@@ -55,17 +55,23 @@ impl QuickLookupWindow {
     /// Load startup script from the specified file.
     /// If reading or parsing the file fails, load the default startup script.
     pub fn load_startup_script(&mut self) -> Result<(), StartupScriptLoadError> {
-        self.files.load_and_get_code(self.quick_lookup_window_settings.source_code.clone())
-            .and_then(|init_script|{
-                self.initialization_script = Some(init_script);
-                if let Some(win) 
-                    = self.tauri_app_handle.get_window(WINDOW_LABEL) {
-                        if let Ok(()) = win.close() {
-                            self.current_state = QuickLookupWindowState::Hidden;
-                        }
-                    }
-                Ok(())
-            })?;
+        let mut init_script 
+            = String::from("window.addEventListener(\"load\", (event) => {");
+        if let Some(css_str) = self.files
+            .load_css(self.quick_lookup_window_settings.source_code.css_file_path.clone())? {
+            init_script.push_str(&css_str) 
+        };
+            init_script.push_str(&self.files.load_js(
+                self.quick_lookup_window_settings.source_code.js_iife_bundle_file_path.clone()
+            )?); 
+            init_script.push_str("});");
+
+        self.initialization_script = Some(init_script);
+        if let Some(win) = self.tauri_app_handle.get_window(WINDOW_LABEL) {
+            if let Ok(()) = win.close() {
+                self.current_state = QuickLookupWindowState::Hidden;
+            }
+        }
 
         Ok(())
     }

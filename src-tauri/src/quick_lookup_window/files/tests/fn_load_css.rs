@@ -1,6 +1,6 @@
 use std::path::Path;
 
-use crate::{quick_lookup_window::files::{MockFilesDependencies, Files, StartupScriptLoadError}, app_data_directory_manager::MockAppDataDirectoryManagerTrait};
+use crate::{quick_lookup_window::files::{MockFilesDependencies, Files, FilesTrait, StartupScriptLoadError}, app_data_directory_manager::MockAppDataDirectoryManagerTrait};
 
 #[test]
 fn works() {

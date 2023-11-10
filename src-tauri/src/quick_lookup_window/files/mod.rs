@@ -23,8 +23,8 @@ mod tests;
 
 #[cfg_attr(test, automock)]
 pub trait FilesTrait {
-  fn load_and_get_code(
-      &self, source_code: settings::data::BrowserSourceCode) -> Result<String,StartupScriptLoadError>;
+    fn load_css(&self, css_file_path_opt: Option<String>) -> Result<Option<String>, StartupScriptLoadError>;
+    fn load_js(&self, js_iife_bundle_file_path: String) -> Result<String, StartupScriptLoadError>;
 }
 
 pub struct Files {
@@ -42,7 +42,9 @@ impl Files {
             app_data_directory_manager,
         }
     }
+}
 
+impl FilesTrait for Files {
     fn load_css(&self, css_file_path_opt: Option<String>) -> Result<Option<String>, StartupScriptLoadError> {
         if let Some(css_file_path) = css_file_path_opt {
             self.app_data_directory_manager
@@ -75,22 +77,6 @@ impl Files {
                     .map_err(|e|get_file_load_error(e.kind(), "js_iife_bundle_file_path".to_string()))
             }) 
     }
-}
-
-impl FilesTrait for Files {
-  fn load_and_get_code(
-      &self, source_code: settings::data::BrowserSourceCode
-      ) -> Result<String,StartupScriptLoadError> {
-
-    let mut init_script 
-        = String::from("window.addEventListener(\"load\", (event) => {");
-    if let Some(css_str) = self.load_css(source_code.css_file_path)? {
-        init_script.push_str(&css_str) 
-    };
-        init_script.push_str(&self.load_js(source_code.js_iife_bundle_file_path)?); 
-        init_script.push_str("});");
-    Ok(init_script)
-  }
 }
 
 

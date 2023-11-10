@@ -2,7 +2,7 @@ use std::path::Path;
 
 use mockall::predicate::eq;
 
-use crate::{app_data_directory_manager::MockAppDataDirectoryManagerTrait, quick_lookup_window::files::{MockFilesDependencies, Files, StartupScriptLoadError}};
+use crate::{app_data_directory_manager::MockAppDataDirectoryManagerTrait, quick_lookup_window::files::{MockFilesDependencies, Files, FilesTrait, StartupScriptLoadError}};
 
 
 #[test]
