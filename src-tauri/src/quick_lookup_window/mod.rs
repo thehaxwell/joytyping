@@ -178,7 +178,7 @@ struct UpdateKeyboardEventPayload {
   layer: usize,
 }
 
-
+#[derive(Debug,PartialEq)]
 enum QuickLookupWindowState {
     Showing(Switch),
     Hidden
