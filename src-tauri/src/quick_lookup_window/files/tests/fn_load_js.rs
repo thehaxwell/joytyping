@@ -41,7 +41,7 @@ fn interprets_app_data_directory_manager_error() {
         .times(1)
         .return_const(Err(()));
 
-    let mut files = Files {
+    let files = Files {
         dependencies: Box::new(mock_deps),
         app_data_directory_manager: Box::new(mock_app_data_directory_manager),
     };
@@ -74,53 +74,53 @@ fn setup_interprets_dependencies_read_to_string_error(
 
 #[test]
 fn interprets_dependencies_read_to_string_error() {
-    let mut files = setup_interprets_dependencies_read_to_string_error(
+    let files = setup_interprets_dependencies_read_to_string_error(
         std::io::ErrorKind::NotFound);
     assert_eq!(files.load_js("build/bundle.js".to_string()),
 		Err(StartupScriptLoadError::FileNotFound("js_iife_bundle_file_path".to_string())));
 
-    let mut files = setup_interprets_dependencies_read_to_string_error(
+    let files = setup_interprets_dependencies_read_to_string_error(
         std::io::ErrorKind::PermissionDenied);
     assert_eq!(files.load_js("build/bundle.js".to_string()),
 		Err(StartupScriptLoadError::PermissionDenied("js_iife_bundle_file_path".to_string())));
 
     // the rest all give FileNotReadable. We'll just test a few
-    let mut files = setup_interprets_dependencies_read_to_string_error(
+    let files = setup_interprets_dependencies_read_to_string_error(
         std::io::ErrorKind::ConnectionReset);
     assert_eq!(files.load_js("build/bundle.js".to_string()),
 		Err(StartupScriptLoadError::FileNotReadable("js_iife_bundle_file_path".to_string())));
 
-    let mut files = setup_interprets_dependencies_read_to_string_error(
+    let files = setup_interprets_dependencies_read_to_string_error(
         std::io::ErrorKind::BrokenPipe);
     assert_eq!(files.load_js("build/bundle.js".to_string()),
 		Err(StartupScriptLoadError::FileNotReadable("js_iife_bundle_file_path".to_string())));
 
-    let mut files = setup_interprets_dependencies_read_to_string_error(
+    let files = setup_interprets_dependencies_read_to_string_error(
         std::io::ErrorKind::AddrInUse);
     assert_eq!(files.load_js("build/bundle.js".to_string()),
 		Err(StartupScriptLoadError::FileNotReadable("js_iife_bundle_file_path".to_string())));
 
-    let mut files = setup_interprets_dependencies_read_to_string_error(
+    let files = setup_interprets_dependencies_read_to_string_error(
         std::io::ErrorKind::ConnectionAborted);
     assert_eq!(files.load_js("build/bundle.js".to_string()),
 		Err(StartupScriptLoadError::FileNotReadable("js_iife_bundle_file_path".to_string())));
 
-    let mut files = setup_interprets_dependencies_read_to_string_error(
+    let files = setup_interprets_dependencies_read_to_string_error(
         std::io::ErrorKind::NotConnected);
     assert_eq!(files.load_js("build/bundle.js".to_string()),
 		Err(StartupScriptLoadError::FileNotReadable("js_iife_bundle_file_path".to_string())));
 
-    let mut files = setup_interprets_dependencies_read_to_string_error(
+    let files = setup_interprets_dependencies_read_to_string_error(
         std::io::ErrorKind::AlreadyExists);
     assert_eq!(files.load_js("build/bundle.js".to_string()),
 		Err(StartupScriptLoadError::FileNotReadable("js_iife_bundle_file_path".to_string())));
 
-    let mut files = setup_interprets_dependencies_read_to_string_error(
+    let files = setup_interprets_dependencies_read_to_string_error(
         std::io::ErrorKind::InvalidData);
     assert_eq!(files.load_js("build/bundle.js".to_string()),
 		Err(StartupScriptLoadError::FileNotReadable("js_iife_bundle_file_path".to_string())));
 
-    let mut files = setup_interprets_dependencies_read_to_string_error(
+    let files = setup_interprets_dependencies_read_to_string_error(
         std::io::ErrorKind::TimedOut);
     assert_eq!(files.load_js("build/bundle.js".to_string()),
 		Err(StartupScriptLoadError::FileNotReadable("js_iife_bundle_file_path".to_string())));

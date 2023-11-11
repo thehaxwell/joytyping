@@ -1,5 +1,5 @@
 
-use crate::{app_data_directory_manager::AppDataDirectoryManagerTrait, settings};
+use crate::app_data_directory_manager::AppDataDirectoryManagerTrait;
 use std::path::PathBuf;
 
 use thiserror::Error;
