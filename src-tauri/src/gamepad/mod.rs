@@ -154,24 +154,6 @@ impl Gamepad {
                     _ => (),
 
                 };
-
-                // if let Some(s_e_a_r)
-                //     = self.layers.get_switch_event_and_reaction(
-                //          self.layers_navigator.get_current_layer_index(),
-                //          switch.clone()) {
-                //     // if on_double_click (or fallback to on_click) is set to
-                //     // type out some key, then hold down that key
-                //     if let Some(SwitchOnClickReaction::Keyboard(keyboard_input)) 
-                //         = s_e_a_r.on_double_click {
-                //         return Some(InputEvent::KeyDown(keyboard_input))
-                //     }
-                //     else if let Some(SwitchOnClickReaction::Keyboard(keyboard_input)) 
-                //         = s_e_a_r.on_click {
-                //         return Some(InputEvent::KeyDown(keyboard_input))
-                //     }
-                //
-                // };
-
             },
             Some(SwitchClickPattern::ClickEnd(switch)) => {
                 self.layers_navigator.undo_last_layer_visit_with_switch(switch.clone());
