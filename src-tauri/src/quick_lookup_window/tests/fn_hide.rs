@@ -1,6 +1,6 @@
 use mockall::predicate::eq;
 
-use crate::{settings::data, quick_lookup_window::{files::MockFilesTrait, QuickLookupWindow, QuickLookupWindowTrait, QuickLookupWindowState}, tauri_app_handle_wrapper::MockTauriAppHandleTrait, gamepad::Switch};
+use crate::{settings::data, quick_lookup_window::{files::MockFilesTrait, QuickLookupWindow, QuickLookupWindowTrait, QuickLookupWindowState}, tauri_app_handle_wrapper::{MockTauriAppHandleTrait, WindowOperationOutcome}, gamepad::Switch};
 
 
 const WINDOW_LABEL: &str = "quick-lookup";
@@ -25,9 +25,9 @@ fn works_when_no_window_is_open() {
     let mock_files = MockFilesTrait::new();
 
     mock_tauri_app_handle
-        .expect_get_window()
+        .expect_hide_window()
         .with(eq(WINDOW_LABEL))
-        .return_const(None);
+        .returning(|_| Ok(WindowOperationOutcome::WindowNotFound));
 
     let mut quick_lookup_window = QuickLookupWindow { 
         tauri_app_handle: Box::new(mock_tauri_app_handle),
@@ -43,41 +43,35 @@ fn works_when_no_window_is_open() {
     assert!(quick_lookup_window.hide(Switch::Button(gilrs::Button::East)).is_ok());
 }
 
-// CHECKPOINT
-// #[test]
-// fn works_when_a_window_is_opened() {
-//     let mut mock_tauri_app_handle = MockTauriAppHandleTrait::new();
-//     let mock_files = MockFilesTrait::new();
-//
-//     mock_tauri_app_handle
-//         .expect_get_window()
-//         .with(eq(WINDOW_LABEL))
-//         .return_const(Some(WindowWrapper));
-//
-//     let mut quick_lookup_window = QuickLookupWindow { 
-//         tauri_app_handle: Box::new(mock_tauri_app_handle),
-//         current_state: 
-//             QuickLookupWindowState::Showing(Switch::Button(gilrs::Button::East)),
-//         initialization_script: None,
-//         current_layer: 0,
-//         files: Box::new(mock_files),
-//         quick_lookup_window_settings: 
-//             setup_quick_lookup_window_settings_example(),
-//         restart_on_change_file_path: 
-//             Some("other/file/path/bundle.js".to_string()),
-//     };
-//     assert!(quick_lookup_window.hide(Switch::Button(gilrs::Button::East)).is_ok());
-// }
-
 #[test]
-fn works_when_a_window_was_opened_with_another_switch() {
+fn works_when_a_window_is_opened() {
     let mut mock_tauri_app_handle = MockTauriAppHandleTrait::new();
     let mock_files = MockFilesTrait::new();
 
     mock_tauri_app_handle
-        .expect_get_window()
+        .expect_hide_window()
         .with(eq(WINDOW_LABEL))
-        .return_const(None);
+        .returning(|_| Ok(WindowOperationOutcome::Success));
+
+    let mut quick_lookup_window = QuickLookupWindow { 
+        tauri_app_handle: Box::new(mock_tauri_app_handle),
+        current_state: 
+            QuickLookupWindowState::Showing(Switch::Button(gilrs::Button::East)),
+        initialization_script: None,
+        current_layer: 0,
+        files: Box::new(mock_files),
+        quick_lookup_window_settings: 
+            setup_quick_lookup_window_settings_example(),
+        restart_on_change_file_path: 
+            Some("other/file/path/bundle.js".to_string()),
+    };
+    assert!(quick_lookup_window.hide(Switch::Button(gilrs::Button::East)).is_ok());
+}
+
+#[test]
+fn works_when_a_window_was_opened_with_another_switch() {
+    let mock_tauri_app_handle = MockTauriAppHandleTrait::new();
+    let mock_files = MockFilesTrait::new();
 
     let mut quick_lookup_window = QuickLookupWindow { 
         tauri_app_handle: Box::new(mock_tauri_app_handle),
