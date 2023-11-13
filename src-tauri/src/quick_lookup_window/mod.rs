@@ -1,4 +1,4 @@
-use crate::{settings::{self, data::QuickLookupWindowTheme}, gamepad::Switch};
+use crate::{settings::{self, data::QuickLookupWindowTheme}, gamepad::Switch, tauri_app_handle_wrapper::{WindowOperationOutcome, EmitWindowEventPayload}};
 use crate::tauri_app_handle_wrapper::{self,TauriAppHandleTrait};
 
 #[cfg(test)]
@@ -67,10 +67,10 @@ impl QuickLookupWindow {
             init_script.push_str("});");
 
         self.initialization_script = Some(init_script);
-        if let Some(win) = self.tauri_app_handle.get_window(WINDOW_LABEL) {
-            if let Ok(()) = win.close() {
+
+        if let Ok(WindowOperationOutcome::Success) 
+            = self.tauri_app_handle.close_window(WINDOW_LABEL) {
                 self.current_state = QuickLookupWindowState::Hidden;
-            }
         }
 
         Ok(())
@@ -98,11 +98,8 @@ impl QuickLookupWindow {
 
 impl QuickLookupWindowTrait for QuickLookupWindow {
     fn show_or_open(&mut self, trigger_switch: Switch) -> Result<(), tauri::Error> {
-        let window = self.tauri_app_handle.get_window(WINDOW_LABEL);
-
-        if let Some(win) = window {
-            win.show()
-        } else {
+        if self.tauri_app_handle.show_window(WINDOW_LABEL)? 
+            == WindowOperationOutcome::WindowNotFound {
             self.tauri_app_handle.create_window(
                 tauri_app_handle_wrapper::CreateWindowArgs{
                     label: WINDOW_LABEL,
@@ -132,6 +129,7 @@ impl QuickLookupWindowTrait for QuickLookupWindow {
 
             Ok(())
         }
+        else { Ok(()) }
         .and_then(|()|{
              self.current_state = QuickLookupWindowState::Showing(trigger_switch);
              Ok(())
@@ -147,34 +145,29 @@ impl QuickLookupWindowTrait for QuickLookupWindow {
             }
         }
 
-        match self.tauri_app_handle.get_window(WINDOW_LABEL) {
-            Some(docs_window) => {
-                docs_window
-                    .hide()
-                    .and_then(|()|{
-                         self.current_state = QuickLookupWindowState::Hidden;
-                         Ok(())
-                    })
-            },
-            None => Ok(())
+        if self.tauri_app_handle.hide_window(WINDOW_LABEL)?
+            == WindowOperationOutcome::Success {
+             self.current_state = QuickLookupWindowState::Hidden;
         }
+        Ok(())
     }
 
     fn update(&mut self, layer: usize) -> Result<(), tauri::Error> {
         self.current_layer = layer;
-        match self.tauri_app_handle.get_window(WINDOW_LABEL) {
-            Some(docs_window) => docs_window.emit("update-keyboard",
+        self.tauri_app_handle.emit_window_event(
+            WINDOW_LABEL,
+            "update-keyboard",
+            EmitWindowEventPayload::UpdateKeyboardEventPayload(
                 UpdateKeyboardEventPayload{
-                    layer,
-                }),
-            None => Ok(()),
-        }
+                layer,
+            }))?;
+        Ok(())
     }
 
 }
 
 #[derive(Clone, serde::Serialize)]
-struct UpdateKeyboardEventPayload {
+pub struct UpdateKeyboardEventPayload {
   layer: usize,
 }
 

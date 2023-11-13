@@ -1,15 +1,22 @@
-use tauri::{window::Window, WindowUrl, Wry};
+use tauri::WindowUrl;
 use tauri::Manager;
 
 #[cfg(test)]
 use mockall::{automock, predicate::*};
 
+use crate::quick_lookup_window::UpdateKeyboardEventPayload;
 use crate::settings::data::HeightAndWidth;
 
 #[cfg_attr(test, automock)]
 pub trait TauriAppHandleTrait {
-    fn get_window(&self, label: &str) -> Option<Window<Wry>>;
-    fn create_window<'a>(&self,args: CreateWindowArgs<'a>) -> tauri::Result<Window<Wry>>;
+    fn show_window(&self, label: &str) -> Result<WindowOperationOutcome,tauri::Error>;
+    fn hide_window(&self, label: &str) -> Result<WindowOperationOutcome,tauri::Error>;
+    fn close_window(&self, label: &str) -> Result<WindowOperationOutcome,tauri::Error>;
+    fn window_is_open(&self, label: &str) -> bool;
+    fn emit_window_event(
+        &self, label: &str, event: &str, payload: EmitWindowEventPayload) 
+        -> Result<WindowOperationOutcome,tauri::Error>;
+    fn create_window<'a>(&self,args: CreateWindowArgs<'a>) -> Result<(),tauri::Error>;
 }
 
 pub struct TauriAppHandleWrapper {
@@ -24,14 +31,48 @@ impl TauriAppHandleWrapper {
             tauri_app_handle,
         }
     }
+
+    fn operate_on_window<F>(&self, label: &str, func: F)
+        -> Result<WindowOperationOutcome,tauri::Error> 
+        where F: FnOnce(tauri::Window) -> tauri::Result<()> {
+        if let Some(win) = self.tauri_app_handle.get_window(label) {
+            func(win)
+               .and_then(|()| Ok(WindowOperationOutcome::Success))
+        }
+        else {
+            Ok(WindowOperationOutcome::WindowNotFound)
+        }
+    }
 }
 
 impl TauriAppHandleTrait for TauriAppHandleWrapper {
-    fn get_window(&self, label: &str) -> Option<Window<Wry>> {
-        self.tauri_app_handle.get_window(label) 
+    fn show_window(&self, label: &str) -> Result<WindowOperationOutcome,tauri::Error> {
+        self.operate_on_window(label, |win|win.show())
     }
 
-    fn create_window(&self,args: CreateWindowArgs) -> tauri::Result<Window<Wry>>{
+    fn hide_window(&self, label: &str) -> Result<WindowOperationOutcome,tauri::Error> {
+        self.operate_on_window(label, |win|win.hide())
+    }
+
+    fn close_window(&self, label: &str) -> Result<WindowOperationOutcome,tauri::Error> {
+        self.operate_on_window(label, |win|win.close())
+    }
+
+    fn window_is_open(&self, label: &str) -> bool {
+        self.tauri_app_handle.get_window(label).is_some()
+    }
+
+    fn emit_window_event(
+        &self, label: &str, event: &str, payload: EmitWindowEventPayload) 
+        -> Result<WindowOperationOutcome,tauri::Error>{
+        self.operate_on_window(label, 
+            |win| match payload {
+                EmitWindowEventPayload::UpdateKeyboardEventPayload(payload)
+                    => win.emit(event,payload)
+               })
+    }
+
+    fn create_window(&self,args: CreateWindowArgs) -> Result<(),tauri::Error>{
         let mut builder = tauri::WindowBuilder::new(
             &self.tauri_app_handle,
             args.label, /* the unique window label */
@@ -62,7 +103,8 @@ impl TauriAppHandleTrait for TauriAppHandleWrapper {
         if let Some(focused) = args.focused {
             builder = builder.focused(focused);
         }
-        builder.build()
+        builder.build()?;
+        Ok(())
     }
 }
 
@@ -77,4 +119,14 @@ pub struct CreateWindowArgs<'a> {
     pub always_on_top: Option<bool>,
     pub skip_taskbar: Option<bool>,
     pub focused: Option<bool>,
+}
+
+#[derive(Debug,PartialEq)]
+pub enum WindowOperationOutcome {
+    Success,
+    WindowNotFound,
+}
+
+pub enum EmitWindowEventPayload {
+    UpdateKeyboardEventPayload(UpdateKeyboardEventPayload),
 }

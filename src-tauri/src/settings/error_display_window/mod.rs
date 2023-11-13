@@ -16,7 +16,7 @@ impl ErrorDisplayWindow {
 
     pub fn open_and_show<S: ToString>(
         &mut self, error: S) -> Result<(), tauri::Error> {
-        if let Some(_win) = self.tauri_app_handle.get_window(WINDOW_LABEL) {
+        if self.tauri_app_handle.window_is_open(WINDOW_LABEL) {
             panic!("make sure to close the window before opening it again");
         }
 
@@ -41,10 +41,8 @@ impl ErrorDisplayWindow {
     }
 
     pub fn close(&self) -> Result<(), tauri::Error> {
-        match self.tauri_app_handle.get_window(WINDOW_LABEL) {
-            Some(docs_window) => docs_window.close(),
-            None => Ok(())
-        }
+        self.tauri_app_handle.close_window(WINDOW_LABEL)?;
+        Ok(())
     }
 }
 
