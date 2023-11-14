@@ -126,14 +126,9 @@ impl QuickLookupWindowTrait for QuickLookupWindow {
                     skip_taskbar: Some(true),
                     focused: Some(false)
                 })?;
-
-            Ok(())
         }
-        else { Ok(()) }
-        .and_then(|()|{
-             self.current_state = QuickLookupWindowState::Showing(trigger_switch);
-             Ok(())
-        })
+        self.current_state = QuickLookupWindowState::Showing(trigger_switch);
+        Ok(())
     }
 
     fn hide(&mut self, trigger_switch: Switch) -> Result<(), tauri::Error> {

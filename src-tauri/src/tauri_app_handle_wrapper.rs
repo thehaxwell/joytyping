@@ -108,6 +108,7 @@ impl TauriAppHandleTrait for TauriAppHandleWrapper {
     }
 }
 
+#[derive(Debug,PartialEq)]
 pub struct CreateWindowArgs {
     pub label: String,
     pub url: WindowUrl,
