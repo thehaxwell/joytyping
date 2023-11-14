@@ -24,9 +24,9 @@ impl ErrorDisplayWindow {
 
         self.tauri_app_handle.create_window(
             tauri_app_handle_wrapper::CreateWindowArgs {
-            label: WINDOW_LABEL, /* the unique window label */
+            label: WINDOW_LABEL.to_string(), /* the unique window label */
             url: tauri::WindowUrl::App("#/settings-load-error".into()),
-            title: Some("Error Loading Settings | Joytyping"),
+            title: Some("Error Loading Settings | Joytyping".to_string()),
             initialization_script: Some(
                 format!("window.__ERROR_MESSAGE__ = `{}`;",err_string)),
             inner_size: Some(HeightAndWidth{height: 500.0, width: 500.0}),

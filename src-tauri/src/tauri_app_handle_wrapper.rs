@@ -16,7 +16,7 @@ pub trait TauriAppHandleTrait {
     fn emit_window_event(
         &self, label: &str, event: &str, payload: EmitWindowEventPayload) 
         -> Result<WindowOperationOutcome,tauri::Error>;
-    fn create_window<'a>(&self,args: CreateWindowArgs<'a>) -> Result<(),tauri::Error>;
+    fn create_window(&self,args: CreateWindowArgs) -> Result<(),tauri::Error>;
 }
 
 pub struct TauriAppHandleWrapper {
@@ -108,11 +108,11 @@ impl TauriAppHandleTrait for TauriAppHandleWrapper {
     }
 }
 
-pub struct CreateWindowArgs<'a> {
-    pub label: &'a str,
+pub struct CreateWindowArgs {
+    pub label: String,
     pub url: WindowUrl,
     pub initialization_script: Option<String>,
-    pub title: Option<&'a str>,
+    pub title: Option<String>,
     pub inner_size: Option<HeightAndWidth>,
     pub center: Option<()>,
     pub decorations: Option<bool>,

@@ -102,7 +102,7 @@ impl QuickLookupWindowTrait for QuickLookupWindow {
             == WindowOperationOutcome::WindowNotFound {
             self.tauri_app_handle.create_window(
                 tauri_app_handle_wrapper::CreateWindowArgs{
-                    label: WINDOW_LABEL,
+                    label: WINDOW_LABEL.to_string(),
                     url: tauri::WindowUrl::App("quick-lookup.html".into()),
                     initialization_script: 
                         if let Some(init_script) = &self.initialization_script {
@@ -118,7 +118,7 @@ impl QuickLookupWindowTrait for QuickLookupWindow {
                         } else {
                             None
                         },
-                    title: Some("Joytyping Quick Lookup"),
+                    title: Some("Joytyping Quick Lookup".to_string()),
                     inner_size: Some(self.quick_lookup_window_settings.inner_size.clone()),
                     center: Some(()),
                     decorations: Some(false),
