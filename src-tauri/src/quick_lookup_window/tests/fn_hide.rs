@@ -88,3 +88,30 @@ fn works_when_a_window_was_opened_with_another_switch() {
     assert!(quick_lookup_window.hide(Switch::Button(gilrs::Button::East)).is_ok());
 }
 
+#[test]
+fn handles_hide_window_error() {
+    let mut mock_tauri_app_handle = MockTauriAppHandleTrait::new();
+    let mock_files = MockFilesTrait::new();
+
+    mock_tauri_app_handle
+        .expect_hide_window()
+        .with(eq(WINDOW_LABEL))
+        .returning(|_| Err(tauri::Error::InvalidWindowHandle));
+
+    let mut quick_lookup_window = QuickLookupWindow { 
+        tauri_app_handle: Box::new(mock_tauri_app_handle),
+        current_state: QuickLookupWindowState::Hidden,
+        initialization_script: None,
+        current_layer: 0,
+        files: Box::new(mock_files),
+        quick_lookup_window_settings: 
+            setup_quick_lookup_window_settings_example(),
+        restart_on_change_file_path: 
+            Some("other/file/path/bundle.js".to_string()),
+    };
+    assert_eq!(
+        quick_lookup_window.hide(Switch::Button(gilrs::Button::East))
+        .unwrap_err()
+        .to_string(),
+        "Unexpected `raw_window_handle` for the current platform".to_string());
+}
