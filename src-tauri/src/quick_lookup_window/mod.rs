@@ -161,7 +161,7 @@ impl QuickLookupWindowTrait for QuickLookupWindow {
 
 }
 
-#[derive(Clone, serde::Serialize)]
+#[derive(Clone, serde::Serialize, Debug, PartialEq)]
 pub struct UpdateKeyboardEventPayload {
   layer: usize,
 }

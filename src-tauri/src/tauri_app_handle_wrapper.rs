@@ -128,6 +128,7 @@ pub enum WindowOperationOutcome {
     WindowNotFound,
 }
 
+#[derive(Debug,PartialEq)]
 pub enum EmitWindowEventPayload {
     UpdateKeyboardEventPayload(UpdateKeyboardEventPayload),
 }
