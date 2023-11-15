@@ -39,6 +39,7 @@ pub fn start_main_loop(
     'main_loop_initializer_loop: loop {
         // close any open window first while there's time
         let _ = settings_error_display_window.close();
+        std::thread::sleep(std::time::Duration::from_millis(100));
 
         let mut settings = Settings::new(
             Box::new(SettingsDependenciesImpl),
