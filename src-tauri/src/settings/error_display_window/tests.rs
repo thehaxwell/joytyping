@@ -18,6 +18,11 @@ fn fn_open_and_show_works() {
     let mut mock_tauri_app_handle = MockTauriAppHandleTrait::new();
 
     mock_tauri_app_handle
+        .expect_window_is_open()
+        .with(eq(WINDOW_LABEL))
+        .return_const(false);
+
+    mock_tauri_app_handle
         .expect_create_window()
         .with(eq(tauri_app_handle_wrapper::CreateWindowArgs{
                     label: WINDOW_LABEL.to_string(),
@@ -48,6 +53,10 @@ fn fn_open_and_show_works() {
 fn fn_open_and_show_handles_create_window_error() {
     let mut mock_tauri_app_handle = MockTauriAppHandleTrait::new();
 
+    mock_tauri_app_handle
+        .expect_window_is_open()
+        .with(eq(WINDOW_LABEL))
+        .return_const(false);
     mock_tauri_app_handle
         .expect_create_window()
         .with(eq(tauri_app_handle_wrapper::CreateWindowArgs{

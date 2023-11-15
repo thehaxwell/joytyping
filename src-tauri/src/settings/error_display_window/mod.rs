@@ -19,6 +19,11 @@ impl ErrorDisplayWindow {
 
     pub fn open_and_show<S: ToString>(
         &mut self, error: S) -> Result<(), tauri::Error> {
+
+        if self.tauri_app_handle.window_is_open(WINDOW_LABEL) {
+            panic!("Don't try to open a window when one is already exists");
+        }
+
         // escape `(tilda) becuase that's what is used in the 
         // initialization_script to delimit the error message string
         let err_string: &str = &str::replace(&error.to_string(),"`",r#"\`"#);

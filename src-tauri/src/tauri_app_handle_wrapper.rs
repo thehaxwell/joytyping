@@ -58,6 +58,7 @@ impl TauriAppHandleTrait for TauriAppHandleWrapper {
         self.operate_on_window(label, |win|win.close())
     }
 
+    //TODO: change this to window_is_built
     fn window_is_open(&self, label: &str) -> bool {
         self.tauri_app_handle.get_window(label).is_some()
     }
