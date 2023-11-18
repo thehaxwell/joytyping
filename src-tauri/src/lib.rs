@@ -47,12 +47,15 @@ pub fn start_main_loop(
                 Box::new(AppDataDirectoryDependenciesImpl))),
             );
 
-        if let Err(e) = settings.load() {
-           let _ = settings_error_display_window.open_and_show(e);
-           break 'main_loop_initializer_loop;
+        let mut settings_data;
+        match settings.load() {
+            Ok(data) => settings_data = data,
+            Err(e) => {
+               let _ = settings_error_display_window.open_and_show(e);
+               break 'main_loop_initializer_loop;
+            }
         }
 
-        let mut settings_data = settings.get_data().unwrap();
 
         let active_profile_index_option = settings_data.profiles.iter()
             .position(|profile| profile.name == settings_data.global.default_profile);

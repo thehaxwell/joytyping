@@ -35,7 +35,6 @@ impl SettingsDependencies for SettingsDependenciesImpl {
 }
 
 pub struct Settings {
-    data: Option<SettingsData>,
     dependencies: Box<dyn SettingsDependencies>,
     app_data_directory_manager: Box<dyn AppDataDirectoryManagerTrait>,
 }
@@ -46,7 +45,6 @@ impl Settings {
        app_data_directory_manager: Box<dyn AppDataDirectoryManagerTrait>,
        ) -> Self{
         Self{
-            data: None,
             dependencies:deps,
             app_data_directory_manager
         }
@@ -54,7 +52,7 @@ impl Settings {
 
     /// Load settings from the specified file.
     /// If reading or parsing the file fails, load the default settings.
-    pub fn load(&mut self) -> Result<(), SettingsLoadError> {
+    pub fn load(&mut self) -> Result<SettingsData, SettingsLoadError> {
         match self.app_data_directory_manager
             .get_app_data_directory()
             .map_err(|()|SettingsLoadError::FileNotFound)
@@ -86,17 +84,12 @@ impl Settings {
                           .map_err(|e:String|SettingsLoadError::FileNotParsable(e)))
             {
                 Ok(data) => {
-                    self.data = Some(data);
-                    Ok(())
+                    Ok(data)
                 }
                 Err(e) => {
                     Err(e)
                 }
             }
-    }
-
-    pub fn get_data(&self) -> Option<SettingsData> {
-        self.data.clone()
     }
 }
 
