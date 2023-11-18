@@ -2,7 +2,7 @@ use enigo::Key;
 use gilrs::Button;
 use mockall::predicate::*;
 
-use crate::{gamepad::{switch_click_pattern_detector::{MockSwitchClickPatternDetectorTrait, SwitchClickPattern}, gilrs_events::MockGilrsEventsTrait, layers_navigator::MockLayersNavigatorTrait, cardinal_levers_move_detector, Gamepad, InputEvent, Switch}, quick_lookup_window::MockQuickLookupWindowTrait, settings::data::{LayerSpecifier, SwitchEventAndReaction, SwitchOnClickReaction, KeyboardInput}};
+use crate::{gamepad::{switch_click_pattern_detector::{MockSwitchClickPatternDetectorTrait, SwitchClickPattern}, gilrs_events::MockGilrsEventsTrait, layers_navigator::MockLayersNavigatorTrait, cardinal_levers_move_detector, Gamepad, InputEvent, Switch}, quick_lookup_window::MockQuickLookupWindowTrait, models::layout::{LayerSpecifier, SwitchEventAndReaction, SwitchOnClickReaction, KeyboardInput}};
 
 use super::super::{gilrs_events::stick_switch_interpreter::StickSwitchButton, layers_wrapper::MockLayersWrapperTrait, layers_navigator::LayerVisitTrigger};
 
@@ -656,7 +656,7 @@ fn setup_handles_move_to_layer_events(
             .expect_get_cardinal_levers()
             .times(1)
             .with(eq(args.new_layer_index))
-            .return_const(None);
+            .returning(|_| None);
 
         mock_mouse_cardinal_levers_move_detector
             .expect_set_mouse_controls()
@@ -822,7 +822,7 @@ fn setup_handles_visit_layer_events(
             .expect_get_cardinal_levers()
             .times(1)
             .with(eq(args.new_layer_index))
-            .return_const(None);
+            .returning(|_| None);
 
         mock_mouse_cardinal_levers_move_detector
             .expect_set_mouse_controls()
@@ -990,7 +990,7 @@ fn setup_handles_move_to_or_visit_layer_events(
             .expect_get_cardinal_levers()
             .times(1)
             .with(eq(args.new_layer_index))
-            .return_const(None);
+            .returning(|_| None);
 
         mock_mouse_cardinal_levers_move_detector
             .expect_set_mouse_controls()
@@ -1146,7 +1146,7 @@ fn setup_handles_show_quick_lookup_window(
             .expect_get_cardinal_levers()
             .times(1)
             .with(eq(args.new_layer_index))
-            .return_const(None);
+            .returning(|_| None);
 
         mock_mouse_cardinal_levers_move_detector
             .expect_set_mouse_controls()

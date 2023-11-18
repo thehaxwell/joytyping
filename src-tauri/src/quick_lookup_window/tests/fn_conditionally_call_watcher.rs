@@ -1,16 +1,15 @@
 use std::{path::Path, io::ErrorKind};
 
-use crate::{settings::data, quick_lookup_window::{files::MockFilesTrait, QuickLookupWindow, QuickLookupWindowState}, tauri_app_handle_wrapper::MockTauriAppHandleTrait};
+use crate::{models, quick_lookup_window::{files::MockFilesTrait, QuickLookupWindow, QuickLookupWindowState}, tauri_app_handle_wrapper::MockTauriAppHandleTrait};
 
 
-fn setup_quick_lookup_window_settings_example(js_path:String) -> data::QuickLookupWindow {
-    data::QuickLookupWindow{
-        theme: Some(data::QuickLookupWindowTheme::Light),
-        inner_size: data::HeightAndWidth{
+fn setup_quick_lookup_window_settings_example(js_path:String) -> models::QuickLookupWindow {
+    models::QuickLookupWindow{
+        inner_size: models::HeightAndWidth{
             height: 100.0,
             width: 100.0,
         },
-        source_code: data::BrowserSourceCode{
+        source_code: models::BrowserSourceCode{
             js_iife_bundle_file_path: js_path,
             css_file_path: None,
         }

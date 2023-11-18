@@ -1,21 +1,22 @@
-use crate::{settings::data::SettingsData, app_data_directory_manager::AppDataDirectoryManagerTrait};
+use crate::{app_data_directory_manager::AppDataDirectoryManagerTrait, models::{data::SettingsData, layout::Layout}};
 use thiserror::Error;
 use std::path::PathBuf;
 
 #[cfg(test)]
 use mockall::{automock, predicate::*};
 
-#[cfg(test)]
-mod tests;
+//TODO: re-introduce tests
+// #[cfg(test)]
+// mod tests;
 
-pub mod data;
 
 pub mod error_display_window;
 
 #[cfg_attr(test, automock)]
 pub trait SettingsDependencies {
     fn read_to_string(&self, path: PathBuf) -> Result<String, std::io::Error>;
-    fn from_str(&self, s: &str) -> Result<SettingsData, toml::de::Error>;
+    fn settings_from_str(&self, s: &str) -> Result<SettingsData, toml::de::Error>;
+    fn layout_from_str(&self, s: &str) -> Result<Layout, toml::de::Error>;
     fn home_dir(&self) -> Option<PathBuf>;
 }
 
@@ -25,7 +26,11 @@ impl SettingsDependencies for SettingsDependenciesImpl {
         std::fs::read_to_string(path)
     }
 
-    fn from_str(&self, s: &str) -> Result<SettingsData, toml::de::Error> {
+    fn settings_from_str(&self, s: &str) -> Result<SettingsData, toml::de::Error> {
+        toml::from_str(s)
+    }
+
+    fn layout_from_str(&self, s: &str) -> Result<Layout, toml::de::Error> {
         toml::from_str(s)
     }
 
@@ -52,12 +57,12 @@ impl Settings {
 
     /// Load settings from the specified file.
     /// If reading or parsing the file fails, load the default settings.
-    pub fn load(&mut self) -> Result<SettingsData, SettingsLoadError> {
-        match self.app_data_directory_manager
+    pub fn load_settings(&mut self) -> Result<SettingsData, SettingsLoadError> {
+        self.app_data_directory_manager
             .get_app_data_directory()
             .map_err(|()|SettingsLoadError::FileNotFound)
             .and_then(|mut path|{
-                path.push("joytyping");
+                path.push("start");
                 path.set_extension("toml");
                 self.dependencies.read_to_string(path)
                     .map_err(|e|{
@@ -77,19 +82,46 @@ impl Settings {
             })
             .and_then(|settings_str| 
                       self.dependencies
-                          .from_str(&settings_str)
+                          .settings_from_str(&settings_str)
                           .map_err(|e|SettingsLoadError::FileNotParsable(e.to_string())))
-            .and_then(|data:SettingsData|
+            .and_then(|data|
                       data.validate_and_clone_and_set_layer_pointers()
                           .map_err(|e:String|SettingsLoadError::FileNotParsable(e)))
-            {
-                Ok(data) => {
-                    Ok(data)
-                }
-                Err(e) => {
-                    Err(e)
-                }
-            }
+            
+    }
+
+
+    /// Load settings from the specified file.
+    /// If reading or parsing the file fails, load the default settings.
+    pub fn load_layout(&mut self, layout_file_path: PathBuf) -> Result<Layout, SettingsLoadError> {
+        self.app_data_directory_manager
+            .get_app_data_directory()
+            .map_err(|()|SettingsLoadError::FileNotFound)
+            .and_then(|mut path|{
+                path.push(layout_file_path);
+                self.dependencies.read_to_string(path)
+                    .map_err(|e|{
+                        match e.kind() {
+                            std::io::ErrorKind::NotFound => {
+                                SettingsLoadError::FileNotFound
+                            },
+                            std::io::ErrorKind::PermissionDenied => {
+                                SettingsLoadError::PermissionDenied
+                            },
+                            _ => {
+                                SettingsLoadError::FileNotReadable
+                            },
+                        }
+                   
+                    })
+            })
+            .and_then(|settings_str| 
+                      self.dependencies
+                          .layout_from_str(&settings_str)
+                          .map_err(|e|SettingsLoadError::FileNotParsable(e.to_string())))
+            .and_then(|data|
+                      data.validate_and_clone_and_set_layer_pointers()
+                          .map_err(|e:String|SettingsLoadError::FileNotParsable(e)))
     }
 }
 

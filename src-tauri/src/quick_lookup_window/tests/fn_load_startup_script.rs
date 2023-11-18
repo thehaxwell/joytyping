@@ -1,14 +1,13 @@
 use gilrs::Button;
 use mockall::predicate::eq;
 
-use crate::{tauri_app_handle_wrapper::{MockTauriAppHandleTrait, WindowOperationOutcome}, quick_lookup_window::{files::{MockFilesTrait, StartupScriptLoadError}, QuickLookupWindow, QuickLookupWindowState}, settings::data, gamepad::Switch};
+use crate::{tauri_app_handle_wrapper::{MockTauriAppHandleTrait, WindowOperationOutcome}, quick_lookup_window::{files::{MockFilesTrait, StartupScriptLoadError}, QuickLookupWindow, QuickLookupWindowState}, models, gamepad::Switch};
 
 const WINDOW_LABEL: &str = "quick-lookup";
 fn setup_quick_lookup_window_settings_example(
-    source_code: data::BrowserSourceCode) -> data::QuickLookupWindow {
-    data::QuickLookupWindow{
-        theme: Some(data::QuickLookupWindowTheme::Light),
-        inner_size: data::HeightAndWidth{
+    source_code: models::BrowserSourceCode) -> models::QuickLookupWindow {
+    models::QuickLookupWindow{
+        inner_size: models::HeightAndWidth{
             height: 100.0,
             width: 100.0,
         },
@@ -43,7 +42,7 @@ fn works_when_no_window_is_open() {
         current_layer: 0,
         files: Box::new(mock_files),
         quick_lookup_window_settings: setup_quick_lookup_window_settings_example(
-            data::BrowserSourceCode{
+            models::BrowserSourceCode{
                 js_iife_bundle_file_path: "path/to/file/bundle.js".to_string(),
                 css_file_path: None,
             }),
@@ -90,7 +89,7 @@ fn works_when_a_window_is_open() {
         current_layer: 0,
         files: Box::new(mock_files),
         quick_lookup_window_settings: setup_quick_lookup_window_settings_example(
-            data::BrowserSourceCode{
+            models::BrowserSourceCode{
                 js_iife_bundle_file_path: "path/to/file/bundle.js".to_string(),
                 css_file_path: None,
             }),
@@ -145,7 +144,7 @@ fn works_when_css_is_expected_and_no_window_is_open() {
         current_layer: 0,
         files: Box::new(mock_files),
         quick_lookup_window_settings: setup_quick_lookup_window_settings_example(
-            data::BrowserSourceCode{
+            models::BrowserSourceCode{
                 js_iife_bundle_file_path: "path/to/file/bundle.js".to_string(),
                 css_file_path: Some("styles.css".to_string()),
             }),
@@ -187,7 +186,7 @@ fn handles_load_css_error() {
         current_layer: 0,
         files: Box::new(mock_files),
         quick_lookup_window_settings: setup_quick_lookup_window_settings_example(
-            data::BrowserSourceCode{
+            models::BrowserSourceCode{
                 js_iife_bundle_file_path: "path/to/file/bundle.js".to_string(),
                 css_file_path: None,
             }),
@@ -230,7 +229,7 @@ fn handles_load_js_error() {
         current_layer: 0,
         files: Box::new(mock_files),
         quick_lookup_window_settings: setup_quick_lookup_window_settings_example(
-            data::BrowserSourceCode{
+            models::BrowserSourceCode{
                 js_iife_bundle_file_path: "path/to/file/bundle.js".to_string(),
                 css_file_path: None,
             }),

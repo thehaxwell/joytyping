@@ -28,6 +28,7 @@ pub mod input_controller;
 pub mod quick_lookup_window;
 pub mod app_data_directory_manager;
 pub mod tauri_app_handle_wrapper;
+pub mod models;
 
 pub fn start_main_loop(
     handle: tauri::AppHandle
@@ -48,7 +49,7 @@ pub fn start_main_loop(
             );
 
         let mut settings_data;
-        match settings.load() {
+        match settings.load_settings() {
             Ok(data) => settings_data = data,
             Err(e) => {
                let _ = settings_error_display_window.open_and_show(e);
@@ -64,6 +65,15 @@ pub fn start_main_loop(
             Some(idx) => idx,
             None => 0
         });
+
+        let active_layout: models::layout::Layout;
+        match settings.load_layout(active_profile.layout_config_relative_file_path.into()) {
+            Ok(data) => active_layout = data,
+            Err(e) => {
+               let _ = settings_error_display_window.open_and_show(e);
+               break 'main_loop_initializer_loop;
+            }
+        }
 
         // assert_eq!(
         //     active_profile.layers.remove(0).switches.unwrap().east.unwrap().on_click.unwrap().keyboard.unwrap().key,
@@ -97,7 +107,7 @@ pub fn start_main_loop(
          = QuickLookupWindow::new(
             Box::new(TauriAppHandleWrapper::new(handle.clone())),
            settings_data.development.and_then(|dev| dev.quick_lookup_window),
-           active_profile.quick_lookup_window,
+           active_layout.quick_lookup_window,
             Box::new(quick_lookup_window::files::Files::new(
                Box::new(FilesDependenciesImpl),
                Box::new(AppDataDirectoryManager::new(
@@ -152,9 +162,9 @@ pub fn start_main_loop(
                     LeftOrRight::Right,
                 )),
             )),
-            Box::new(LayersWrapper::new(active_profile.layers.clone(),active_profile.left_upper_is_d_pad)),
+            Box::new(LayersWrapper::new(active_layout.layers.clone(),active_profile.left_upper_is_d_pad)),
             Box::new(SwitchClickPatternDetector::new(active_profile.switch_click_event_thresholds)),
-            Box::new(LayersNavigator::new(active_profile.layers,active_profile.left_upper_is_d_pad)),
+            Box::new(LayersNavigator::new(active_layout.layers,active_profile.left_upper_is_d_pad)),
             Box::new(quick_lookup_window),
             Box::new(cardinal_levers_move_detector::mouse::Mouse::new(
                 Box::new(CardinalLeversMoveDetector::new()),

@@ -1,4 +1,4 @@
-use crate::{settings::data::{CardinalLevers, SingleCardinalLever}, gamepad::InputEvent};
+use crate::{models::layout::{CardinalLevers, SingleCardinalLever}, gamepad::InputEvent};
 
 use super::CardinalLeversMoveDetectorTrait;
 

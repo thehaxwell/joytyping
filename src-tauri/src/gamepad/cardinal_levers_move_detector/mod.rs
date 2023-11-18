@@ -1,4 +1,4 @@
-use crate::settings::data::MouseControl;
+use crate::models::layout::MouseControl;
 
 #[cfg(test)]
 use mockall::{automock, predicate::*};

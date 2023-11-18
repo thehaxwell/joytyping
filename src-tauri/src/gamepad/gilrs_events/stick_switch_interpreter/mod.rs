@@ -1,4 +1,5 @@
 use crate::LeftOrRight;
+use crate::models;
 use crate::settings;
 
 #[cfg(test)]
@@ -114,7 +115,7 @@ pub struct AxisClickThresholds {
 
 impl AxisClickThresholds {
     pub fn get_from_setting(
-        thresholds: settings::data::StickSwitchesClickThresholds, alignment: LeftOrRight
+        thresholds: models::data::StickSwitchesClickThresholds, alignment: LeftOrRight
         ) -> Self {
         if alignment == LeftOrRight::Left {
             Self {

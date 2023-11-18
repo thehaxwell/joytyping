@@ -1,18 +1,17 @@
 use mockall::predicate::eq;
 
-use crate::{settings::data, quick_lookup_window::{files::MockFilesTrait, QuickLookupWindow, QuickLookupWindowTrait, QuickLookupWindowState}, tauri_app_handle_wrapper::{MockTauriAppHandleTrait, WindowOperationOutcome, self}, gamepad::Switch};
+use crate::{models, quick_lookup_window::{files::MockFilesTrait, QuickLookupWindow, QuickLookupWindowTrait, QuickLookupWindowState}, tauri_app_handle_wrapper::{MockTauriAppHandleTrait, WindowOperationOutcome, self}, gamepad::Switch};
 
 
 const WINDOW_LABEL: &str = "quick-lookup";
 
-fn setup_quick_lookup_window_settings_example() -> data::QuickLookupWindow {
-    data::QuickLookupWindow{
-        theme: Some(data::QuickLookupWindowTheme::Light),
-        inner_size: data::HeightAndWidth{
+fn setup_quick_lookup_window_settings_example() -> models::QuickLookupWindow {
+    models::QuickLookupWindow{
+        inner_size: models::HeightAndWidth{
             height: 100.0,
             width: 100.0,
         },
-        source_code: data::BrowserSourceCode{
+        source_code: models::BrowserSourceCode{
             js_iife_bundle_file_path: "path/to/file/bundle.js".to_string(),
             css_file_path: None,
         }
@@ -57,13 +56,12 @@ fn works_when_the_window_didnt_exist() {
         .returning(|_| Ok(WindowOperationOutcome::WindowNotFound));
 
     let initialization_script = "initialization_script placeholder".to_string();
-    let quick_lookup_window_settings = data::QuickLookupWindow {
-        theme: Some(data::QuickLookupWindowTheme::Light),
-        inner_size: data::HeightAndWidth{
+    let quick_lookup_window_settings = models::QuickLookupWindow {
+        inner_size: models::HeightAndWidth{
             height: 100.0,
             width: 100.0,
         },
-        source_code: data::BrowserSourceCode{
+        source_code: models::BrowserSourceCode{
             js_iife_bundle_file_path: "path/to/file/bundle.js".to_string(),
             css_file_path: None,
         }
@@ -148,13 +146,12 @@ fn handle_create_window_error() {
         .returning(|_| Ok(WindowOperationOutcome::WindowNotFound));
 
     let initialization_script = "initialization_script placeholder".to_string();
-    let quick_lookup_window_settings = data::QuickLookupWindow {
-        theme: Some(data::QuickLookupWindowTheme::Light),
-        inner_size: data::HeightAndWidth{
+    let quick_lookup_window_settings = models::QuickLookupWindow {
+        inner_size: models::HeightAndWidth{
             height: 100.0,
             width: 100.0,
         },
-        source_code: data::BrowserSourceCode{
+        source_code: models::BrowserSourceCode{
             js_iife_bundle_file_path: "path/to/file/bundle.js".to_string(),
             css_file_path: None,
         }

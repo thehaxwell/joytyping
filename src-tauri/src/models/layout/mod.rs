@@ -6,104 +6,22 @@ use serde::de::{self, Deserializer, Visitor, MapAccess};
 
 use crate::{settings::LayerNodeRef, gamepad::{Switch, gilrs_events::stick_switch_interpreter::StickSwitchButton}};
 
-use self::err_message_builder::{ErrMessageBuilderNode, ErrMessageBuilder};
+use super::{QuickLookupWindow, err_message_builder::{ErrMessageBuilder, ErrMessageBuilderNode}};
 
 #[cfg(test)]
 mod tests;
 
-mod err_message_builder;
-
 #[derive(Deserialize, Debug, Clone, PartialEq)]
-pub struct SettingsData {
-	pub profiles: Vec<Profile>,
-    pub global: Global,
-    pub development: Option<Development>,
-}
-
-impl SettingsData {
-    pub fn validate_and_clone_and_set_layer_pointers(&self) -> Result<Self,String> {
-        let err_message_builder = ErrMessageBuilder::new();
-
-        Ok(SettingsData { 
-            profiles: self.profiles
-                .iter()
-                .map(|profile|profile.validate_and_clone_and_set_layer_pointers(
-                    err_message_builder
-                        .branch(ErrMessageBuilderNode::OneOfMany {
-                            field: "profiles".to_string(), specific_id: profile.name.clone() })))
-                .collect::<Result<Vec<_>,_>>()?,
-            global: self.global.clone(),
-            development:
-                if let Some(dev) = &self.development {
-                    Some(dev.validate_and_clone(
-                        err_message_builder
-                            .branch(ErrMessageBuilderNode::Single { field: "development".to_string() }))?)
-                }
-                else {
-                    None
-                },
-        })    
-    }
-}
-
-#[derive(Deserialize, Debug, Clone, PartialEq)]
-pub struct Development {
-    pub quick_lookup_window: Option<QuickLookupWindow>,
-}
-
-impl Development {
-    pub fn validate_and_clone(
-        &self,
-        err_message_builder: ErrMessageBuilder) -> Result<Self,String> {
-        // if let Some(window) = &self.quick_lookup_window {
-        //     window.validate(
-        //         err_message_builder
-        //             .branch(ErrMessageBuilderNode::Single { field: "quick_lookup_window".to_string() }))?;
-        // }
-        Ok(Development {
-            quick_lookup_window: 
-                if let Some(window) = &self.quick_lookup_window {
-                    Some(window.validate_and_clone(
-                        err_message_builder
-                            .branch(ErrMessageBuilderNode::Single {
-                                field: "quick_lookup_window".to_string() }))?)
-                }
-                else {
-                    None
-                },
-        })
-    }
-}
-
-#[derive(Deserialize, Debug, Clone, PartialEq)]
-pub struct Global {
-    pub default_profile: String,
-}
-
-#[derive(Deserialize, Debug, Clone, PartialEq)]
-pub struct Profile {
-	pub name: String,
+pub struct Layout {
     pub quick_lookup_window: QuickLookupWindow,
     pub layers: Vec<Layer>,
-    pub stick_switches_click_thresholds: StickSwitchesClickThresholds,
-    pub trigger_2_switches_click_thresholds: Trigger2SwitchesClickThresholds,
-    pub left_upper_is_d_pad: bool,
-    #[serde(default = "default_switch_click_event_thresholds")]
-    pub switch_click_event_thresholds: SwitchClickEventThresholds,
-}
-fn default_switch_click_event_thresholds() -> SwitchClickEventThresholds {
-    SwitchClickEventThresholds {
-        minimum_milliseconds_down_for_click_and_hold:
-            default_switch_click_event_threshold_milliseconds(),
-        maximum_milliseconds_between_clicks_for_double_click: 
-            default_switch_click_event_threshold_milliseconds(),
-    }
 }
 
-impl Profile {
-    fn validate_and_clone_and_set_layer_pointers(
+impl Layout {
+    pub fn validate_and_clone_and_set_layer_pointers(
         &self,
-        err_message_builder: ErrMessageBuilder) -> Result<Self,String> {
+        ) -> Result<Self,String> {
+        let err_message_builder = ErrMessageBuilder::new();
         let pointers: Vec<LayerNodeRef> = self.layers
             .iter()
             .enumerate()
@@ -117,17 +35,7 @@ impl Profile {
             .collect();
 
 
-        self.stick_switches_click_thresholds
-            .validate(err_message_builder
-                .branch(ErrMessageBuilderNode::Single {
-                    field: "stick_switches_click_thresholds".to_string()}))?;
-        self.trigger_2_switches_click_thresholds
-            .validate(err_message_builder
-                .branch(ErrMessageBuilderNode::Single {
-                    field: "trigger_2_switches_click_thresholds".to_string()}))?;
-
-        Ok(Profile {
-            name: self.name.clone(),
+        Ok(Layout {
             quick_lookup_window:
                 self.quick_lookup_window
                     .validate_and_clone(err_message_builder
@@ -143,52 +51,6 @@ impl Profile {
                                 field: "layers".to_string(), specific_id: layer.id.clone() })
                         ))
                 .collect::<Result<Vec<_>,_>>()?,
-            stick_switches_click_thresholds: self.stick_switches_click_thresholds,
-            trigger_2_switches_click_thresholds: self.trigger_2_switches_click_thresholds,
-            left_upper_is_d_pad: self.left_upper_is_d_pad,
-            switch_click_event_thresholds: self.switch_click_event_thresholds.clone(),
-        })
-    }
-}
-
-#[derive(Deserialize, Debug, Clone, PartialEq)]
-pub struct SwitchClickEventThresholds {
-    #[serde(default = "default_switch_click_event_threshold_milliseconds")]
-    pub minimum_milliseconds_down_for_click_and_hold: u64,
-    #[serde(default = "default_switch_click_event_threshold_milliseconds")]
-    pub maximum_milliseconds_between_clicks_for_double_click: u64,
-}
-fn default_switch_click_event_threshold_milliseconds() -> u64 {500}
-
-#[derive(Deserialize, Debug, Clone, PartialEq)]
-pub struct QuickLookupWindow {
-    pub inner_size: HeightAndWidth,
-    pub source_code: BrowserSourceCode,
-    pub theme: Option<QuickLookupWindowTheme>,
-}
-
-impl QuickLookupWindow {
-    pub fn validate_and_clone(
-        &self,
-        err_message_builder: ErrMessageBuilder) -> Result<Self,String> {
-        self.inner_size.validate(
-            err_message_builder
-                .branch(ErrMessageBuilderNode::Single { field: "inner_size".to_string() }))?;
-        Ok(QuickLookupWindow { 
-            inner_size: self.inner_size.clone(),
-            source_code: self.source_code.clone(),
-            // if the theme isn't specified then default to the
-            // system setting
-            theme: if let Some(th) = &self.theme {
-                    Some(th.clone())
-                }
-                else {
-                    Some(match dark_light::detect() {
-                        dark_light::Mode::Dark => QuickLookupWindowTheme::Dark,
-                        dark_light::Mode::Light => QuickLookupWindowTheme::Light,
-                        dark_light::Mode::Default => QuickLookupWindowTheme::Dark,
-                    })
-                }
         })
     }
 }
@@ -200,133 +62,7 @@ pub enum QuickLookupWindowTheme {
     Dark,
 }
 
-#[derive(Deserialize, Debug, Clone, PartialEq)]
-pub struct BrowserSourceCode {
-    pub js_iife_bundle_file_path: String,
-    pub css_file_path: Option<String>,
-}
 
-#[derive(Deserialize, Debug, Clone, PartialEq)]
-pub struct HeightAndWidth {
-    pub width: f64,
-    pub height: f64,
-}
-
-impl HeightAndWidth {
-    pub fn validate(
-        &self,
-        err_message_builder: ErrMessageBuilder) -> Result<(),String> {
-            let thresholds_arr = [
-                (self.height, "height"),
-                (self.width, "width"),
-            ];
-            thresholds_arr
-                .iter()
-                .map(|(threshold,label)|{
-                    if *threshold < 0.0 {
-                        Err(err_message_builder
-                            .branch(ErrMessageBuilderNode::Single { field: label.to_string() })
-                            .build_message(format!(
-                                "value ({}) is lower than the minimum acceptable 0.0",
-                                threshold)))
-                    }
-                    else {
-                        Ok(())
-                    }
-                })
-                .collect()
-    }
-}
-
-#[derive(Deserialize, Debug, Clone, Copy, PartialEq)]
-pub struct StickSwitchesClickThresholds {
-    pub left_stick_up: f32,
-    pub left_stick_down: f32,
-    pub left_stick_left: f32,
-    pub left_stick_right: f32,
-    pub right_stick_up: f32,
-    pub right_stick_down: f32,
-    pub right_stick_left: f32,
-    pub right_stick_right: f32,
-}
-
-impl StickSwitchesClickThresholds {
-    pub fn validate(
-        &self,
-        err_message_builder: ErrMessageBuilder) -> Result<(),String> {
-            let thresholds_arr = [
-                (self.left_stick_up, "left_stick_up"),
-                (self.left_stick_down, "left_stick_down"),
-                (self.left_stick_left, "left_stick_left"),
-                (self.left_stick_right, "left_stick_right"),
-                (self.right_stick_up, "right_stick_up"),
-                (self.right_stick_down, "right_stick_down"),
-                (self.right_stick_left, "right_stick_left"),
-                (self.right_stick_right, "right_stick_right"),
-            ];
-            thresholds_arr
-                .iter()
-                .map(|(threshold,label)|{
-                    if *threshold < 0.0 {
-                        Err(err_message_builder
-                            .branch(ErrMessageBuilderNode::Single { field: label.to_string() })
-                            .build_message(format!(
-                                "value ({}) is lower than the minimum acceptable 0.0",
-                                threshold)))
-                    }
-                    else if *threshold > 1.0 {
-                        Err(err_message_builder
-                            .branch(ErrMessageBuilderNode::Single { field: label.to_string() })
-                            .build_message(format!(
-                                "value ({}) is higher than the maximum acceptable 1.0",
-                                threshold)))
-                    }
-                    else {
-                        Ok(())
-                    }
-                })
-                .collect()
-    }
-}
-
-#[derive(Deserialize, Debug, Clone, Copy, PartialEq)]
-pub struct Trigger2SwitchesClickThresholds {
-    pub left_trigger_2: f32,
-    pub right_trigger_2: f32,
-}
-
-impl Trigger2SwitchesClickThresholds {
-    pub fn validate(
-        &self,
-        err_message_builder: ErrMessageBuilder) -> Result<(),String> {
-            let thresholds_arr = [
-                (self.left_trigger_2, "left_trigger_2"),
-                (self.right_trigger_2, "right_trigger_2"),
-            ];
-            thresholds_arr
-                .iter()
-                .map(|(threshold,label)|{
-                    if *threshold < 0.0 {
-                        Err(err_message_builder
-                            .branch(ErrMessageBuilderNode::Single { field: label.to_string() })
-                            .build_message(format!(
-                                "value ({}) is lower than the minimum acceptable 0.0",
-                                threshold)))
-                    }
-                    else if *threshold > 1.0 {
-                        Err(err_message_builder
-                            .branch(ErrMessageBuilderNode::Single { field: label.to_string() })
-                            .build_message(format!(
-                                "value ({}) is higher than the maximum acceptable 1.0",
-                                threshold)))
-                    }
-                    else {
-                        Ok(())
-                    }
-                })
-                .collect()
-    }
-}
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct Layer {

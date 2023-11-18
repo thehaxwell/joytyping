@@ -8,7 +8,7 @@ use gilrs::Button;
 // use crate::settings::data::SwitchEventAndReaction;
 // use crate::settings::data::SwitchOnClickReaction;
 
-use crate::settings::data::SwitchClickEventThresholds;
+use crate::models::data::SwitchClickEventThresholds;
 
 use super::SwitchClickPatternDetector;
 use super::SwitchClickPatternDetectorTrait;

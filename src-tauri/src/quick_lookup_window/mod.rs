@@ -1,4 +1,4 @@
-use crate::{settings::{self, data::QuickLookupWindowTheme}, gamepad::Switch, tauri_app_handle_wrapper::{WindowOperationOutcome, EmitWindowEventPayload}};
+use crate::{gamepad::Switch, tauri_app_handle_wrapper::{WindowOperationOutcome, EmitWindowEventPayload}, models};
 use crate::tauri_app_handle_wrapper::{self,TauriAppHandleTrait};
 
 #[cfg(test)]
@@ -26,15 +26,15 @@ pub struct QuickLookupWindow {
     current_layer: usize,
     files: Box<dyn FilesTrait>,
     initialization_script: Option<String>,
-    quick_lookup_window_settings: settings::data::QuickLookupWindow,
+    quick_lookup_window_settings: models::QuickLookupWindow,
     restart_on_change_file_path: Option<String>,
 }
 
 impl QuickLookupWindow {
     pub fn new(
        tauri_app_handle: Box<dyn TauriAppHandleTrait>,
-       dev_quick_lookup_window_settings: Option<settings::data::QuickLookupWindow>,
-       prod_quick_lookup_window_settings: settings::data::QuickLookupWindow,
+       dev_quick_lookup_window_settings: Option<models::QuickLookupWindow>,
+       prod_quick_lookup_window_settings: models::QuickLookupWindow,
        files: Box<dyn FilesTrait>,
        ) -> Self {
         Self { 
@@ -109,11 +109,13 @@ impl QuickLookupWindowTrait for QuickLookupWindow {
                             Some(format!(
                                "window.__START_LAYER__= {};document.documentElement.setAttribute('data-theme','{}');{}", 
                                self.current_layer,
-                               match self.quick_lookup_window_settings.theme {
-                                   Some(QuickLookupWindowTheme::Light) => "light",
-                                   Some(QuickLookupWindowTheme::Dark) => "dark",
-                                   None => "light",
-                               },
+                               "light",
+                               // TODO: use the layout theme here
+                               // match self.quick_lookup_window_settings.theme {
+                               //     Some(QuickLookupWindowTheme::Light) => "light",
+                               //     Some(QuickLookupWindowTheme::Dark) => "dark",
+                               //     None => "light",
+                               // },
                                init_script))
                         } else {
                             None

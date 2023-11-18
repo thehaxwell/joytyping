@@ -1,4 +1,4 @@
-use crate::{gamepad::cardinal_levers_move_detector::{CardinalLeversMoveDetector, calc}, settings::data::MouseControl};
+use crate::{gamepad::cardinal_levers_move_detector::{CardinalLeversMoveDetector, calc}, models::layout::MouseControl};
 
 use super::CardinalLeversMoveDetectorTrait;
 

@@ -1,24 +1,18 @@
-use crate::settings::data::*;
+use crate::models::{layout::*, BrowserSourceCode, HeightAndWidth};
 use enigo::{Key, MouseButton};
 
 pub struct SetupConfig {
     pub include_index_in_gamepad: bool,
     pub my_ps3_controller_first_layer_step_1_left_trigger_on_double_click_visit_layer_name: String,
-    pub my_ps3_controller_stick_switches_click_thresholds_left_stick_left: f32,
-    pub my_ps3_controller_stick_switches_click_thresholds_right_trigger_2: f32,
     pub my_ps3_controller_quick_lookup_window_inner_size_height: f64,
     pub my_ps3_controller_quick_lookup_window_inner_size_width: f64,
-    pub development_quick_lookup_window_inner_size_height: f64,
     pub my_ps3_controller_cardinal_levers_second_layer_step_4_left_stick_control_mouse_cursor_deadzone_upper_limit: f32,
     pub my_ps3_controller_cardinal_levers_second_layer_step_4_right_stick_control_mouse_scrollwheel_scale_factor: f32,
 }
 
-pub fn setup_settings_data_example(config: SetupConfig) -> SettingsData {
-    let ps4_controller_profile = Profile{
-        name: "My PS3 Controller".to_string(),
-        left_upper_is_d_pad: true,
+pub fn setup_example(config: SetupConfig) -> Layout {
+    Layout{
         quick_lookup_window: QuickLookupWindow{
-            theme: Some(QuickLookupWindowTheme::Light),
             inner_size: HeightAndWidth{
                 height: config.my_ps3_controller_quick_lookup_window_inner_size_height,
                 width: config.my_ps3_controller_quick_lookup_window_inner_size_width,
@@ -27,24 +21,6 @@ pub fn setup_settings_data_example(config: SetupConfig) -> SettingsData {
                 js_iife_bundle_file_path: "path/to/file/bundle.js".to_string(),
                 css_file_path: None,
             }
-        },
-        stick_switches_click_thresholds: StickSwitchesClickThresholds {
-            left_stick_up: 0.5,
-            left_stick_down: 0.5,
-            left_stick_left: config.my_ps3_controller_stick_switches_click_thresholds_left_stick_left,
-            left_stick_right: 0.5,
-            right_stick_up: 0.5,
-            right_stick_down: 0.5,
-            right_stick_left: 0.5,
-            right_stick_right: 0.5
-        },
-        trigger_2_switches_click_thresholds: Trigger2SwitchesClickThresholds { 
-            left_trigger_2: 0.3,
-            right_trigger_2: config.my_ps3_controller_stick_switches_click_thresholds_right_trigger_2, 
-        },
-        switch_click_event_thresholds: SwitchClickEventThresholds {
-            minimum_milliseconds_down_for_click_and_hold: 500,
-            maximum_milliseconds_between_clicks_for_double_click: 500,
         },
         layers: vec![
             Layer {
@@ -946,23 +922,5 @@ pub fn setup_settings_data_example(config: SetupConfig) -> SettingsData {
             },
 
       ]
-    };
-
-    SettingsData {
-        profiles: vec![ps4_controller_profile],
-        global: Global{default_profile:"My PS3 Controller".to_string()},
-        development: Some(Development {
-            quick_lookup_window: Some(QuickLookupWindow{
-                theme: Some(QuickLookupWindowTheme::Light),
-                inner_size: HeightAndWidth{
-                    height: config.development_quick_lookup_window_inner_size_height,
-                    width: 30.0,
-                },
-                source_code: BrowserSourceCode{
-                    js_iife_bundle_file_path: "path/to/file/bundle.js".to_string(),
-                    css_file_path: None,
-                }
-            }) 
-        }),
     }
 }

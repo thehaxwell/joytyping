@@ -1,13 +1,12 @@
-use crate::{settings::data, tauri_app_handle_wrapper::MockTauriAppHandleTrait, quick_lookup_window::{files::MockFilesTrait, QuickLookupWindow, QuickLookupWindowState}};
+use crate::{models, tauri_app_handle_wrapper::MockTauriAppHandleTrait, quick_lookup_window::{files::MockFilesTrait, QuickLookupWindow, QuickLookupWindowState}};
 
-fn setup_quick_lookup_window_settings_example() -> data::QuickLookupWindow {
-    data::QuickLookupWindow{
-        theme: Some(data::QuickLookupWindowTheme::Light),
-        inner_size: data::HeightAndWidth{
+fn setup_quick_lookup_window_settings_example() -> models::QuickLookupWindow {
+    models::QuickLookupWindow{
+        inner_size: models::HeightAndWidth{
             height: 100.0,
             width: 100.0,
         },
-        source_code: data::BrowserSourceCode{
+        source_code: models::BrowserSourceCode{
             js_iife_bundle_file_path: "path/to/file/bundle.js".to_string(),
             css_file_path: None,
         }
@@ -41,13 +40,12 @@ fn works_with_dev_quick_lookup_window_settings_set(){
 
     let quick_lookup_window = QuickLookupWindow::new(
         Box::new(mock_tauri_app_handle),
-        Some(data::QuickLookupWindow{
-            theme: Some(data::QuickLookupWindowTheme::Dark),
-            inner_size: data::HeightAndWidth{
+        Some(models::QuickLookupWindow{
+            inner_size: models::HeightAndWidth{
                 height: 100.0,
                 width: 100.0,
             },
-            source_code: data::BrowserSourceCode{
+            source_code: models::BrowserSourceCode{
                 js_iife_bundle_file_path: "path/to/dev/file/bundle.js".to_string(),
                 css_file_path: None,
             }
@@ -59,13 +57,12 @@ fn works_with_dev_quick_lookup_window_settings_set(){
     assert_eq!(quick_lookup_window.current_state, QuickLookupWindowState::Hidden);
     assert!(quick_lookup_window.initialization_script.is_none());
     assert_eq!(quick_lookup_window.current_layer, 0);
-    assert_eq!(quick_lookup_window.quick_lookup_window_settings,data::QuickLookupWindow{
-            theme: Some(data::QuickLookupWindowTheme::Dark),
-            inner_size: data::HeightAndWidth{
+    assert_eq!(quick_lookup_window.quick_lookup_window_settings,models::QuickLookupWindow{
+            inner_size: models::HeightAndWidth{
                 height: 100.0,
                 width: 100.0,
             },
-            source_code: data::BrowserSourceCode{
+            source_code: models::BrowserSourceCode{
                 js_iife_bundle_file_path: "path/to/dev/file/bundle.js".to_string(),
                 css_file_path: None,
             }

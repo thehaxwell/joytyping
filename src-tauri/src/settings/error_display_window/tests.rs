@@ -1,6 +1,6 @@
 use mockall::predicate::eq;
 
-use crate::{settings::{error_display_window::ErrorDisplayWindow, data}, tauri_app_handle_wrapper::{MockTauriAppHandleTrait, self}};
+use crate::{models,settings::error_display_window::ErrorDisplayWindow, tauri_app_handle_wrapper::{MockTauriAppHandleTrait, self}};
 
 struct ExampleError {
     message: String,
@@ -30,7 +30,7 @@ fn fn_open_and_show_works() {
                     initialization_script: 
                         Some(r#"window.__ERROR_MESSAGE__ = `Something went \`wrong\``;"#.to_string()),
                     title: Some("Failed to load Joytyping settings".to_string()),
-                    inner_size: Some(data::HeightAndWidth{height: 400.0, width: 500.0}),
+                    inner_size: Some(models::HeightAndWidth{height: 400.0, width: 500.0}),
                     center: Some(()),
                     decorations: None,
                     always_on_top: None,
@@ -65,7 +65,7 @@ fn fn_open_and_show_handles_create_window_error() {
                     initialization_script: 
                         Some(r#"window.__ERROR_MESSAGE__ = `Something went \`wrong\``;"#.to_string()),
                     title: Some("Failed to load Joytyping settings".to_string()),
-                    inner_size: Some(data::HeightAndWidth{height: 400.0, width: 500.0}),
+                    inner_size: Some(models::HeightAndWidth{height: 400.0, width: 500.0}),
                     center: Some(()),
                     decorations: None,
                     always_on_top: None,
