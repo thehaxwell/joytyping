@@ -30,16 +30,21 @@ pub trait FilesTrait {
 pub struct Files {
    dependencies: Box<dyn FilesDependencies>,
    app_data_directory_manager: Box<dyn AppDataDirectoryManagerTrait>,
+   // path prefix is to be used to change the
+   // starting point for relative file paths
+   path_prefix: Option<PathBuf>
 }
 
 impl Files {
     pub fn new(
        dependencies: Box<dyn FilesDependencies>,
        app_data_directory_manager: Box<dyn AppDataDirectoryManagerTrait>,
+       path_prefix: Option<PathBuf>
        ) -> Self {
         Self { 
             dependencies,
             app_data_directory_manager,
+            path_prefix,
         }
     }
 }
@@ -51,6 +56,9 @@ impl FilesTrait for Files {
                 .get_app_data_directory()
                 .map_err(|()|StartupScriptLoadError::FileNotFound("css_file_path".to_string()))
                 .and_then(|mut path|{
+                    if let Some(path_prefix) = &self.path_prefix {
+                        path.push(path_prefix);
+                    }
                     path.push(css_file_path);
                     self.dependencies.read_to_string(path)
                         .map_err(|e|get_file_load_error(e.kind(), "css_file_path".to_string()))
@@ -72,6 +80,9 @@ impl FilesTrait for Files {
             .get_app_data_directory()
             .map_err(|()| StartupScriptLoadError::FileNotFound("js_iife_bundle_file_path".to_string()))
             .and_then(|mut path|{
+                if let Some(path_prefix) = &self.path_prefix {
+                    path.push(path_prefix);
+                }
                 path.push(js_iife_bundle_file_path);
                 self.dependencies.read_to_string(path)
                     .map_err(|e|get_file_load_error(e.kind(), "js_iife_bundle_file_path".to_string()))

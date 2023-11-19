@@ -1,4 +1,4 @@
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use mockall::predicate::eq;
 
@@ -6,7 +6,7 @@ use crate::{app_data_directory_manager::MockAppDataDirectoryManagerTrait, quick_
 
 
 #[test]
-fn works() {
+fn works_with_no_path_prefix() {
     let mut mock_app_data_directory_manager = MockAppDataDirectoryManagerTrait::new();
     let mut mock_deps = MockFilesDependencies::new();
 
@@ -24,6 +24,34 @@ fn works() {
     let files = Files {
         dependencies: Box::new(mock_deps),
         app_data_directory_manager: Box::new(mock_app_data_directory_manager),
+        path_prefix: None,
+    };
+
+    assert_eq!(
+        files.load_js("build/bundle.js".to_string()).unwrap(),
+        "js code placeholder".to_string());
+}
+
+#[test]
+fn works_with_some_path_prefix() {
+    let mut mock_app_data_directory_manager = MockAppDataDirectoryManagerTrait::new();
+    let mut mock_deps = MockFilesDependencies::new();
+
+    mock_app_data_directory_manager
+        .expect_get_app_data_directory()
+        .times(1)
+        .return_const(Ok(Path::new("an/example/path").to_path_buf()));
+
+    mock_deps
+        .expect_read_to_string()
+        .with(eq(Path::new("an/example/path/some/layout/build/bundle.js").to_path_buf()))
+        .times(1)
+        .returning(|_|Ok("js code placeholder".to_string()));
+
+    let files = Files {
+        dependencies: Box::new(mock_deps),
+        app_data_directory_manager: Box::new(mock_app_data_directory_manager),
+        path_prefix: Some(PathBuf::from("some/layout")),
     };
 
     assert_eq!(
@@ -44,6 +72,7 @@ fn interprets_app_data_directory_manager_error() {
     let files = Files {
         dependencies: Box::new(mock_deps),
         app_data_directory_manager: Box::new(mock_app_data_directory_manager),
+        path_prefix: None,
     };
 
     assert_eq!(files.load_js("build/bundle.js".to_string()),
@@ -69,6 +98,7 @@ fn setup_interprets_dependencies_read_to_string_error(
     Files {
         dependencies: Box::new(mock_deps),
         app_data_directory_manager: Box::new(mock_app_data_directory_manager),
+        path_prefix: None,
     }
 }
 

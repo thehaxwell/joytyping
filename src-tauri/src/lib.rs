@@ -67,7 +67,7 @@ pub fn start_main_loop(
         });
 
         let active_layout: models::layout::Layout;
-        match settings.load_layout(active_profile.layout_config_relative_file_path.into()) {
+        match settings.load_layout(active_profile.layout_config_relative_file_path.clone().into()) {
             Ok(data) => active_layout = data,
             Err(e) => {
                let _ = settings_error_display_window.open_and_show(e);
@@ -105,15 +105,26 @@ pub fn start_main_loop(
 
         let mut quick_lookup_window 
          = QuickLookupWindow::new(
-            Box::new(TauriAppHandleWrapper::new(handle.clone())),
-           settings_data.development.and_then(|dev| dev.quick_lookup_window),
+           Box::new(TauriAppHandleWrapper::new(handle.clone())),
+           settings_data.development.clone().and_then(|dev| dev.quick_lookup_window),
            active_layout.quick_lookup_window,
-            Box::new(quick_lookup_window::files::Files::new(
-               Box::new(FilesDependenciesImpl),
-               Box::new(AppDataDirectoryManager::new(
-                   Box::new(AppDataDirectoryDependenciesImpl))),
-            )),
-            active_profile.theme,
+           Box::new(quick_lookup_window::files::Files::new(
+              Box::new(FilesDependenciesImpl),
+              Box::new(AppDataDirectoryManager::new(
+                  Box::new(AppDataDirectoryDependenciesImpl))),
+              // returns path if not in development mode
+              settings_data.development.map_or(
+                 //TODO: this is too much logic to be in lib.
+                 //Try put it away in some struct
+                 (||{ 
+                   let mut path = std::path::PathBuf::from(
+                       active_profile.layout_config_relative_file_path.clone());
+                   path.pop(); // remove the file name from the path
+                   Some(path)
+                 })(),
+              |_|None)
+           )),
+           active_profile.theme,
         );
 
         if let Err(e) 
