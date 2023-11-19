@@ -43,6 +43,7 @@ fn works_when_no_window_is_open() {
             setup_quick_lookup_window_settings_example(),
         restart_on_change_file_path: 
             Some("other/file/path/bundle.js".to_string()),
+        theme: None,
     };
     assert!(quick_lookup_window.update(2).is_ok());
     assert_eq!(quick_lookup_window.current_layer,2);
@@ -74,6 +75,7 @@ fn works_when_a_window_is_open() {
             setup_quick_lookup_window_settings_example(),
         restart_on_change_file_path: 
             Some("other/file/path/bundle.js".to_string()),
+        theme: None,
     };
     assert!(quick_lookup_window.update(2).is_ok());
     assert_eq!(quick_lookup_window.current_layer,2);
@@ -104,6 +106,7 @@ fn handles_emit_window_event_errors() {
             setup_quick_lookup_window_settings_example(),
         restart_on_change_file_path: 
             Some("other/file/path/bundle.js".to_string()),
+        theme: None,
     };
     assert_eq!(quick_lookup_window.update(2)
             .unwrap_err()

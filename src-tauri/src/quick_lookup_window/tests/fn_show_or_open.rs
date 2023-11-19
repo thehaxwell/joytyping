@@ -1,6 +1,6 @@
 use mockall::predicate::eq;
 
-use crate::{models, quick_lookup_window::{files::MockFilesTrait, QuickLookupWindow, QuickLookupWindowTrait, QuickLookupWindowState}, tauri_app_handle_wrapper::{MockTauriAppHandleTrait, WindowOperationOutcome, self}, gamepad::Switch};
+use crate::{models::{self, data::Theme}, quick_lookup_window::{files::MockFilesTrait, QuickLookupWindow, QuickLookupWindowTrait, QuickLookupWindowState}, tauri_app_handle_wrapper::{MockTauriAppHandleTrait, WindowOperationOutcome, self}, gamepad::Switch};
 
 
 const WINDOW_LABEL: &str = "quick-lookup";
@@ -38,6 +38,7 @@ fn works_when_the_window_is_closed() {
             setup_quick_lookup_window_settings_example(),
         restart_on_change_file_path: 
             Some("other/file/path/bundle.js".to_string()),
+        theme: None,
     };
     assert!(quick_lookup_window.show_or_open(Switch::Button(gilrs::Button::East)).is_ok());
     assert_eq!(
@@ -45,8 +46,8 @@ fn works_when_the_window_is_closed() {
        QuickLookupWindowState::Showing(Switch::Button(gilrs::Button::East)));
 }
 
-#[test]
-fn works_when_the_window_didnt_exist() {
+fn setup_works_when_the_window_didnt_exist_build(
+    theme: Option<Theme>, theme_str: &str) -> QuickLookupWindow {
     let mut mock_tauri_app_handle = MockTauriAppHandleTrait::new();
     let mock_files = MockFilesTrait::new();
 
@@ -74,7 +75,8 @@ fn works_when_the_window_didnt_exist() {
                     url: tauri::WindowUrl::App("quick-lookup.html".into()),
                     initialization_script: 
                         Some(format!(
-                           "window.__START_LAYER__= 0;document.documentElement.setAttribute('data-theme','light');{}", 
+                           "window.__START_LAYER__= 0;document.documentElement.setAttribute('data-theme','{}');{}", 
+                           theme_str,
                            initialization_script.clone())),
                     title: Some("Joytyping Quick Lookup".to_string()),
                     inner_size: Some(quick_lookup_window_settings.inner_size.clone()),
@@ -86,7 +88,7 @@ fn works_when_the_window_didnt_exist() {
                 }))
         .returning(|_| Ok(()));
 
-    let mut quick_lookup_window = QuickLookupWindow { 
+    QuickLookupWindow { 
         tauri_app_handle: Box::new(mock_tauri_app_handle),
         current_state: QuickLookupWindowState::Hidden,
         initialization_script: Some(initialization_script),
@@ -95,7 +97,30 @@ fn works_when_the_window_didnt_exist() {
         quick_lookup_window_settings,
         restart_on_change_file_path: 
             Some("other/file/path/bundle.js".to_string()),
-    };
+        theme,
+    }
+}
+
+#[test]
+fn works_when_the_window_didnt_exist_build() {
+    let mut quick_lookup_window 
+        = setup_works_when_the_window_didnt_exist_build(Some(Theme::Dark),"dark");
+    assert!(quick_lookup_window.show_or_open(Switch::Button(gilrs::Button::East)).is_ok());
+    assert_eq!(
+       quick_lookup_window.current_state,
+       QuickLookupWindowState::Showing(Switch::Button(gilrs::Button::East)));
+
+
+    let mut quick_lookup_window 
+        = setup_works_when_the_window_didnt_exist_build(Some(Theme::Light),"light");
+    assert!(quick_lookup_window.show_or_open(Switch::Button(gilrs::Button::East)).is_ok());
+    assert_eq!(
+       quick_lookup_window.current_state,
+       QuickLookupWindowState::Showing(Switch::Button(gilrs::Button::East)));
+
+
+    let mut quick_lookup_window 
+        = setup_works_when_the_window_didnt_exist_build(None,"light");
     assert!(quick_lookup_window.show_or_open(Switch::Button(gilrs::Button::East)).is_ok());
     assert_eq!(
        quick_lookup_window.current_state,
@@ -123,6 +148,7 @@ fn handle_show_window_error() {
             setup_quick_lookup_window_settings_example(),
         restart_on_change_file_path: 
             Some("other/file/path/bundle.js".to_string()),
+        theme: None,
     };
     assert_eq!(
         quick_lookup_window
@@ -185,6 +211,7 @@ fn handle_create_window_error() {
         quick_lookup_window_settings,
         restart_on_change_file_path: 
             Some("other/file/path/bundle.js".to_string()),
+        theme: None,
     };
 
     assert_eq!(

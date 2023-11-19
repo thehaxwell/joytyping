@@ -28,6 +28,7 @@ fn works() {
             setup_quick_lookup_window_settings_example(
                 "path/to/dev/file/bundle.js".to_string()),
         restart_on_change_file_path: None,
+        theme: None,
     };
 
     assert_eq!(quick_lookup_window
@@ -47,6 +48,7 @@ fn works() {
             setup_quick_lookup_window_settings_example(
                 "other/file/path/bundle.js".to_string()),
         restart_on_change_file_path: Some("other/file/path/bundle.js".to_string()),
+        theme: None,
     };
 
     assert_eq!(quick_lookup_window
@@ -81,6 +83,7 @@ fn handles_errors_correctly() {
             setup_quick_lookup_window_settings_example(
                 "path/to/dev/file/bundle.js".to_string()),
         restart_on_change_file_path: Some("path/to/dev/file/bundle.js".to_string()),
+        theme: None,
     };
 
     let res = quick_lookup_window

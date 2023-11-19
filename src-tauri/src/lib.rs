@@ -113,6 +113,7 @@ pub fn start_main_loop(
                Box::new(AppDataDirectoryManager::new(
                    Box::new(AppDataDirectoryDependenciesImpl))),
             )),
+            active_profile.theme,
         );
 
         if let Err(e) 

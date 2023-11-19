@@ -1,4 +1,4 @@
-use crate::{gamepad::Switch, tauri_app_handle_wrapper::{WindowOperationOutcome, EmitWindowEventPayload}, models};
+use crate::{gamepad::Switch, tauri_app_handle_wrapper::{WindowOperationOutcome, EmitWindowEventPayload}, models::{self, data::Theme}};
 use crate::tauri_app_handle_wrapper::{self,TauriAppHandleTrait};
 
 #[cfg(test)]
@@ -28,6 +28,7 @@ pub struct QuickLookupWindow {
     initialization_script: Option<String>,
     quick_lookup_window_settings: models::QuickLookupWindow,
     restart_on_change_file_path: Option<String>,
+    theme: Option<Theme>,
 }
 
 impl QuickLookupWindow {
@@ -36,6 +37,7 @@ impl QuickLookupWindow {
        dev_quick_lookup_window_settings: Option<models::QuickLookupWindow>,
        prod_quick_lookup_window_settings: models::QuickLookupWindow,
        files: Box<dyn FilesTrait>,
+       theme: Option<Theme>,
        ) -> Self {
         Self { 
             tauri_app_handle,
@@ -49,6 +51,7 @@ impl QuickLookupWindow {
             restart_on_change_file_path: 
                 dev_quick_lookup_window_settings
                 .and_then(|sets|Some(sets.source_code.js_iife_bundle_file_path)),
+            theme,
         }
     }
 
@@ -109,13 +112,11 @@ impl QuickLookupWindowTrait for QuickLookupWindow {
                             Some(format!(
                                "window.__START_LAYER__= {};document.documentElement.setAttribute('data-theme','{}');{}", 
                                self.current_layer,
-                               "light",
-                               // TODO: use the layout theme here
-                               // match self.quick_lookup_window_settings.theme {
-                               //     Some(QuickLookupWindowTheme::Light) => "light",
-                               //     Some(QuickLookupWindowTheme::Dark) => "dark",
-                               //     None => "light",
-                               // },
+                               match self.theme {
+                                   Some(Theme::Light) => "light",
+                                   Some(Theme::Dark) => "dark",
+                                   None => "light",
+                               },
                                init_script))
                         } else {
                             None

@@ -48,6 +48,7 @@ fn works_when_no_window_is_open() {
             }),
         restart_on_change_file_path: 
             Some("other/file/path/bundle.js".to_string()),
+        theme: None,
     };
 
     assert!(quick_lookup_window.load_startup_script().is_ok());
@@ -95,6 +96,7 @@ fn works_when_a_window_is_open() {
             }),
         restart_on_change_file_path: 
             Some("other/file/path/bundle.js".to_string()),
+        theme: None,
     };
 
     assert!(quick_lookup_window.load_startup_script().is_ok());
@@ -150,6 +152,7 @@ fn works_when_css_is_expected_and_no_window_is_open() {
             }),
         restart_on_change_file_path: 
             Some("other/file/path/bundle.js".to_string()),
+        theme: None,
     };
 
     assert!(quick_lookup_window.load_startup_script().is_ok());
@@ -192,6 +195,7 @@ fn handles_load_css_error() {
             }),
         restart_on_change_file_path: 
             Some("other/file/path/bundle.js".to_string()),
+        theme: None,
     };
 
     assert_eq!(quick_lookup_window.current_state,QuickLookupWindowState::Hidden);
@@ -235,6 +239,7 @@ fn handles_load_js_error() {
             }),
         restart_on_change_file_path: 
             Some("other/file/path/bundle.js".to_string()),
+        theme: None,
     };
 
     assert_eq!(quick_lookup_window.current_state,QuickLookupWindowState::Hidden);

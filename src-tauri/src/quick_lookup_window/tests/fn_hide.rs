@@ -38,6 +38,7 @@ fn works_when_no_window_is_open() {
             setup_quick_lookup_window_settings_example(),
         restart_on_change_file_path: 
             Some("other/file/path/bundle.js".to_string()),
+        theme: None,
     };
     assert!(quick_lookup_window.hide(Switch::Button(gilrs::Button::East)).is_ok());
 }
@@ -63,6 +64,7 @@ fn works_when_a_window_is_opened() {
             setup_quick_lookup_window_settings_example(),
         restart_on_change_file_path: 
             Some("other/file/path/bundle.js".to_string()),
+        theme: None,
     };
     assert!(quick_lookup_window.hide(Switch::Button(gilrs::Button::East)).is_ok());
 }
@@ -83,6 +85,7 @@ fn works_when_a_window_was_opened_with_another_switch() {
             setup_quick_lookup_window_settings_example(),
         restart_on_change_file_path: 
             Some("other/file/path/bundle.js".to_string()),
+        theme: None,
     };
     assert!(quick_lookup_window.hide(Switch::Button(gilrs::Button::East)).is_ok());
 }
@@ -107,6 +110,7 @@ fn handles_hide_window_error() {
             setup_quick_lookup_window_settings_example(),
         restart_on_change_file_path: 
             Some("other/file/path/bundle.js".to_string()),
+        theme: None,
     };
     assert_eq!(
         quick_lookup_window.hide(Switch::Button(gilrs::Button::East))
