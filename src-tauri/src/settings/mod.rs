@@ -1,4 +1,4 @@
-use crate::{app_data_directory_manager::AppDataDirectoryManagerTrait, models::{data::SettingsData, layout::Layout}};
+use crate::{app_data_directory_manager::AppDataDirectoryManagerTrait, models::{main_config::MainConfig, layout::Layout}};
 use thiserror::Error;
 use std::path::PathBuf;
 
@@ -15,7 +15,7 @@ pub mod error_display_window;
 #[cfg_attr(test, automock)]
 pub trait SettingsDependencies {
     fn read_to_string(&self, path: PathBuf) -> Result<String, std::io::Error>;
-    fn settings_from_str(&self, s: &str) -> Result<SettingsData, toml::de::Error>;
+    fn settings_from_str(&self, s: &str) -> Result<MainConfig, toml::de::Error>;
     fn layout_from_str(&self, s: &str) -> Result<Layout, toml::de::Error>;
     fn home_dir(&self) -> Option<PathBuf>;
 }
@@ -26,7 +26,7 @@ impl SettingsDependencies for SettingsDependenciesImpl {
         std::fs::read_to_string(path)
     }
 
-    fn settings_from_str(&self, s: &str) -> Result<SettingsData, toml::de::Error> {
+    fn settings_from_str(&self, s: &str) -> Result<MainConfig, toml::de::Error> {
         toml::from_str(s)
     }
 
@@ -57,7 +57,7 @@ impl Settings {
 
     /// Load settings from the specified file.
     /// If reading or parsing the file fails, load the default settings.
-    pub fn load_settings(&mut self) -> Result<SettingsData, SettingsLoadError> {
+    pub fn load_settings(&mut self) -> Result<MainConfig, SettingsLoadError> {
         self.app_data_directory_manager
             .get_app_data_directory()
             .map_err(|()|SettingsLoadError::FileNotFound)
@@ -141,7 +141,7 @@ pub enum SettingsLoadError {
 }
 
 
-// a utility for settings_data::Layer
+// a utility for layout_config::Layer
 #[derive(Debug, PartialEq)]
 pub struct LayerNodeRef{
     pub id: String,

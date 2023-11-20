@@ -1,6 +1,6 @@
-use crate::settings::data::*;
+use crate::settings::main_config::*;
 
-pub fn setup_settings_data_example() -> SettingsData {
+pub fn setup_settings_data_example() -> MainConfig {
     let ps4_controller_profile = Profile{
         name: "My PS3 Controller".to_string(),
         left_upper_is_d_pad: true,
@@ -36,7 +36,7 @@ pub fn setup_settings_data_example() -> SettingsData {
         layers: Vec::new()
     };
 
-    SettingsData {
+    MainConfig {
         profiles: vec![ps4_controller_profile],
         global: Global{default_profile:"My PS3 Controller".to_string()},
         development: None,
@@ -44,7 +44,7 @@ pub fn setup_settings_data_example() -> SettingsData {
 }
 
 
-pub fn setup_settings_data_example_with_error() -> SettingsData {
+pub fn setup_settings_data_example_with_error() -> MainConfig {
     let ps4_controller_profile = Profile{
         name: "My PS3 Controller".to_string(),
         left_upper_is_d_pad: true,
@@ -80,7 +80,7 @@ pub fn setup_settings_data_example_with_error() -> SettingsData {
         layers: Vec::new()
     };
 
-    SettingsData {
+    MainConfig {
         profiles: vec![ps4_controller_profile],
         global: Global{default_profile:"My PS3 Controller".to_string()},
         development: None,

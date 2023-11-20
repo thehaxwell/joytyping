@@ -75,30 +75,6 @@ pub fn start_main_loop(
             }
         }
 
-        // assert_eq!(
-        //     active_profile.layers.remove(0).switches.unwrap().east.unwrap().on_click.unwrap().keyboard.unwrap().key,
-        //     enigo::Key::Return);
-
-        // assert_eq!(
-        //     active_profile.layers.remove(7).switches.unwrap().south.unwrap().on_click.unwrap().mouse.unwrap().button,
-        //     enigo::MouseButton::Left);
-
-        // assert_eq!(
-        //     active_profile.layers.remove(0).switches.unwrap().left_trigger.unwrap().on_click_and_hold.unwrap().visit_layer.unwrap(),
-        //     settings_data::LayerSpecifier{name: "first-layer-step-3".to_string(), pointer: None});
-        
-        // assert_eq!(
-        //     active_profile.clone().layers.remove(7).cardinal_levers.unwrap().left_stick.unwrap(),
-        //     settings_data::SingleCardinalLever::ControlMouseCursor(
-        //         settings_data::ControlMouseCursorFunction{
-        //             center_at: settings_data::ControlMouseCursorCenterCoordinates{x: 0.0, y: 0.0}}));
-        //
-        // assert_eq!(
-        //     active_profile.clone().layers.remove(7).cardinal_levers.unwrap().right_stick.unwrap(),
-        //     settings_data::SingleCardinalLever::ControlMouseScrollwheel(
-        //         settings_data::ControlMouseScrollwheelFunction{
-        //             center_at_y: 0.0}));
-
         let (tx, rx) = std::sync::mpsc::channel();
         // NOTE: this next line doesn't work if it's in a nested scope(idk why)
         let mut watcher = RecommendedWatcher::new(tx, Config::default()).unwrap();

@@ -1,6 +1,6 @@
 use enigo::{Key, MouseButton};
 
-use crate::settings::data::{Layer, Switches, SwitchEventAndReaction, SwitchOnClickReaction, KeyboardInput, LayerSpecifier, MouseInput, CardinalLevers, SingleCardinalLever, MouseControl};
+use crate::models::main_config::{Layer, Switches, SwitchEventAndReaction, SwitchOnClickReaction, KeyboardInput, LayerSpecifier, MouseInput, CardinalLevers, SingleCardinalLever, MouseControl};
 
 pub fn setup_layers_examples() -> Vec<Layer> {
         vec![

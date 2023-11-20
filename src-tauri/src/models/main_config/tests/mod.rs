@@ -6,7 +6,7 @@ use super::*;
 
 mod setup_example;
 
-fn setup_settings_data_toggle_index_in_gamepad() -> SettingsData {
+fn setup_settings_data_toggle_index_in_gamepad() -> MainConfig {
     setup_example(SetupConfig {
         my_ps3_controller_stick_switches_click_thresholds_left_stick_left: 0.5,
         my_ps3_controller_stick_switches_click_thresholds_right_trigger_2: 0.2,

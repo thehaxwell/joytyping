@@ -1,8 +1,7 @@
 use serde::Deserialize;
 use self::err_message_builder::{ErrMessageBuilder, ErrMessageBuilderNode};
 
-//TODO: rename data to settings
-pub mod data;
+pub mod main_config;
 pub mod layout;
 pub mod err_message_builder;
 

@@ -1,4 +1,4 @@
-use crate::models::{data::*, HeightAndWidth, BrowserSourceCode};
+use crate::models::{main_config::*, HeightAndWidth, BrowserSourceCode};
 
 pub struct SetupConfig {
     pub my_ps3_controller_stick_switches_click_thresholds_left_stick_left: f32,
@@ -6,7 +6,7 @@ pub struct SetupConfig {
     pub development_quick_lookup_window_inner_size_height: f64,
 }
 
-pub fn setup_example(config: SetupConfig) -> SettingsData {
+pub fn setup_example(config: SetupConfig) -> MainConfig {
     let ps4_controller_profile = Profile{
         name: "My PS3 Controller".to_string(),
         left_upper_is_d_pad: true,
@@ -32,7 +32,7 @@ pub fn setup_example(config: SetupConfig) -> SettingsData {
         },
     };
 
-    SettingsData {
+    MainConfig {
         profiles: vec![ps4_controller_profile],
         global: Global{default_profile:"My PS3 Controller".to_string()},
         development: Some(Development {

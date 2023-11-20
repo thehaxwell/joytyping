@@ -5,19 +5,18 @@ use super::{QuickLookupWindow, err_message_builder::{ErrMessageBuilder, ErrMessa
 #[cfg(test)]
 mod tests;
 
-//TODO: rename SettingsData to Settings
 #[derive(Deserialize, Debug, Clone, PartialEq)]
-pub struct SettingsData {
+pub struct MainConfig {
 	pub profiles: Vec<Profile>,
     pub global: Global,
     pub development: Option<Development>,
 }
 
-impl SettingsData {
+impl MainConfig {
     pub fn validate_and_clone_and_set_layer_pointers(&self) -> Result<Self,String> {
         let err_message_builder = ErrMessageBuilder::new();
 
-        Ok(SettingsData { 
+        Ok(MainConfig { 
             profiles: self.profiles
                 .iter()
                 .map(|profile|profile.validate_and_clone_and_set_layer_pointers(

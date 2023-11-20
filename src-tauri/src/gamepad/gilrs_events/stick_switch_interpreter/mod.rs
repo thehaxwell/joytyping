@@ -115,7 +115,7 @@ pub struct AxisClickThresholds {
 
 impl AxisClickThresholds {
     pub fn get_from_setting(
-        thresholds: models::data::StickSwitchesClickThresholds, alignment: LeftOrRight
+        thresholds: models::main_config::StickSwitchesClickThresholds, alignment: LeftOrRight
         ) -> Self {
         if alignment == LeftOrRight::Left {
             Self {

@@ -2,13 +2,7 @@ use std::time::Instant;
 
 use gilrs::Button;
 
-// use crate::settings::data::KeyboardInput;
-// use crate::settings::data::LayerSpecifier;
-// use crate::settings::data::MouseInput;
-// use crate::settings::data::SwitchEventAndReaction;
-// use crate::settings::data::SwitchOnClickReaction;
-
-use crate::models::data::SwitchClickEventThresholds;
+use crate::models::main_config::SwitchClickEventThresholds;
 
 use super::SwitchClickPatternDetector;
 use super::SwitchClickPatternDetectorTrait;
