@@ -60,6 +60,15 @@ impl QuickLookupWindow {
     pub fn load_startup_script(&mut self) -> Result<(), StartupScriptLoadError> {
         let mut init_script 
             = String::from("window.addEventListener(\"load\", (event) => {");
+
+        init_script.push_str(
+            &format!("document.documentElement.setAttribute('data-theme','{}');",
+               match self.theme {
+                   Some(Theme::Light) => "light",
+                   Some(Theme::Dark) => "dark",
+                   None => "dark",
+               }));
+
         if let Some(css_str) = self.files
             .load_css(self.quick_lookup_window_settings.source_code.css_file_path.clone())? {
             init_script.push_str(&css_str) 
@@ -110,13 +119,8 @@ impl QuickLookupWindowTrait for QuickLookupWindow {
                     initialization_script: 
                         if let Some(init_script) = &self.initialization_script {
                             Some(format!(
-                               "window.__START_LAYER__= {};document.documentElement.setAttribute('data-theme','{}');{}", 
+                               "window.__START_LAYER__= {};{}", 
                                self.current_layer,
-                               match self.theme {
-                                   Some(Theme::Light) => "light",
-                                   Some(Theme::Dark) => "dark",
-                                   None => "light",
-                               },
                                init_script))
                         } else {
                             None

@@ -55,8 +55,9 @@ fn works_when_no_window_is_open() {
     assert_eq!(quick_lookup_window.current_state,QuickLookupWindowState::Hidden);
 
     assert_eq!(quick_lookup_window.initialization_script.unwrap(),
-       format!("{}{}{}",
+       format!("{}{}{}{}",
                "window.addEventListener(\"load\", (event) => {",
+               "document.documentElement.setAttribute('data-theme','dark');",
                "console.log('this is the js code');",
                "});",
        ));
@@ -103,8 +104,9 @@ fn works_when_a_window_is_open() {
     assert_eq!(quick_lookup_window.current_state,QuickLookupWindowState::Hidden);
 
     assert_eq!(quick_lookup_window.initialization_script.unwrap(),
-       format!("{}{}{}",
+       format!("{}{}{}{}",
                "window.addEventListener(\"load\", (event) => {",
+               "document.documentElement.setAttribute('data-theme','dark');",
                "console.log('this is the js code');",
                "});",
        ));
@@ -159,8 +161,9 @@ fn works_when_css_is_expected_and_no_window_is_open() {
     assert_eq!(quick_lookup_window.current_state,QuickLookupWindowState::Hidden);
 
     assert_eq!(quick_lookup_window.initialization_script.unwrap(),
-       format!("{}{}{}{}",
+       format!("{}{}{}{}{}",
                "window.addEventListener(\"load\", (event) => {",
+               "document.documentElement.setAttribute('data-theme','dark');",
                styles_code,
                "console.log('this is the js code');",
                "});",));
