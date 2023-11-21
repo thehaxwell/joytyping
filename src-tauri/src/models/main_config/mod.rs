@@ -75,7 +75,8 @@ pub struct Profile {
     pub left_upper_is_d_pad: bool,
     #[serde(default = "default_switch_click_event_thresholds")]
     pub switch_click_event_thresholds: SwitchClickEventThresholds,
-    pub theme: Option<Theme>,
+    #[serde(default = "default_theme")]
+    pub theme: Theme,
     pub layout_config_relative_file_path: String,
 }
 fn default_switch_click_event_thresholds() -> SwitchClickEventThresholds {
@@ -84,6 +85,15 @@ fn default_switch_click_event_thresholds() -> SwitchClickEventThresholds {
             default_switch_click_event_threshold_milliseconds(),
         maximum_milliseconds_between_clicks_for_double_click: 
             default_switch_click_event_threshold_milliseconds(),
+    }
+}
+fn default_theme() -> Theme {
+    // if the theme isn't specified then default to the
+    // system setting
+    match dark_light::detect() {
+        dark_light::Mode::Dark => Theme::Dark,
+        dark_light::Mode::Light => Theme::Light,
+        dark_light::Mode::Default => Theme::Dark,
     }
 }
 
@@ -109,18 +119,7 @@ impl Profile {
             trigger_2_switches_click_thresholds: self.trigger_2_switches_click_thresholds,
             left_upper_is_d_pad: self.left_upper_is_d_pad,
             switch_click_event_thresholds: self.switch_click_event_thresholds.clone(),
-            theme: if let Some(th) = &self.theme {
-                    Some(th.clone())
-                }
-                else {
-                    // if the theme isn't specified then default to the
-                    // system setting
-                    Some(match dark_light::detect() {
-                        dark_light::Mode::Dark => Theme::Dark,
-                        dark_light::Mode::Light => Theme::Light,
-                        dark_light::Mode::Default => Theme::Dark,
-                    })
-                }
+            theme: self.theme.clone(),
         })
     }
 }

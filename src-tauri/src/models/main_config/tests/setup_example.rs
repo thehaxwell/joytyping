@@ -10,7 +10,7 @@ pub fn setup_example(config: SetupConfig) -> MainConfig {
     let ps4_controller_profile = Profile{
         name: "My PS3 Controller".to_string(),
         left_upper_is_d_pad: true,
-        theme: Some(Theme::Light),
+        theme: Theme::Light,
         layout_config_relative_file_path: "layout-name/main.toml".to_string(),
         stick_switches_click_thresholds: StickSwitchesClickThresholds {
             left_stick_up: 0.5,

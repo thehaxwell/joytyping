@@ -1,6 +1,6 @@
 use mockall::predicate::eq;
 
-use crate::{models, quick_lookup_window::{files::MockFilesTrait, QuickLookupWindow, QuickLookupWindowTrait, QuickLookupWindowState}, tauri_app_handle_wrapper::{MockTauriAppHandleTrait, WindowOperationOutcome}, gamepad::Switch};
+use crate::{models::{self, main_config::Theme}, quick_lookup_window::{files::MockFilesTrait, QuickLookupWindow, QuickLookupWindowTrait, QuickLookupWindowState}, tauri_app_handle_wrapper::{MockTauriAppHandleTrait, WindowOperationOutcome}, gamepad::Switch};
 
 
 const WINDOW_LABEL: &str = "quick-lookup";
@@ -38,7 +38,7 @@ fn works_when_no_window_is_open() {
             setup_quick_lookup_window_settings_example(),
         restart_on_change_file_path: 
             Some("other/file/path/bundle.js".to_string()),
-        theme: None,
+        theme: Theme::Light,
     };
     assert!(quick_lookup_window.hide(Switch::Button(gilrs::Button::East)).is_ok());
 }
@@ -64,7 +64,7 @@ fn works_when_a_window_is_opened() {
             setup_quick_lookup_window_settings_example(),
         restart_on_change_file_path: 
             Some("other/file/path/bundle.js".to_string()),
-        theme: None,
+        theme: Theme::Light,
     };
     assert!(quick_lookup_window.hide(Switch::Button(gilrs::Button::East)).is_ok());
 }
@@ -85,7 +85,7 @@ fn works_when_a_window_was_opened_with_another_switch() {
             setup_quick_lookup_window_settings_example(),
         restart_on_change_file_path: 
             Some("other/file/path/bundle.js".to_string()),
-        theme: None,
+        theme: Theme::Light,
     };
     assert!(quick_lookup_window.hide(Switch::Button(gilrs::Button::East)).is_ok());
 }
@@ -110,7 +110,7 @@ fn handles_hide_window_error() {
             setup_quick_lookup_window_settings_example(),
         restart_on_change_file_path: 
             Some("other/file/path/bundle.js".to_string()),
-        theme: None,
+        theme: Theme::Light,
     };
     assert_eq!(
         quick_lookup_window.hide(Switch::Button(gilrs::Button::East))

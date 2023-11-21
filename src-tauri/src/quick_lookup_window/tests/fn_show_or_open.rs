@@ -38,67 +38,13 @@ fn works_when_the_window_is_closed() {
             setup_quick_lookup_window_settings_example(),
         restart_on_change_file_path: 
             Some("other/file/path/bundle.js".to_string()),
-        theme: None,
+        theme: Theme::Light,
     };
     assert!(quick_lookup_window.show_or_open(Switch::Button(gilrs::Button::East)).is_ok());
     assert_eq!(
        quick_lookup_window.current_state,
        QuickLookupWindowState::Showing(Switch::Button(gilrs::Button::East)));
 }
-
-// fn setup_works_when_the_window_didnt_exist_build(
-// ) -> QuickLookupWindow {
-//     let mut mock_tauri_app_handle = MockTauriAppHandleTrait::new();
-//     let mock_files = MockFilesTrait::new();
-//
-//     mock_tauri_app_handle
-//         .expect_show_window()
-//         .with(eq(WINDOW_LABEL))
-//         .returning(|_| Ok(WindowOperationOutcome::WindowNotFound));
-//
-//     let initialization_script = "initialization_script placeholder".to_string();
-//     let quick_lookup_window_settings = models::QuickLookupWindow {
-//         inner_size: models::HeightAndWidth{
-//             height: 100.0,
-//             width: 100.0,
-//         },
-//         source_code: models::BrowserSourceCode{
-//             js_iife_bundle_file_path: "path/to/file/bundle.js".to_string(),
-//             css_file_path: None,
-//         }
-//     };
-//
-//     mock_tauri_app_handle
-//         .expect_create_window()
-//         .with(eq(tauri_app_handle_wrapper::CreateWindowArgs{
-//                     label: WINDOW_LABEL.to_string(),
-//                     url: tauri::WindowUrl::App("quick-lookup.html".into()),
-//                     initialization_script: 
-//                         Some(format!(
-//                            "window.__START_LAYER__= 0;{}", 
-//                            initialization_script.clone())),
-//                     title: Some("Joytyping Quick Lookup".to_string()),
-//                     inner_size: Some(quick_lookup_window_settings.inner_size.clone()),
-//                     center: Some(()),
-//                     decorations: Some(false),
-//                     always_on_top: Some(true),
-//                     skip_taskbar: Some(true),
-//                     focused: Some(false)
-//                 }))
-//         .returning(|_| Ok(()));
-//
-//     QuickLookupWindow { 
-//         tauri_app_handle: Box::new(mock_tauri_app_handle),
-//         current_state: QuickLookupWindowState::Hidden,
-//         initialization_script: Some(initialization_script),
-//         current_layer: 0,
-//         files: Box::new(mock_files),
-//         quick_lookup_window_settings,
-//         restart_on_change_file_path: 
-//             Some("other/file/path/bundle.js".to_string()),
-//         theme: None,
-//     }
-// }
 
 #[test]
 fn works_when_the_window_didnt_exist_build() {
@@ -150,7 +96,7 @@ fn works_when_the_window_didnt_exist_build() {
         quick_lookup_window_settings,
         restart_on_change_file_path: 
             Some("other/file/path/bundle.js".to_string()),
-        theme: None,
+        theme: Theme::Light,
     };
     assert!(quick_lookup_window.show_or_open(Switch::Button(gilrs::Button::East)).is_ok());
     assert_eq!(
@@ -195,7 +141,7 @@ fn handle_show_window_error() {
             setup_quick_lookup_window_settings_example(),
         restart_on_change_file_path: 
             Some("other/file/path/bundle.js".to_string()),
-        theme: None,
+        theme: Theme::Light,
     };
     assert_eq!(
         quick_lookup_window
@@ -258,7 +204,7 @@ fn handle_create_window_error() {
         quick_lookup_window_settings,
         restart_on_change_file_path: 
             Some("other/file/path/bundle.js".to_string()),
-        theme: None,
+        theme: Theme::Light,
     };
 
     assert_eq!(

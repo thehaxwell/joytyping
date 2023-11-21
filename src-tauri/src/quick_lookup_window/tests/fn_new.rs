@@ -23,7 +23,7 @@ fn works_with_dev_quick_lookup_window_settings_not_set(){
         None,
         setup_quick_lookup_window_settings_example(),
         Box::new(mock_files),
-        Some(Theme::Light)
+        Theme::Light
     );
 
     assert_eq!(quick_lookup_window.current_state, QuickLookupWindowState::Hidden);
@@ -31,7 +31,7 @@ fn works_with_dev_quick_lookup_window_settings_not_set(){
     assert_eq!(quick_lookup_window.current_layer, 0);
     assert_eq!(quick_lookup_window.quick_lookup_window_settings,setup_quick_lookup_window_settings_example());
     assert!(quick_lookup_window.restart_on_change_file_path.is_none());
-    assert_eq!(quick_lookup_window.theme.unwrap(), Theme::Light);
+    assert_eq!(quick_lookup_window.theme, Theme::Light);
 
 }
 
@@ -54,7 +54,7 @@ fn works_with_dev_quick_lookup_window_settings_set(){
         }),
         setup_quick_lookup_window_settings_example(),
         Box::new(mock_files),
-        Some(Theme::Dark)
+        Theme::Dark
     );
 
     assert_eq!(quick_lookup_window.current_state, QuickLookupWindowState::Hidden);
@@ -71,6 +71,6 @@ fn works_with_dev_quick_lookup_window_settings_set(){
             }
         });
     assert_eq!(quick_lookup_window.restart_on_change_file_path.unwrap(), "path/to/dev/file/bundle.js".to_string());
-    assert_eq!(quick_lookup_window.theme.unwrap(), Theme::Dark);
+    assert_eq!(quick_lookup_window.theme, Theme::Dark);
 
 }

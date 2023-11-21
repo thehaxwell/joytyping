@@ -28,7 +28,7 @@ pub struct QuickLookupWindow {
     initialization_script: Option<String>,
     quick_lookup_window_settings: models::QuickLookupWindow,
     restart_on_change_file_path: Option<String>,
-    theme: Option<Theme>,
+    theme: Theme,
 }
 
 impl QuickLookupWindow {
@@ -37,7 +37,7 @@ impl QuickLookupWindow {
        dev_quick_lookup_window_settings: Option<models::QuickLookupWindow>,
        prod_quick_lookup_window_settings: models::QuickLookupWindow,
        files: Box<dyn FilesTrait>,
-       theme: Option<Theme>,
+       theme: Theme,
        ) -> Self {
         Self { 
             tauri_app_handle,
@@ -64,9 +64,8 @@ impl QuickLookupWindow {
         init_script.push_str(
             &format!("document.documentElement.setAttribute('data-theme','{}');",
                match self.theme {
-                   Some(Theme::Light) => "light",
-                   Some(Theme::Dark) => "dark",
-                   None => "dark",
+                   Theme::Light => "light",
+                   Theme::Dark => "dark",
                }));
 
         if let Some(css_str) = self.files

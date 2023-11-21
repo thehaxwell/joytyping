@@ -1,7 +1,7 @@
 use gilrs::Button;
 use mockall::predicate::eq;
 
-use crate::{tauri_app_handle_wrapper::{MockTauriAppHandleTrait, WindowOperationOutcome}, quick_lookup_window::{files::{MockFilesTrait, StartupScriptLoadError}, QuickLookupWindow, QuickLookupWindowState}, models, gamepad::Switch};
+use crate::{tauri_app_handle_wrapper::{MockTauriAppHandleTrait, WindowOperationOutcome}, quick_lookup_window::{files::{MockFilesTrait, StartupScriptLoadError}, QuickLookupWindow, QuickLookupWindowState}, models::{self, main_config::Theme}, gamepad::Switch};
 
 const WINDOW_LABEL: &str = "quick-lookup";
 fn setup_quick_lookup_window_settings_example(
@@ -48,7 +48,7 @@ fn works_when_no_window_is_open() {
             }),
         restart_on_change_file_path: 
             Some("other/file/path/bundle.js".to_string()),
-        theme: None,
+        theme: Theme::Dark,
     };
 
     assert!(quick_lookup_window.load_startup_script().is_ok());
@@ -97,7 +97,7 @@ fn works_when_a_window_is_open() {
             }),
         restart_on_change_file_path: 
             Some("other/file/path/bundle.js".to_string()),
-        theme: None,
+        theme: Theme::Light,
     };
 
     assert!(quick_lookup_window.load_startup_script().is_ok());
@@ -106,7 +106,7 @@ fn works_when_a_window_is_open() {
     assert_eq!(quick_lookup_window.initialization_script.unwrap(),
        format!("{}{}{}{}",
                "window.addEventListener(\"load\", (event) => {",
-               "document.documentElement.setAttribute('data-theme','dark');",
+               "document.documentElement.setAttribute('data-theme','light');",
                "console.log('this is the js code');",
                "});",
        ));
@@ -154,7 +154,7 @@ fn works_when_css_is_expected_and_no_window_is_open() {
             }),
         restart_on_change_file_path: 
             Some("other/file/path/bundle.js".to_string()),
-        theme: None,
+        theme: Theme::Dark,
     };
 
     assert!(quick_lookup_window.load_startup_script().is_ok());
@@ -198,7 +198,7 @@ fn handles_load_css_error() {
             }),
         restart_on_change_file_path: 
             Some("other/file/path/bundle.js".to_string()),
-        theme: None,
+        theme: Theme::Light,
     };
 
     assert_eq!(quick_lookup_window.current_state,QuickLookupWindowState::Hidden);
@@ -242,7 +242,7 @@ fn handles_load_js_error() {
             }),
         restart_on_change_file_path: 
             Some("other/file/path/bundle.js".to_string()),
-        theme: None,
+        theme: Theme::Dark,
     };
 
     assert_eq!(quick_lookup_window.current_state,QuickLookupWindowState::Hidden);

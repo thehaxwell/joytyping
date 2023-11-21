@@ -1,6 +1,6 @@
 use std::{path::Path, io::ErrorKind};
 
-use crate::{models, quick_lookup_window::{files::MockFilesTrait, QuickLookupWindow, QuickLookupWindowState}, tauri_app_handle_wrapper::MockTauriAppHandleTrait};
+use crate::{models::{self, main_config::Theme}, quick_lookup_window::{files::MockFilesTrait, QuickLookupWindow, QuickLookupWindowState}, tauri_app_handle_wrapper::MockTauriAppHandleTrait};
 
 
 fn setup_quick_lookup_window_settings_example(js_path:String) -> models::QuickLookupWindow {
@@ -28,7 +28,7 @@ fn works() {
             setup_quick_lookup_window_settings_example(
                 "path/to/dev/file/bundle.js".to_string()),
         restart_on_change_file_path: None,
-        theme: None,
+        theme: Theme::Light,
     };
 
     assert_eq!(quick_lookup_window
@@ -48,7 +48,7 @@ fn works() {
             setup_quick_lookup_window_settings_example(
                 "other/file/path/bundle.js".to_string()),
         restart_on_change_file_path: Some("other/file/path/bundle.js".to_string()),
-        theme: None,
+        theme: Theme::Light,
     };
 
     assert_eq!(quick_lookup_window
@@ -83,7 +83,7 @@ fn handles_errors_correctly() {
             setup_quick_lookup_window_settings_example(
                 "path/to/dev/file/bundle.js".to_string()),
         restart_on_change_file_path: Some("path/to/dev/file/bundle.js".to_string()),
-        theme: None,
+        theme: Theme::Light,
     };
 
     let res = quick_lookup_window
