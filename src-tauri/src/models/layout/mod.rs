@@ -1,7 +1,7 @@
 use enigo::MouseButton;
 use gilrs::Button;
 use serde::Deserialize;
-use std::fmt;
+use std::{fmt, collections::HashSet};
 use serde::de::{self, Deserializer, Visitor, MapAccess};
 
 use crate::{settings::LayerNodeRef, gamepad::{Switch, gilrs_events::stick_switch_interpreter::StickSwitchButton}};
@@ -678,6 +678,41 @@ impl KeyboardInput {
                 match KeyboardInput::to_enigo_key(modifier) {
                     Ok(key) => modifiers.push(key),
                     Err(err) => return Err(err)
+                }
+            }
+        }
+
+        modifiers = HashSet
+            ::<enigo::Key>
+            ::from_iter(modifiers)
+            .into_iter()
+            .collect();
+
+        #[cfg(target_os="windows")]
+        return Self::new_capital_letters_workaround(key,modifiers);
+
+        #[cfg(not(target_os="windows"))]
+        return Ok(Self{key, modifiers});
+    }
+
+    // On windows, enigo::Key::Layout('A') is simply ignored
+    // by enigo. So this function changes 'A' to 'a' and adds
+    // enigo::Key::Shift to manually input the capital letters
+    fn new_fn_capital_letters_workaround(
+        key: enigo::Key,
+        mut modifiers: Vec<enigo::Key>,
+    ) -> Result<KeyboardInput, KeyboardInputError> {
+        if let enigo::Key::Layout(character) = key {
+            if character.is_uppercase() {
+                if let Some(layout_char) = character.to_lowercase().next() {
+                    modifiers.push(enigo::Key::Shift);
+                    return Ok(Self{
+                        key: enigo::Key::Layout(layout_char),
+                        modifiers: HashSet::<enigo::Key>
+                            ::from_iter(modifiers)
+                            .into_iter()
+                            .collect(),
+                    });
                 }
             }
         }
