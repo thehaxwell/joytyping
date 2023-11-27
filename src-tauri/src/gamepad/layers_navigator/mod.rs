@@ -86,16 +86,6 @@ impl LayersNavigator {
                         .iter()
                         .filter_map(|(switch,event_and_reaction_opt)|
                             if let Some(SwitchEventAndReaction { on_click, on_double_click }) = event_and_reaction_opt {
-                                 // if let Some(SwitchOnClickReaction::VisitLayer(layer_specifier)) 
-                                 //     = on_click.clone().or(on_double_click.clone()) {
-                                 //        Some(LayerVisit {
-                                 //            trigger_switch: switch.clone(),
-                                 //            from_index: index,
-                                 //            to_index: layer_specifier.index_in_gamepad.unwrap(),
-                                 //        })
-                                 // }
-                                 // else { None }
-
                                 let mut layer_visits: Vec<LayerVisit> = Vec::new();
 
                                 // get layer_visits from on_click
@@ -166,13 +156,11 @@ impl LayersNavigator {
 
 impl LayersNavigatorTrait for LayersNavigator {
     fn move_to_layer(&mut self, layer_specifier: LayerSpecifier) {
-        println!(">>>>> from {}, move_to_layer: {:?}",self.current_layer_index ,layer_specifier);
         self.set_current_layer_index(layer_specifier.index_in_gamepad.unwrap());
         self.latest_move_to_index = self.current_layer_index;
     }
 
     fn visit_layer(&mut self, trigger: LayerVisitTrigger, layer_specifier: LayerSpecifier) {
-        println!(">>>>> from {}, visit_layer: {:?}",self.current_layer_index ,layer_specifier);
         self.layer_visits.push(LayerVisit {
             trigger,
             to_index: layer_specifier.index_in_gamepad.unwrap(),
@@ -182,7 +170,6 @@ impl LayersNavigatorTrait for LayersNavigator {
     }
 
     fn move_to_or_visit_layer(&mut self, trigger: LayerVisitTrigger, layer_specifier: LayerSpecifier) {
-        println!(">>>>> from {}, move_to_or_visit_layer: {:?}",self.current_layer_index,layer_specifier);
         self.potential_layer_visit = Some(LayerVisit {
             trigger,
             to_index: layer_specifier.index_in_gamepad.unwrap(),

@@ -46,13 +46,11 @@ impl KeyboardInputControllerTrait for KeyboardInputController {
     // it will be allowed to be triggered many times by calling trigger_input()
     // until key_up() is called (or key_down() is called again).
     fn key_down(&mut self, key_to_click: KeyboardInput) {
-        println!("KeyboardInputController::key_down({:?})",key_to_click);
         self.active_key = Some(key_to_click);
         self.trigger_input();
     }
 
     fn key_up(&mut self) {
-        println!("KeyboardInputController::key_up");
         self.active_key = None;
     }
 
