@@ -9,10 +9,8 @@ use tauri::Manager;
 use joytyping::start_main_loop;
 
 #[tauri::command]
-fn start_main_loop_command(handle: tauri::AppHandle) {
-    std::thread::spawn( move || {
-        start_main_loop(handle);
-    });
+fn start_main_loop_command(app_handle: tauri::AppHandle) {
+    app_handle.trigger_global("main-loop-interruption",Some("MainLoopInterruption::ReInitiailze".to_string()))
 }
 
 fn main() {

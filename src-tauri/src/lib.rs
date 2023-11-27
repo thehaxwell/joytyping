@@ -36,8 +36,10 @@ pub fn start_main_loop(
     let mut settings_error_display_window = ErrorDisplayWindow::new(
         Box::new(TauriAppHandleWrapper::new(handle.clone())));
 
+    let mut interrupt_event_reciever = MainLoopInterruptionEventReciever::new(handle.clone());
 
     'main_loop_initializer_loop: loop {
+
         // close any open window first while there's time
         let _ = settings_error_display_window.close();
         std::thread::sleep(std::time::Duration::from_millis(100));
@@ -167,7 +169,6 @@ pub fn start_main_loop(
             Box::new(mouse_input_controller::button::Button::new(Box::new(EnigoWrapper::new()))),
         );
 
-        let mut interrupt_event_reciever = MainLoopInterruptionEventReciever::new(handle.clone());
         'main_loop: loop {
             // slow this loop down a little
             std::thread::sleep(std::time::Duration::from_millis(10));
@@ -190,7 +191,7 @@ pub fn start_main_loop(
                 }
                 Ok(MainLoopInterruption::Terminate) => {
                     println!("Terminating.");
-                    break 'main_loop_initializer_loop;
+                    return;
                 }
             }
 
@@ -201,6 +202,22 @@ pub fn start_main_loop(
             }
         }
     }
+
+    // give a chance to save this loop. If the
+    // main_loop_initializer_loop breaks(but not from
+    // MainLoopInterruption::Terminate), it can
+    // still be restarted with MainLoopInterruption::ReInitiailze
+    loop {
+        std::thread::sleep(std::time::Duration::from_millis(100));
+        match interrupt_event_reciever.try_recv() {
+            Ok(MainLoopInterruption::ReInitiailze) => {
+                start_main_loop(handle.clone());
+                break;
+            }
+            _other => (),
+        }
+    }
+    interrupt_event_reciever.destruct();
 }
 
 #[derive(Debug,PartialEq,Clone)]
@@ -217,13 +234,15 @@ pub enum MainLoopInterruption {
 
 struct MainLoopInterruptionEventReciever {
     reciever: std::sync::mpsc::Receiver<MainLoopInterruption>,
+    handle_id: tauri::EventHandler,
+    app_handle: tauri::AppHandle,
 }
 
 impl MainLoopInterruptionEventReciever {
-    fn new(handle: tauri::AppHandle) -> Self {
+    fn new(app_handle: tauri::AppHandle) -> Self {
         let (tx, rx) = std::sync::mpsc::channel();
 
-        handle.once_global("main-loop-interruption", move |event| {
+       let handle_id = app_handle.listen_global("main-loop-interruption", move |event| {
             match event.payload() {
                 Some("MainLoopInterruption::ReInitiailze") => {
                     let _ = tx.send(MainLoopInterruption::ReInitiailze);
@@ -237,8 +256,14 @@ impl MainLoopInterruptionEventReciever {
         });
 
         Self {
-            reciever: rx
+            reciever: rx,
+            handle_id,
+            app_handle,
         }
+    }
+
+    fn destruct(&self) {
+        self.app_handle.unlisten(self.handle_id);
     }
 
     fn try_recv(&mut self) -> Result<MainLoopInterruption,TryRecvError> {
