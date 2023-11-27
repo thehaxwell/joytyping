@@ -32,9 +32,9 @@ fn main() {
               "quit" => {
                 // end the main loop thread(s)
                 app_handle.trigger_global("main-loop-interruption",Some("MainLoopInterruption::Terminate".to_string()));
+                // sleep for .5secs to let start_main_loop() return
+                std::thread::sleep(std::time::Duration::from_millis(500));
                 // end this thread
-                // TODO: figure out how to make the 
-                // following execute AFTER start_main_loop() returns
                 std::process::exit(0); 
               }
               "reload" => {
