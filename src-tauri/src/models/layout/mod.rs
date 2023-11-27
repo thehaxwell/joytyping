@@ -689,7 +689,7 @@ impl KeyboardInput {
             .collect();
 
         #[cfg(target_os="windows")]
-        return Self::new_capital_letters_workaround(key,modifiers);
+        return Self::new_fn_capital_letters_workaround(key,modifiers);
 
         #[cfg(not(target_os="windows"))]
         return Ok(Self{key, modifiers});
