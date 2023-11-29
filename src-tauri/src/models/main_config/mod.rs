@@ -202,6 +202,7 @@ impl StickSwitchesClickThresholds {
 #[derive(Deserialize, Debug, Clone, Copy, PartialEq)]
 pub struct StickCardinalLevers {
     pub deadzone_upper_limits: DeadzoneUpperLimits,
+    pub mouse_controls: MouseControls,
 }
 
 impl StickCardinalLevers {
@@ -254,6 +255,38 @@ impl DeadzoneUpperLimits {
                 .collect()
     }
 }
+
+#[derive(Deserialize, Debug, Clone, Copy, PartialEq)]
+pub struct MouseControls {
+    pub scroll_scale_factor: f32,
+    pub cursor_move_scale_factor: f32,
+}
+
+impl MouseControls {
+    pub fn validate(
+        &self,
+        err_message_builder: ErrMessageBuilder) -> Result<(),String> {
+            [
+                (self.scroll_scale_factor, "scroll_scale_factor"),
+                (self.cursor_move_scale_factor, "cursor_move_scale_factor"),
+            ]
+            .iter()
+            .map(|(threshold,label)|{
+                if *threshold < 0.0 {
+                    Err(err_message_builder
+                        .branch(ErrMessageBuilderNode::Single { field: label.to_string() })
+                        .build_message(format!(
+                            "value ({}) is lower than the minimum acceptable 0.0",
+                            threshold)))
+                }
+                else {
+                    Ok(())
+                }
+            })
+            .collect()
+    }
+}
+
 
 
 #[derive(Deserialize, Debug, Clone, Copy, PartialEq)]

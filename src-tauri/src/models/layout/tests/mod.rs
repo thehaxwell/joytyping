@@ -15,7 +15,6 @@ fn setup_settings_data_toggle_index_in_gamepad(include_index_in_gamepad: bool) -
            "second-layer-step-1".to_string(),
         my_ps3_controller_quick_lookup_window_inner_size_height: 100.0,
         my_ps3_controller_quick_lookup_window_inner_size_width: 100.0,
-        my_ps3_controller_cardinal_levers_second_layer_step_4_right_stick_control_mouse_scrollwheel_scale_factor: 10.0,
     })
 }
 
@@ -35,7 +34,6 @@ fn settings_data_validate_and_clone_and_set_layer_pointers_gives_the_right_error
            "seconda-layer-step-1".to_string(),
        my_ps3_controller_quick_lookup_window_inner_size_height: 100.0,
        my_ps3_controller_quick_lookup_window_inner_size_width: 100.0,
-       my_ps3_controller_cardinal_levers_second_layer_step_4_right_stick_control_mouse_scrollwheel_scale_factor: 10.0,
     }).validate_and_clone_and_set_layer_pointers();
 
     assert_eq!(
@@ -56,7 +54,6 @@ fn settings_data_validate_and_clone_and_set_layer_pointers_gives_the_right_error
            "second-layer-step-1".to_string(),
        my_ps3_controller_quick_lookup_window_inner_size_height: 100.0,
        my_ps3_controller_quick_lookup_window_inner_size_width: -100.0,
-       my_ps3_controller_cardinal_levers_second_layer_step_4_right_stick_control_mouse_scrollwheel_scale_factor: 10.0,
     }).validate_and_clone_and_set_layer_pointers();
 
     assert_eq!(
@@ -75,7 +72,6 @@ fn settings_data_validate_and_clone_and_set_layer_pointers_gives_the_right_error
            "second-layer-step-1".to_string(),
        my_ps3_controller_quick_lookup_window_inner_size_height: -1.002,
        my_ps3_controller_quick_lookup_window_inner_size_width: 100.0,
-       my_ps3_controller_cardinal_levers_second_layer_step_4_right_stick_control_mouse_scrollwheel_scale_factor: 10.0,
     }).validate_and_clone_and_set_layer_pointers();
 
     assert_eq!(

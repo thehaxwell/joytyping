@@ -11,6 +11,8 @@ fn setup_settings_data_toggle_index_in_gamepad() -> MainConfig {
         my_ps3_controller_stick_switches_click_thresholds_left_stick_left: 0.5,
         my_ps3_controller_stick_switches_click_thresholds_right_trigger_2: 0.2,
         development_quick_lookup_window_inner_size_height: 100.0,
+        // TODO: add a test for this, and the deadzone_upper_limit
+        // my_ps3_controller_cardinal_levers_second_layer_step_4_right_stick_control_mouse_scrollwheel_scale_factor: 10.0,
     })
 }
 

@@ -78,12 +78,12 @@ impl Layer {
         pointers: &Vec<LayerNodeRef>,
         err_message_builder: ErrMessageBuilder) -> Result<Self,String> {
 
-        if let Some(cardinal_levers) = &self.cardinal_levers {
-            cardinal_levers.validate(
-              err_message_builder
-                 .branch(ErrMessageBuilderNode::Single {
-                     field: "cardinal_levers".to_string() }))?
-        }
+        // if let Some(cardinal_levers) = &self.cardinal_levers {
+        //     cardinal_levers.validate(
+        //       err_message_builder
+        //          .branch(ErrMessageBuilderNode::Single {
+        //              field: "cardinal_levers".to_string() }))?
+        // }
 
         Ok(Self {
             id: self.id.clone(),
@@ -200,53 +200,54 @@ pub struct CardinalLevers {
     pub right_stick: Option<SingleCardinalLever>,
 }
 
-impl CardinalLevers {
-    pub fn validate(
-        &self,
-        err_message_builder: ErrMessageBuilder) -> Result<(),String> {
-        if let Some(left_stick) = &self.left_stick {
-            left_stick.validate(
-              err_message_builder
-                 .branch(ErrMessageBuilderNode::Single {
-                     field: "left_stick".to_string() }))?
-        }
-        if let Some(right_stick) = &self.right_stick {
-            right_stick.validate(
-              err_message_builder
-                 .branch(ErrMessageBuilderNode::Single {
-                     field: "right_stick".to_string() }))?
-        }
-        Ok(())
-    }
-}
+// impl CardinalLevers {
+//     pub fn validate(
+//         &self,
+//         err_message_builder: ErrMessageBuilder) -> Result<(),String> {
+//         if let Some(left_stick) = &self.left_stick {
+//             left_stick.validate(
+//               err_message_builder
+//                  .branch(ErrMessageBuilderNode::Single {
+//                      field: "left_stick".to_string() }))?
+//         }
+//         if let Some(right_stick) = &self.right_stick {
+//             right_stick.validate(
+//               err_message_builder
+//                  .branch(ErrMessageBuilderNode::Single {
+//                      field: "right_stick".to_string() }))?
+//         }
+//         Ok(())
+//     }
+// }
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum SingleCardinalLever {
-    ControlMouseCursor(MouseControl),
-    ControlMouseScrollwheel(MouseControl),
+    ControlMouseCursor,
+    ControlMouseScrollwheel,
 }
 
-impl SingleCardinalLever {
-    pub fn validate(
-        &self,
-        err_message_builder: ErrMessageBuilder) -> Result<(),String> {
-        match self {
-            SingleCardinalLever::ControlMouseCursor(mouse_control)
-                => mouse_control.validate(
-                      err_message_builder
-                         .branch(ErrMessageBuilderNode::Single {
-                             field: "control_mouse_cursor".to_string() }))?,
-            SingleCardinalLever::ControlMouseScrollwheel(mouse_control)
-                => mouse_control.validate(
-                      err_message_builder
-                         .branch(ErrMessageBuilderNode::Single {
-                             field: "control_mouse_scrollwheel".to_string() }))?,
-        };
-        Ok(())
-    }
-}
+// impl SingleCardinalLever {
+//     pub fn validate(
+//         &self,
+//         err_message_builder: ErrMessageBuilder) -> Result<(),String> {
+//         match self {
+//             SingleCardinalLever::ControlMouseCursor(mouse_control)
+//                 => mouse_control.validate(
+//                       err_message_builder
+//                          .branch(ErrMessageBuilderNode::Single {
+//                              field: "control_mouse_cursor".to_string() }))?,
+//             SingleCardinalLever::ControlMouseScrollwheel(mouse_control)
+//                 => mouse_control.validate(
+//                       err_message_builder
+//                          .branch(ErrMessageBuilderNode::Single {
+//                              field: "control_mouse_scrollwheel".to_string() }))?,
+//         };
+//         Ok(())
+//     }
+// }
 
+// TODO: delete
 #[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct MouseControl {
     pub scale_factor: f32,

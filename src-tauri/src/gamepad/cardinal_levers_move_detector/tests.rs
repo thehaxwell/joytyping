@@ -1,4 +1,4 @@
-use crate::{gamepad::cardinal_levers_move_detector::{CardinalLeversMoveDetector, calc}, models::{layout::MouseControl, main_config::DeadzoneUpperLimits}};
+use crate::{gamepad::cardinal_levers_move_detector::{CardinalLeversMoveDetector, calc}, models::main_config::DeadzoneUpperLimits};
 
 use super::CardinalLeversMoveDetectorTrait;
 
@@ -8,15 +8,16 @@ fn initializer_works() {
         left_stick: 0.123,
         right_stick: 0.3221,
     };
-    let cardinal_levers_move_detector = CardinalLeversMoveDetector::new(deadzone_upper_limits);
-    assert!(cardinal_levers_move_detector.left_mouse_control.is_none());
-    assert!(cardinal_levers_move_detector.right_mouse_control.is_none());
+    let cardinal_levers_move_detector = CardinalLeversMoveDetector::new(deadzone_upper_limits, 12.34);
+    assert_eq!(cardinal_levers_move_detector.left_lever_is_active, false);
+    assert_eq!(cardinal_levers_move_detector.right_lever_is_active, false);
     assert!(cardinal_levers_move_detector.current_left_stick_x.is_none());
     assert!(cardinal_levers_move_detector.current_left_stick_y.is_none());
     assert!(cardinal_levers_move_detector.current_right_stick_x.is_none());
     assert!(cardinal_levers_move_detector.current_right_stick_y.is_none());
     assert_eq!(cardinal_levers_move_detector.left_stick_at_rest_counter, 0);
     assert_eq!(cardinal_levers_move_detector.right_stick_at_rest_counter, 0);
+    assert_eq!(cardinal_levers_move_detector.scale_factor, 12.34);
 }
 
 // meant to mimic CardinalLeversMoveDetector::new()
@@ -27,8 +28,9 @@ fn setup_new_cardinal_levers_move_detector()
             left_stick: 0.123,
             right_stick: 0.3221,
         },
-        left_mouse_control: None,
-        right_mouse_control: None,
+        scale_factor: 1.0,
+        left_lever_is_active: false,
+        right_lever_is_active: false,
         current_left_stick_x: None,
         current_left_stick_y: None,
         current_right_stick_x: None,
@@ -39,15 +41,15 @@ fn setup_new_cardinal_levers_move_detector()
 }
 
 #[test]
-fn set_mouse_controls_works() {
+fn activate_levers_works() {
     let mut cardinal_levers_move_detector 
         = setup_new_cardinal_levers_move_detector();
 
-    cardinal_levers_move_detector.set_mouse_controls(
-        None, None);
+    cardinal_levers_move_detector.activate_levers(
+        false, false);
 
-    assert!(cardinal_levers_move_detector.left_mouse_control.is_none());
-    assert!(cardinal_levers_move_detector.right_mouse_control.is_none());
+    assert!(!cardinal_levers_move_detector.left_lever_is_active);
+    assert!(!cardinal_levers_move_detector.right_lever_is_active);
     assert!(cardinal_levers_move_detector.current_left_stick_x.is_none());
     assert!(cardinal_levers_move_detector.current_left_stick_y.is_none());
     assert!(cardinal_levers_move_detector.current_right_stick_x.is_none());
@@ -60,8 +62,9 @@ fn set_mouse_controls_works() {
             left_stick: 0.2,
             right_stick: 0.3221,
         },
-        left_mouse_control: None,
-        right_mouse_control: None,
+        scale_factor: 1.0,
+        left_lever_is_active: false,
+        right_lever_is_active: false,
         current_left_stick_x: Some(1),
         current_left_stick_y: Some(31),
         current_right_stick_x: Some(11),
@@ -70,14 +73,11 @@ fn set_mouse_controls_works() {
         right_stick_at_rest_counter: 0,
     };
 
-    let left_mouse_control = MouseControl {
-        scale_factor: 5.0 };
+    cardinal_levers_move_detector.activate_levers(
+        true, false);
 
-    cardinal_levers_move_detector.set_mouse_controls(
-        Some(left_mouse_control.clone()), None);
-
-    assert_eq!(cardinal_levers_move_detector.left_mouse_control.unwrap(), left_mouse_control);
-    assert!(cardinal_levers_move_detector.right_mouse_control.is_none());
+    assert!(cardinal_levers_move_detector.left_lever_is_active);
+    assert!(!cardinal_levers_move_detector.right_lever_is_active);
     assert!(cardinal_levers_move_detector.current_left_stick_x.is_none());
     assert!(cardinal_levers_move_detector.current_left_stick_y.is_none());
     assert!(cardinal_levers_move_detector.current_right_stick_x.is_none());
@@ -90,8 +90,9 @@ fn set_mouse_controls_works() {
             left_stick: 0.12,
             right_stick: 1.201,
         },
-        left_mouse_control: None,
-        right_mouse_control: None,
+        scale_factor: 1.0,
+        left_lever_is_active: false,
+        right_lever_is_active: false,
         current_left_stick_x: Some(0),
         current_left_stick_y: Some(12),
         current_right_stick_x: None,
@@ -100,18 +101,10 @@ fn set_mouse_controls_works() {
         right_stick_at_rest_counter: 0,
     };
 
-    let left_mouse_control = MouseControl {
-        scale_factor: 5.12 };
-    let right_mouse_control = MouseControl {
-        scale_factor: 1.23 };
+    cardinal_levers_move_detector.activate_levers(true,true);
 
-    cardinal_levers_move_detector.set_mouse_controls(
-        Some(left_mouse_control.clone()), Some(right_mouse_control.clone()));
-
-    assert_eq!(cardinal_levers_move_detector.left_mouse_control.unwrap(),
-        left_mouse_control);
-    assert_eq!(cardinal_levers_move_detector.right_mouse_control.unwrap(),
-        right_mouse_control);
+    assert!(cardinal_levers_move_detector.left_lever_is_active);
+    assert!(cardinal_levers_move_detector.right_lever_is_active);
     assert!(cardinal_levers_move_detector.current_left_stick_x.is_none());
     assert!(cardinal_levers_move_detector.current_left_stick_y.is_none());
     assert!(cardinal_levers_move_detector.current_right_stick_x.is_none());
@@ -145,36 +138,34 @@ fn calc_utility_fn_works() {
     .iter()
     .for_each(|(deadzone_upper_limit,value,scale_factor)|{
         assert_eq!(
-            calc(&MouseControl {
-                scale_factor: *scale_factor,
-            },*deadzone_upper_limit,*value),
+            calc(*scale_factor,*deadzone_upper_limit,*value),
         0);
     });
 
     // passing the deadzone
-    assert_eq!(calc(&MouseControl { scale_factor: 5.12 },
+    assert_eq!(calc(5.12,
         0.0, 1.0), 5);
-    assert_eq!(calc(&MouseControl { scale_factor: 5.12 },
+    assert_eq!(calc(5.12,
         0.12, 1.0), 5);
 
-    assert_eq!(calc(&MouseControl { scale_factor: 10.0 },
+    assert_eq!(calc(10.0,
         0.0, 0.1), 1);
-    assert_eq!(calc(&MouseControl { scale_factor: 10.0 },
+    assert_eq!(calc(10.0,
         0.0, 0.3), 3);
-    assert_eq!(calc(&MouseControl { scale_factor: 10.0 },
+    assert_eq!(calc(10.0,
         0.0, 0.7), 7);
-    assert_eq!(calc(&MouseControl { scale_factor: 10.0 },
+    assert_eq!(calc(10.0,
         0.0, 1.0), 10);
 
-    assert_eq!(calc(&MouseControl { scale_factor: 2.0 },
+    assert_eq!(calc(2.0,
         0.0, 0.5), 1);
-    assert_eq!(calc(&MouseControl { scale_factor: 2.4 },
+    assert_eq!(calc(2.4,
         0.0, 0.5), 1);
-    assert_eq!(calc(&MouseControl { scale_factor: 2.5 },
+    assert_eq!(calc(2.5,
         0.0, 0.5), 1);
-    assert_eq!(calc(&MouseControl { scale_factor: 2.9 },
+    assert_eq!(calc(2.9,
         0.0, 0.5), 1);
-    assert_eq!(calc(&MouseControl { scale_factor: 3.0 },
+    assert_eq!(calc(3.0,
         0.0, 0.5), 2);
 
 }
@@ -192,10 +183,9 @@ fn axis_changed_works_for_left_stick_x() {
                     left_stick: 0.12,
                     right_stick: 0.2,
                 },
-                left_mouse_control: 
-                    Some(MouseControl {
-                        scale_factor: 5.12 }),
-                right_mouse_control: None,
+                scale_factor: 5.0,
+                left_lever_is_active: true,
+                right_lever_is_active: false,
                 current_left_stick_x: None,
                 current_left_stick_y: *current_left_stick_y,
                 current_right_stick_x: None,
@@ -231,10 +221,9 @@ fn axis_changed_works_for_left_stick_y() {
                     left_stick: 0.12,
                     right_stick: 0.2,
                 },
-                left_mouse_control: 
-                    Some(MouseControl {
-                        scale_factor: 5.12 }),
-                right_mouse_control: None,
+                scale_factor: 5.0,
+                left_lever_is_active: true,
+                right_lever_is_active: false,
                 current_left_stick_x: *current_left_stick_x,
                 current_left_stick_y: None,
                 current_right_stick_x: None,
@@ -271,10 +260,9 @@ fn axis_changed_works_for_right_stick_x() {
                     left_stick: 0.1,
                     right_stick: 0.12,
                 },
-                left_mouse_control: None,
-                right_mouse_control: 
-                    Some(MouseControl {
-                        scale_factor: 5.12 }),
+                scale_factor: 5.0,
+                left_lever_is_active: false,
+                right_lever_is_active: true,
                 current_left_stick_x: None,
                 current_left_stick_y: None,
                 current_right_stick_x: None,
@@ -312,9 +300,9 @@ fn axis_changed_works_for_right_stick_y() {
                     left_stick: 0.1,
                     right_stick: 0.12,
                 },
-                left_mouse_control: None,
-                right_mouse_control: Some(MouseControl {
-                        scale_factor: 5.12 }),
+                scale_factor: 5.0,
+                left_lever_is_active: false,
+                right_lever_is_active: true,
                 current_left_stick_x: None,
                 current_left_stick_y: None,
                 current_right_stick_x: *current_right_stick_x,
@@ -354,8 +342,9 @@ fn tick_works_left_stick() {
                 left_stick: 0.12,
                 right_stick: 0.21,
             },
-            left_mouse_control: None,
-            right_mouse_control: None,
+            scale_factor: 1.0,
+            left_lever_is_active: false,
+            right_lever_is_active: false,
             current_left_stick_x: Some(x),
             current_left_stick_y: Some(y),
             current_right_stick_x: None,
@@ -367,8 +356,8 @@ fn tick_works_left_stick() {
         assert_eq!(
             cardinal_levers_move_detector.tick().unwrap(),(x,y));
 
-        assert!(cardinal_levers_move_detector.left_mouse_control.is_none());
-        assert!(cardinal_levers_move_detector.right_mouse_control.is_none());
+        assert!(!cardinal_levers_move_detector.left_lever_is_active);
+        assert!(!cardinal_levers_move_detector.right_lever_is_active);
         assert_eq!(cardinal_levers_move_detector.current_left_stick_x.unwrap(),x);
         assert_eq!(cardinal_levers_move_detector.current_left_stick_y.unwrap(),y);
         assert!(cardinal_levers_move_detector.current_right_stick_x.is_none());
@@ -387,8 +376,9 @@ fn tick_left_stick_resting_position_wont_emit_forever() {
             left_stick: 0.12,
             right_stick: 0.21,
         },
-        left_mouse_control: None,
-        right_mouse_control: None,
+        scale_factor: 1.0,
+        left_lever_is_active: false,
+        right_lever_is_active: false,
         current_left_stick_x: Some(0),
         current_left_stick_y: Some(0),
         current_right_stick_x: None,
@@ -406,8 +396,8 @@ fn tick_left_stick_resting_position_wont_emit_forever() {
             assert!(cardinal_levers_move_detector.tick().is_none());
         }
 
-        assert!(cardinal_levers_move_detector.left_mouse_control.is_none());
-        assert!(cardinal_levers_move_detector.right_mouse_control.is_none());
+        assert!(!cardinal_levers_move_detector.left_lever_is_active);
+        assert!(!cardinal_levers_move_detector.right_lever_is_active);
         assert_eq!(cardinal_levers_move_detector.current_left_stick_x.unwrap(),0);
         assert_eq!(cardinal_levers_move_detector.current_left_stick_y.unwrap(),0);
         assert!(cardinal_levers_move_detector.current_right_stick_x.is_none());
@@ -441,8 +431,9 @@ fn tick_works_right_stick() {
                 left_stick: 0.12,
                 right_stick: 0.21,
             },
-            left_mouse_control: None,
-            right_mouse_control: None,
+            scale_factor: 1.0,
+            left_lever_is_active: false,
+            right_lever_is_active: false,
             current_left_stick_x: None,
             current_left_stick_y: None,
             current_right_stick_x: Some(x),
@@ -454,8 +445,8 @@ fn tick_works_right_stick() {
         assert_eq!(
             cardinal_levers_move_detector.tick().unwrap(),(x,y));
 
-        assert!(cardinal_levers_move_detector.left_mouse_control.is_none());
-        assert!(cardinal_levers_move_detector.right_mouse_control.is_none());
+        assert!(!cardinal_levers_move_detector.left_lever_is_active);
+        assert!(!cardinal_levers_move_detector.right_lever_is_active);
         assert_eq!(cardinal_levers_move_detector.current_right_stick_x.unwrap(),x);
         assert_eq!(cardinal_levers_move_detector.current_right_stick_y.unwrap(),y);
         assert!(cardinal_levers_move_detector.current_left_stick_x.is_none());
@@ -474,8 +465,9 @@ fn tick_right_stick_resting_position_wont_emit_forever() {
             left_stick: 0.12,
             right_stick: 0.21,
         },
-        left_mouse_control: None,
-        right_mouse_control: None,
+        scale_factor: 1.0,
+        left_lever_is_active: false,
+        right_lever_is_active: false,
         current_left_stick_x: None,
         current_left_stick_y: None,
         current_right_stick_x: Some(0),
@@ -493,8 +485,8 @@ fn tick_right_stick_resting_position_wont_emit_forever() {
             assert!(cardinal_levers_move_detector.tick().is_none());
         }
 
-        assert!(cardinal_levers_move_detector.left_mouse_control.is_none());
-        assert!(cardinal_levers_move_detector.right_mouse_control.is_none());
+        assert!(!cardinal_levers_move_detector.left_lever_is_active);
+        assert!(!cardinal_levers_move_detector.right_lever_is_active);
         assert!(cardinal_levers_move_detector.current_left_stick_x.is_none());
         assert!(cardinal_levers_move_detector.current_left_stick_y.is_none());
         assert_eq!(cardinal_levers_move_detector.current_right_stick_x.unwrap(),0);
@@ -528,8 +520,9 @@ fn tick_left_stick_takes_precidence_over_right() {
                 left_stick: 0.12,
                 right_stick: 0.21,
             },
-            left_mouse_control: None,
-            right_mouse_control: None,
+            scale_factor: 1.0,
+            left_lever_is_active: false,
+            right_lever_is_active: false,
             current_left_stick_x: Some(x),
             current_left_stick_y: Some(y),
             current_right_stick_x: Some(12), //random value
@@ -541,8 +534,8 @@ fn tick_left_stick_takes_precidence_over_right() {
         assert_eq!(
             cardinal_levers_move_detector.tick().unwrap(),(x,y));
 
-        assert!(cardinal_levers_move_detector.left_mouse_control.is_none());
-        assert!(cardinal_levers_move_detector.right_mouse_control.is_none());
+        assert!(!cardinal_levers_move_detector.left_lever_is_active);
+        assert!(!cardinal_levers_move_detector.right_lever_is_active);
         assert_eq!(cardinal_levers_move_detector.current_left_stick_x.unwrap(),x);
         assert_eq!(cardinal_levers_move_detector.current_left_stick_y.unwrap(),y);
         assert_eq!(cardinal_levers_move_detector.current_right_stick_x.unwrap(),12);

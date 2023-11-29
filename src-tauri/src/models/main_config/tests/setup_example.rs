@@ -24,6 +24,7 @@ pub fn setup_example(config: SetupConfig) -> MainConfig {
         },
         stick_cardinal_levers: StickCardinalLevers {
             deadzone_upper_limits: DeadzoneUpperLimits { left_stick: 0.12, right_stick: 0.21 },
+            mouse_controls: MouseControls { scroll_scale_factor: 2.0, cursor_move_scale_factor: 5.3 },
         },
         trigger_2_switches_click_thresholds: Trigger2SwitchesClickThresholds { 
             left_trigger_2: 0.3,

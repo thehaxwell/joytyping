@@ -34,44 +34,41 @@ impl Mouse {
 }
 
 impl MouseTrait for Mouse {
+    // rename this fn to activate_levers
     fn set_mouse_controls(
         &mut self,
         cardinal_levers: Option<CardinalLevers>,
         ){
             if let Some(CardinalLevers { left_stick, right_stick }) 
                 = cardinal_levers {
-                self.mouse_cursor_move_detector.set_mouse_controls(
+                self.mouse_cursor_move_detector.activate_levers(
                     match left_stick.clone() {
-                        Some(SingleCardinalLever::ControlMouseCursor(
-                           mouse_control)) 
-                        => Some(mouse_control),
-                        _ => None,
+                        Some(SingleCardinalLever::ControlMouseCursor) 
+                        => true,
+                        _ => false,
                     },
                     match right_stick.clone() {
-                        Some(SingleCardinalLever::ControlMouseCursor(
-                           mouse_control)) 
-                        => Some(mouse_control),
-                        _ => None,
+                        Some(SingleCardinalLever::ControlMouseCursor) 
+                        => true,
+                        _ => false,
                     });
 
 
-                self.mouse_scroll_detector.set_mouse_controls(
+                self.mouse_scroll_detector.activate_levers(
                     match left_stick {
-                        Some(SingleCardinalLever::ControlMouseScrollwheel(
-                           mouse_control)) 
-                        => Some(mouse_control.clone()),
-                        _ => None,
+                        Some(SingleCardinalLever::ControlMouseScrollwheel) 
+                        => true,
+                        _ => false,
                     },
                     match right_stick {
-                        Some(SingleCardinalLever::ControlMouseScrollwheel(
-                           mouse_control)) 
-                        => Some(mouse_control.clone()),
-                        _ => None,
+                        Some(SingleCardinalLever::ControlMouseScrollwheel) 
+                        => true,
+                        _ => false,
                     });
             }
             else {
-                self.mouse_cursor_move_detector.set_mouse_controls(None,None);
-                self.mouse_scroll_detector.set_mouse_controls(None,None);
+                self.mouse_cursor_move_detector.activate_levers(false,false);
+                self.mouse_scroll_detector.activate_levers(false,false);
             }
     }
 

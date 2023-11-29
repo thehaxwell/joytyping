@@ -1,6 +1,6 @@
 use mockall::predicate::eq;
 
-use crate::{gamepad::{cardinal_levers_move_detector::MockCardinalLeversMoveDetectorTrait, InputEvent}, models::layout::{CardinalLevers, MouseControl, SingleCardinalLever}};
+use crate::{gamepad::{cardinal_levers_move_detector::MockCardinalLeversMoveDetectorTrait, InputEvent}, models::layout::{CardinalLevers, SingleCardinalLever}};
 
 use {super::Mouse, super::MouseTrait};
 
@@ -105,13 +105,13 @@ fn fn_set_mouse_controls_works() {
         = MockCardinalLeversMoveDetectorTrait::new();
 
     mock_mouse_cursor_move_detector
-        .expect_set_mouse_controls()
-        .with(eq(None),eq(None))
+        .expect_activate_levers()
+        .with(eq(false),eq(false))
         .times(1)
         .return_const(());
     mock_mouse_scroll_detector
-        .expect_set_mouse_controls()
-        .with(eq(None),eq(None))
+        .expect_activate_levers()
+        .with(eq(false),eq(false))
         .times(1)
         .return_const(());
 
@@ -122,14 +122,6 @@ fn fn_set_mouse_controls_works() {
 
     mouse.set_mouse_controls(None);
 
-    // setup for the rest of the assertions in this test
-    let left_mouse_mouse_control = MouseControl {
-        scale_factor: 1.2,
-    };
-    let right_mouse_mouse_control = MouseControl {
-        scale_factor: 20.0,
-    };
-
     // only the left control is set:
     // that control is for for mouse_cursor_move_detector
     let mut mock_mouse_cursor_move_detector 
@@ -138,16 +130,13 @@ fn fn_set_mouse_controls_works() {
         = MockCardinalLeversMoveDetectorTrait::new();
 
     mock_mouse_cursor_move_detector
-        .expect_set_mouse_controls()
-        .with(
-            eq(Some(left_mouse_mouse_control.clone())),
-            eq(None),
-        )
+        .expect_activate_levers()
+        .with(eq(true),eq(false))
         .times(1)
         .return_const(());
     mock_mouse_scroll_detector
-        .expect_set_mouse_controls()
-        .with(eq(None),eq(None))
+        .expect_activate_levers()
+        .with(eq(false),eq(false))
         .times(1)
         .return_const(());
 
@@ -158,7 +147,7 @@ fn fn_set_mouse_controls_works() {
 
     mouse.set_mouse_controls(Some(CardinalLevers{
         left_stick: Some(SingleCardinalLever
-                ::ControlMouseCursor(left_mouse_mouse_control.clone())),
+                ::ControlMouseCursor),
         right_stick: None,
     }));
 
@@ -170,18 +159,13 @@ fn fn_set_mouse_controls_works() {
         = MockCardinalLeversMoveDetectorTrait::new();
 
     mock_mouse_cursor_move_detector
-        .expect_set_mouse_controls()
-        .with(
-            eq(None),
-            eq(None),
-        )
+        .expect_activate_levers()
+        .with(eq(false),eq(false))
         .times(1)
         .return_const(());
     mock_mouse_scroll_detector
-        .expect_set_mouse_controls()
-        .with(
-            eq(Some(left_mouse_mouse_control.clone())),
-            eq(None))
+        .expect_activate_levers()
+        .with(eq(true),eq(false))
         .times(1)
         .return_const(());
 
@@ -192,7 +176,7 @@ fn fn_set_mouse_controls_works() {
 
     mouse.set_mouse_controls(Some(CardinalLevers{
         left_stick: Some(SingleCardinalLever
-                ::ControlMouseScrollwheel(left_mouse_mouse_control.clone())),
+                ::ControlMouseScrollwheel),
         right_stick: None,
     }));
 
@@ -204,16 +188,13 @@ fn fn_set_mouse_controls_works() {
         = MockCardinalLeversMoveDetectorTrait::new();
 
     mock_mouse_cursor_move_detector
-        .expect_set_mouse_controls()
-        .with(
-            eq(Some(left_mouse_mouse_control.clone())),
-            eq(Some(right_mouse_mouse_control.clone())),
-        )
+        .expect_activate_levers()
+        .with(eq(true),eq(true))
         .times(1)
         .return_const(());
     mock_mouse_scroll_detector
-        .expect_set_mouse_controls()
-        .with(eq(None),eq(None))
+        .expect_activate_levers()
+        .with(eq(false),eq(false))
         .times(1)
         .return_const(());
 
@@ -224,9 +205,9 @@ fn fn_set_mouse_controls_works() {
 
     mouse.set_mouse_controls(Some(CardinalLevers{
         left_stick: Some(SingleCardinalLever
-                ::ControlMouseCursor(left_mouse_mouse_control.clone())),
+                ::ControlMouseCursor),
         right_stick: Some(SingleCardinalLever
-                ::ControlMouseCursor(right_mouse_mouse_control.clone())),
+                ::ControlMouseCursor),
     }));
 
 
@@ -238,16 +219,13 @@ fn fn_set_mouse_controls_works() {
         = MockCardinalLeversMoveDetectorTrait::new();
 
     mock_mouse_cursor_move_detector
-        .expect_set_mouse_controls()
-        .with(eq(None),eq(None))
+        .expect_activate_levers()
+        .with(eq(false),eq(false))
         .times(1)
         .return_const(());
     mock_mouse_scroll_detector
-        .expect_set_mouse_controls()
-        .with(
-            eq(Some(left_mouse_mouse_control.clone())),
-            eq(Some(right_mouse_mouse_control.clone())),
-        )
+        .expect_activate_levers()
+        .with(eq(true),eq(true))
         .times(1)
         .return_const(());
 
@@ -258,9 +236,9 @@ fn fn_set_mouse_controls_works() {
 
     mouse.set_mouse_controls(Some(CardinalLevers{
         left_stick: Some(SingleCardinalLever
-                ::ControlMouseScrollwheel(left_mouse_mouse_control.clone())),
+                ::ControlMouseScrollwheel),
         right_stick: Some(SingleCardinalLever
-                ::ControlMouseScrollwheel(right_mouse_mouse_control.clone())),
+                ::ControlMouseScrollwheel),
     }));
 
     // both controls are set:
@@ -273,19 +251,13 @@ fn fn_set_mouse_controls_works() {
         = MockCardinalLeversMoveDetectorTrait::new();
 
     mock_mouse_cursor_move_detector
-        .expect_set_mouse_controls()
-        .with(
-            eq(Some(left_mouse_mouse_control.clone())),
-            eq(None),
-        )
+        .expect_activate_levers()
+        .with(eq(true),eq(false))
         .times(1)
         .return_const(());
     mock_mouse_scroll_detector
-        .expect_set_mouse_controls()
-        .with(
-            eq(None),
-            eq(Some(right_mouse_mouse_control.clone()))
-        )
+        .expect_activate_levers()
+        .with(eq(false),eq(true))
         .times(1)
         .return_const(());
 
@@ -296,9 +268,9 @@ fn fn_set_mouse_controls_works() {
 
     mouse.set_mouse_controls(Some(CardinalLevers{
         left_stick: Some(SingleCardinalLever
-                ::ControlMouseCursor(left_mouse_mouse_control.clone())),
+                ::ControlMouseCursor),
         right_stick: Some(SingleCardinalLever
-                ::ControlMouseScrollwheel(right_mouse_mouse_control.clone())),
+                ::ControlMouseScrollwheel),
     }));
 
     // both controls are set:
@@ -311,19 +283,13 @@ fn fn_set_mouse_controls_works() {
         = MockCardinalLeversMoveDetectorTrait::new();
 
     mock_mouse_cursor_move_detector
-        .expect_set_mouse_controls()
-        .with(
-            eq(None),
-            eq(Some(right_mouse_mouse_control.clone()))
-        )
+        .expect_activate_levers()
+        .with(eq(false),eq(true))
         .times(1)
         .return_const(());
     mock_mouse_scroll_detector
-        .expect_set_mouse_controls()
-        .with(
-            eq(Some(left_mouse_mouse_control.clone())),
-            eq(None),
-        )
+        .expect_activate_levers()
+        .with(eq(true),eq(false))
         .times(1)
         .return_const(());
 
@@ -334,9 +300,9 @@ fn fn_set_mouse_controls_works() {
 
     mouse.set_mouse_controls(Some(CardinalLevers{
         left_stick: Some(SingleCardinalLever
-                ::ControlMouseScrollwheel(left_mouse_mouse_control.clone())),
+                ::ControlMouseScrollwheel),
         right_stick: Some(SingleCardinalLever
-                ::ControlMouseCursor(right_mouse_mouse_control.clone())),
+                ::ControlMouseCursor),
     }));
 
 }

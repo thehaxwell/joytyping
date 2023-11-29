@@ -6,7 +6,6 @@ pub struct SetupConfig {
     pub my_ps3_controller_first_layer_step_1_left_trigger_on_double_click_visit_layer_name: String,
     pub my_ps3_controller_quick_lookup_window_inner_size_height: f64,
     pub my_ps3_controller_quick_lookup_window_inner_size_width: f64,
-    pub my_ps3_controller_cardinal_levers_second_layer_step_4_right_stick_control_mouse_scrollwheel_scale_factor: f32,
 }
 
 pub fn setup_example(config: SetupConfig) -> Layout {
@@ -905,15 +904,8 @@ pub fn setup_example(config: SetupConfig) -> Layout {
                     right_trigger_2: None,
                 }),
                 cardinal_levers: Some(CardinalLevers{
-                    left_stick: Some(SingleCardinalLever::ControlMouseCursor(
-                        MouseControl {
-                            scale_factor: 10.0,
-                        })),
-                    right_stick: Some(SingleCardinalLever::ControlMouseScrollwheel(
-                        MouseControl {
-                            scale_factor:
-                                config.my_ps3_controller_cardinal_levers_second_layer_step_4_right_stick_control_mouse_scrollwheel_scale_factor,
-                        })),
+                    left_stick: Some(SingleCardinalLever::ControlMouseCursor),
+                    right_stick: Some(SingleCardinalLever::ControlMouseScrollwheel),
                 })
             },
 
