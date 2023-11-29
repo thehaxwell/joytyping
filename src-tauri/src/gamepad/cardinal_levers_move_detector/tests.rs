@@ -1,10 +1,14 @@
-use crate::{gamepad::cardinal_levers_move_detector::{CardinalLeversMoveDetector, calc}, models::layout::MouseControl};
+use crate::{gamepad::cardinal_levers_move_detector::{CardinalLeversMoveDetector, calc}, models::{layout::MouseControl, main_config::DeadzoneUpperLimits}};
 
 use super::CardinalLeversMoveDetectorTrait;
 
 #[test]
 fn initializer_works() {
-    let cardinal_levers_move_detector = CardinalLeversMoveDetector::new();
+    let deadzone_upper_limits = DeadzoneUpperLimits {
+        left_stick: 0.123,
+        right_stick: 0.3221,
+    };
+    let cardinal_levers_move_detector = CardinalLeversMoveDetector::new(deadzone_upper_limits);
     assert!(cardinal_levers_move_detector.left_mouse_control.is_none());
     assert!(cardinal_levers_move_detector.right_mouse_control.is_none());
     assert!(cardinal_levers_move_detector.current_left_stick_x.is_none());
@@ -19,6 +23,10 @@ fn initializer_works() {
 fn setup_new_cardinal_levers_move_detector()
     -> CardinalLeversMoveDetector {
     CardinalLeversMoveDetector {
+        deadzone_upper_limits: DeadzoneUpperLimits {
+            left_stick: 0.123,
+            right_stick: 0.3221,
+        },
         left_mouse_control: None,
         right_mouse_control: None,
         current_left_stick_x: None,
@@ -48,6 +56,10 @@ fn set_mouse_controls_works() {
 
     let mut cardinal_levers_move_detector 
         = CardinalLeversMoveDetector {
+        deadzone_upper_limits: DeadzoneUpperLimits {
+            left_stick: 0.2,
+            right_stick: 0.3221,
+        },
         left_mouse_control: None,
         right_mouse_control: None,
         current_left_stick_x: Some(1),
@@ -75,6 +87,10 @@ fn set_mouse_controls_works() {
 
     let mut cardinal_levers_move_detector 
         = CardinalLeversMoveDetector {
+        deadzone_upper_limits: DeadzoneUpperLimits {
+            left_stick: 0.12,
+            right_stick: 1.201,
+        },
         left_mouse_control: None,
         right_mouse_control: None,
         current_left_stick_x: Some(0),
@@ -135,35 +151,35 @@ fn calc_utility_fn_works() {
             calc(&MouseControl {
                 deadzone_upper_limit: *deadzone_upper_limit,
                 scale_factor: *scale_factor,
-            },*value),
+            },*deadzone_upper_limit,*value),
         0);
     });
 
     // passing the deadzone
     assert_eq!(calc(&MouseControl { deadzone_upper_limit: 0.0, scale_factor: 5.12 },
-        1.0), 5);
+        0.0, 1.0), 5);
     assert_eq!(calc(&MouseControl { deadzone_upper_limit: 0.12, scale_factor: 5.12 },
-        1.0), 5);
+        0.12, 1.0), 5);
 
     assert_eq!(calc(&MouseControl { deadzone_upper_limit: 0.0, scale_factor: 10.0 },
-        0.1), 1);
+        0.0, 0.1), 1);
     assert_eq!(calc(&MouseControl { deadzone_upper_limit: 0.0, scale_factor: 10.0 },
-        0.3), 3);
+        0.0, 0.3), 3);
     assert_eq!(calc(&MouseControl { deadzone_upper_limit: 0.0, scale_factor: 10.0 },
-        0.7), 7);
+        0.0, 0.7), 7);
     assert_eq!(calc(&MouseControl { deadzone_upper_limit: 0.0, scale_factor: 10.0 },
-        1.0), 10);
+        0.0, 1.0), 10);
 
     assert_eq!(calc(&MouseControl { deadzone_upper_limit: 0.0, scale_factor: 2.0 },
-        0.5), 1);
+        0.0, 0.5), 1);
     assert_eq!(calc(&MouseControl { deadzone_upper_limit: 0.0, scale_factor: 2.4 },
-        0.5), 1);
+        0.0, 0.5), 1);
     assert_eq!(calc(&MouseControl { deadzone_upper_limit: 0.0, scale_factor: 2.5 },
-        0.5), 1);
+        0.0, 0.5), 1);
     assert_eq!(calc(&MouseControl { deadzone_upper_limit: 0.0, scale_factor: 2.9 },
-        0.5), 1);
+        0.0, 0.5), 1);
     assert_eq!(calc(&MouseControl { deadzone_upper_limit: 0.0, scale_factor: 3.0 },
-        0.5), 2);
+        0.0, 0.5), 2);
 
 }
 
@@ -176,6 +192,10 @@ fn axis_changed_works_for_left_stick_x() {
     ].iter().for_each(|(current_left_stick_y,result_current_left_stick_y)|{
         let mut cardinal_levers_move_detector 
             = CardinalLeversMoveDetector {
+                deadzone_upper_limits: DeadzoneUpperLimits {
+                    left_stick: 0.12,
+                    right_stick: 0.2,
+                },
                 left_mouse_control: 
                     Some(MouseControl {
                         deadzone_upper_limit: 0.12,
@@ -212,6 +232,10 @@ fn axis_changed_works_for_left_stick_y() {
     ].iter().for_each(|(current_left_stick_x,result_current_left_stick_x)|{
         let mut cardinal_levers_move_detector 
             = CardinalLeversMoveDetector {
+                deadzone_upper_limits: DeadzoneUpperLimits {
+                    left_stick: 0.12,
+                    right_stick: 0.2,
+                },
                 left_mouse_control: 
                     Some(MouseControl {
                         deadzone_upper_limit: 0.12,
@@ -249,6 +273,10 @@ fn axis_changed_works_for_right_stick_x() {
     ].iter().for_each(|(current_right_stick_y,result_current_right_stick_y)|{
         let mut cardinal_levers_move_detector 
             = CardinalLeversMoveDetector {
+                deadzone_upper_limits: DeadzoneUpperLimits {
+                    left_stick: 0.1,
+                    right_stick: 0.12,
+                },
                 left_mouse_control: None,
                 right_mouse_control: 
                     Some(MouseControl {
@@ -287,6 +315,10 @@ fn axis_changed_works_for_right_stick_y() {
     ].iter().for_each(|(current_right_stick_x,result_current_right_stick_x)|{
         let mut cardinal_levers_move_detector 
             = CardinalLeversMoveDetector {
+                deadzone_upper_limits: DeadzoneUpperLimits {
+                    left_stick: 0.1,
+                    right_stick: 0.12,
+                },
                 left_mouse_control: None,
                 right_mouse_control: Some(MouseControl {
                         deadzone_upper_limit: 0.12,
@@ -326,6 +358,10 @@ fn tick_works_left_stick() {
 
         let mut cardinal_levers_move_detector 
             = CardinalLeversMoveDetector {
+            deadzone_upper_limits: DeadzoneUpperLimits {
+                left_stick: 0.12,
+                right_stick: 0.21,
+            },
             left_mouse_control: None,
             right_mouse_control: None,
             current_left_stick_x: Some(x),
@@ -355,6 +391,10 @@ fn tick_works_left_stick() {
 fn tick_left_stick_resting_position_wont_emit_forever() {
     let mut cardinal_levers_move_detector 
         = CardinalLeversMoveDetector {
+        deadzone_upper_limits: DeadzoneUpperLimits {
+            left_stick: 0.12,
+            right_stick: 0.21,
+        },
         left_mouse_control: None,
         right_mouse_control: None,
         current_left_stick_x: Some(0),
@@ -405,6 +445,10 @@ fn tick_works_right_stick() {
 
         let mut cardinal_levers_move_detector 
             = CardinalLeversMoveDetector {
+            deadzone_upper_limits: DeadzoneUpperLimits {
+                left_stick: 0.12,
+                right_stick: 0.21,
+            },
             left_mouse_control: None,
             right_mouse_control: None,
             current_left_stick_x: None,
@@ -434,6 +478,10 @@ fn tick_works_right_stick() {
 fn tick_right_stick_resting_position_wont_emit_forever() {
     let mut cardinal_levers_move_detector 
         = CardinalLeversMoveDetector {
+        deadzone_upper_limits: DeadzoneUpperLimits {
+            left_stick: 0.12,
+            right_stick: 0.21,
+        },
         left_mouse_control: None,
         right_mouse_control: None,
         current_left_stick_x: None,
@@ -484,6 +532,10 @@ fn tick_left_stick_takes_precidence_over_right() {
 
         let mut cardinal_levers_move_detector 
             = CardinalLeversMoveDetector {
+            deadzone_upper_limits: DeadzoneUpperLimits {
+                left_stick: 0.12,
+                right_stick: 0.21,
+            },
             left_mouse_control: None,
             right_mouse_control: None,
             current_left_stick_x: Some(x),

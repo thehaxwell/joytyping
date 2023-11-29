@@ -22,6 +22,9 @@ pub fn setup_example(config: SetupConfig) -> MainConfig {
             right_stick_left: 0.5,
             right_stick_right: 0.5
         },
+        stick_cardinal_levers: StickCardinalLevers {
+            deadzone_upper_limits: DeadzoneUpperLimits { left_stick: 0.12, right_stick: 0.21 },
+        },
         trigger_2_switches_click_thresholds: Trigger2SwitchesClickThresholds { 
             left_trigger_2: 0.3,
             right_trigger_2: config.my_ps3_controller_stick_switches_click_thresholds_right_trigger_2, 

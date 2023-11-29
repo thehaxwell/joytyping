@@ -71,6 +71,7 @@ pub struct Global {
 pub struct Profile {
 	pub name: String,
     pub stick_switches_click_thresholds: StickSwitchesClickThresholds,
+    pub stick_cardinal_levers: StickCardinalLevers,
     pub trigger_2_switches_click_thresholds: Trigger2SwitchesClickThresholds,
     pub left_upper_is_d_pad: bool,
     #[serde(default = "default_switch_click_event_thresholds")]
@@ -106,6 +107,12 @@ impl Profile {
             .validate(err_message_builder
                 .branch(ErrMessageBuilderNode::Single {
                     field: "stick_switches_click_thresholds".to_string()}))?;
+
+        self.stick_cardinal_levers
+            .validate(err_message_builder
+                .branch(ErrMessageBuilderNode::Single {
+                    field: "stick_cardinal_levers".to_string()}))?;
+
         self.trigger_2_switches_click_thresholds
             .validate(err_message_builder
                 .branch(ErrMessageBuilderNode::Single {
@@ -116,6 +123,7 @@ impl Profile {
             layout_config_relative_file_path: 
                 self.layout_config_relative_file_path.clone(),
             stick_switches_click_thresholds: self.stick_switches_click_thresholds,
+            stick_cardinal_levers: self.stick_cardinal_levers,
             trigger_2_switches_click_thresholds: self.trigger_2_switches_click_thresholds,
             left_upper_is_d_pad: self.left_upper_is_d_pad,
             switch_click_event_thresholds: self.switch_click_event_thresholds.clone(),
@@ -190,6 +198,63 @@ impl StickSwitchesClickThresholds {
                 .collect()
     }
 }
+
+#[derive(Deserialize, Debug, Clone, Copy, PartialEq)]
+pub struct StickCardinalLevers {
+    pub deadzone_upper_limits: DeadzoneUpperLimits,
+}
+
+impl StickCardinalLevers {
+    pub fn validate(
+        &self,
+        err_message_builder: ErrMessageBuilder) -> Result<(),String> {
+        self.deadzone_upper_limits
+            .validate(err_message_builder
+                        .branch(ErrMessageBuilderNode::Single {
+                            field: "deadzone_upper_limits".to_string()}))?;
+        Ok(())
+    }
+}
+
+#[derive(Deserialize, Debug, Clone, Copy, PartialEq)]
+pub struct DeadzoneUpperLimits {
+    pub left_stick: f32,
+    pub right_stick: f32,
+}
+
+impl DeadzoneUpperLimits {
+    pub fn validate(
+        &self,
+        err_message_builder: ErrMessageBuilder) -> Result<(),String> {
+            let thresholds_arr = [
+                (self.left_stick, "left_stick"),
+                (self.right_stick, "right_stick"),
+            ];
+            thresholds_arr
+                .iter()
+                .map(|(threshold,label)|{
+                    if *threshold < 0.0 {
+                        Err(err_message_builder
+                            .branch(ErrMessageBuilderNode::Single { field: label.to_string() })
+                            .build_message(format!(
+                                "value ({}) is lower than the minimum acceptable 0.0",
+                                threshold)))
+                    }
+                    else if *threshold > 1.0 {
+                        Err(err_message_builder
+                            .branch(ErrMessageBuilderNode::Single { field: label.to_string() })
+                            .build_message(format!(
+                                "value ({}) is higher than the maximum acceptable 1.0",
+                                threshold)))
+                    }
+                    else {
+                        Ok(())
+                    }
+                })
+                .collect()
+    }
+}
+
 
 #[derive(Deserialize, Debug, Clone, Copy, PartialEq)]
 pub struct Trigger2SwitchesClickThresholds {

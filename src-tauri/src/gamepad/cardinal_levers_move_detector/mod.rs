@@ -1,4 +1,4 @@
-use crate::models::layout::MouseControl;
+use crate::models::{layout::MouseControl, main_config::DeadzoneUpperLimits};
 
 #[cfg(test)]
 use mockall::{automock, predicate::*};
@@ -21,6 +21,8 @@ pub struct CardinalLeversMoveDetector {
     left_mouse_control: Option<MouseControl>,
     right_mouse_control: Option<MouseControl>,
 
+    deadzone_upper_limits: DeadzoneUpperLimits,
+
     current_left_stick_x: Option<i32>,
     current_left_stick_y: Option<i32>,
     current_right_stick_x: Option<i32>,
@@ -32,8 +34,10 @@ pub struct CardinalLeversMoveDetector {
 
 impl CardinalLeversMoveDetector {
     pub fn new(
+        deadzone_upper_limits: DeadzoneUpperLimits,
     ) -> Self {
         Self {
+            deadzone_upper_limits,
             left_mouse_control: None,
             right_mouse_control: None,
             current_left_stick_x: None,
@@ -66,7 +70,7 @@ impl CardinalLeversMoveDetectorTrait for CardinalLeversMoveDetector {
                => if let Some(mouse_control) 
                       = &self.left_mouse_control {
                         self.current_left_stick_x 
-                            = Some(calc(&mouse_control, value));
+                            = Some(calc(&mouse_control, self.deadzone_upper_limits.left_stick, value));
                         if self.current_left_stick_y.is_none() {
                             self.current_left_stick_y = Some(0);
                         }
@@ -75,7 +79,7 @@ impl CardinalLeversMoveDetectorTrait for CardinalLeversMoveDetector {
                => if let Some(mouse_control) 
                       = &self.left_mouse_control {
                         self.current_left_stick_y 
-                            = Some(-calc(&mouse_control, value));
+                            = Some(-calc(&mouse_control, self.deadzone_upper_limits.left_stick, value));
                         if self.current_left_stick_x.is_none() {
                             self.current_left_stick_x = Some(0);
                         }
@@ -84,7 +88,7 @@ impl CardinalLeversMoveDetectorTrait for CardinalLeversMoveDetector {
                => if let Some(mouse_control) 
                       = &self.right_mouse_control {
                         self.current_right_stick_x 
-                            = Some(calc(&mouse_control, value));
+                            = Some(calc(&mouse_control, self.deadzone_upper_limits.right_stick, value));
                         if self.current_right_stick_y.is_none() {
                             self.current_right_stick_y = Some(0);
                         }
@@ -93,7 +97,7 @@ impl CardinalLeversMoveDetectorTrait for CardinalLeversMoveDetector {
                => if let Some(mouse_control) 
                       = &self.right_mouse_control {
                         self.current_right_stick_y 
-                            = Some(-calc(&mouse_control, value));
+                            = Some(-calc(&mouse_control, self.deadzone_upper_limits.right_stick, value));
                         if self.current_right_stick_x.is_none() {
                             self.current_right_stick_x = Some(0);
                         }
@@ -145,8 +149,10 @@ impl CardinalLeversMoveDetectorTrait for CardinalLeversMoveDetector {
     }
 }
 
-fn calc(mouse_control: &MouseControl, value: f32) -> i32 {
-    if value.abs() >= mouse_control.deadzone_upper_limit.abs() {
+fn calc(mouse_control: &MouseControl,
+        deadzone_upper_limit: f32,
+        value: f32) -> i32 {
+    if value.abs() >= deadzone_upper_limit.abs() {
        (value * mouse_control.scale_factor).round() as i32
     } else { 0 }
 }

@@ -157,8 +157,8 @@ pub fn start_main_loop(
             Box::new(LayersNavigator::new(active_layout.layers,active_profile.left_upper_is_d_pad)),
             Box::new(quick_lookup_window),
             Box::new(cardinal_levers_move_detector::mouse::Mouse::new(
-                Box::new(CardinalLeversMoveDetector::new()),
-                Box::new(CardinalLeversMoveDetector::new()),
+                Box::new(CardinalLeversMoveDetector::new(active_profile.stick_cardinal_levers.deadzone_upper_limits)),
+                Box::new(CardinalLeversMoveDetector::new(active_profile.stick_cardinal_levers.deadzone_upper_limits)),
             ))
         );
 
