@@ -6,7 +6,6 @@ pub struct SetupConfig {
     pub my_ps3_controller_first_layer_step_1_left_trigger_on_double_click_visit_layer_name: String,
     pub my_ps3_controller_quick_lookup_window_inner_size_height: f64,
     pub my_ps3_controller_quick_lookup_window_inner_size_width: f64,
-    pub my_ps3_controller_cardinal_levers_second_layer_step_4_left_stick_control_mouse_cursor_deadzone_upper_limit: f32,
     pub my_ps3_controller_cardinal_levers_second_layer_step_4_right_stick_control_mouse_scrollwheel_scale_factor: f32,
 }
 
@@ -908,13 +907,10 @@ pub fn setup_example(config: SetupConfig) -> Layout {
                 cardinal_levers: Some(CardinalLevers{
                     left_stick: Some(SingleCardinalLever::ControlMouseCursor(
                         MouseControl {
-                            deadzone_upper_limit: 
-                                config.my_ps3_controller_cardinal_levers_second_layer_step_4_left_stick_control_mouse_cursor_deadzone_upper_limit,
                             scale_factor: 10.0,
                         })),
                     right_stick: Some(SingleCardinalLever::ControlMouseScrollwheel(
                         MouseControl {
-                            deadzone_upper_limit: 0.0,
                             scale_factor:
                                 config.my_ps3_controller_cardinal_levers_second_layer_step_4_right_stick_control_mouse_scrollwheel_scale_factor,
                         })),

@@ -71,7 +71,6 @@ fn set_mouse_controls_works() {
     };
 
     let left_mouse_control = MouseControl {
-        deadzone_upper_limit: 0.2,
         scale_factor: 5.0 };
 
     cardinal_levers_move_detector.set_mouse_controls(
@@ -102,10 +101,8 @@ fn set_mouse_controls_works() {
     };
 
     let left_mouse_control = MouseControl {
-        deadzone_upper_limit: 0.12,
         scale_factor: 5.12 };
     let right_mouse_control = MouseControl {
-        deadzone_upper_limit: 1.201,
         scale_factor: 1.23 };
 
     cardinal_levers_move_detector.set_mouse_controls(
@@ -149,36 +146,35 @@ fn calc_utility_fn_works() {
     .for_each(|(deadzone_upper_limit,value,scale_factor)|{
         assert_eq!(
             calc(&MouseControl {
-                deadzone_upper_limit: *deadzone_upper_limit,
                 scale_factor: *scale_factor,
             },*deadzone_upper_limit,*value),
         0);
     });
 
     // passing the deadzone
-    assert_eq!(calc(&MouseControl { deadzone_upper_limit: 0.0, scale_factor: 5.12 },
+    assert_eq!(calc(&MouseControl { scale_factor: 5.12 },
         0.0, 1.0), 5);
-    assert_eq!(calc(&MouseControl { deadzone_upper_limit: 0.12, scale_factor: 5.12 },
+    assert_eq!(calc(&MouseControl { scale_factor: 5.12 },
         0.12, 1.0), 5);
 
-    assert_eq!(calc(&MouseControl { deadzone_upper_limit: 0.0, scale_factor: 10.0 },
+    assert_eq!(calc(&MouseControl { scale_factor: 10.0 },
         0.0, 0.1), 1);
-    assert_eq!(calc(&MouseControl { deadzone_upper_limit: 0.0, scale_factor: 10.0 },
+    assert_eq!(calc(&MouseControl { scale_factor: 10.0 },
         0.0, 0.3), 3);
-    assert_eq!(calc(&MouseControl { deadzone_upper_limit: 0.0, scale_factor: 10.0 },
+    assert_eq!(calc(&MouseControl { scale_factor: 10.0 },
         0.0, 0.7), 7);
-    assert_eq!(calc(&MouseControl { deadzone_upper_limit: 0.0, scale_factor: 10.0 },
+    assert_eq!(calc(&MouseControl { scale_factor: 10.0 },
         0.0, 1.0), 10);
 
-    assert_eq!(calc(&MouseControl { deadzone_upper_limit: 0.0, scale_factor: 2.0 },
+    assert_eq!(calc(&MouseControl { scale_factor: 2.0 },
         0.0, 0.5), 1);
-    assert_eq!(calc(&MouseControl { deadzone_upper_limit: 0.0, scale_factor: 2.4 },
+    assert_eq!(calc(&MouseControl { scale_factor: 2.4 },
         0.0, 0.5), 1);
-    assert_eq!(calc(&MouseControl { deadzone_upper_limit: 0.0, scale_factor: 2.5 },
+    assert_eq!(calc(&MouseControl { scale_factor: 2.5 },
         0.0, 0.5), 1);
-    assert_eq!(calc(&MouseControl { deadzone_upper_limit: 0.0, scale_factor: 2.9 },
+    assert_eq!(calc(&MouseControl { scale_factor: 2.9 },
         0.0, 0.5), 1);
-    assert_eq!(calc(&MouseControl { deadzone_upper_limit: 0.0, scale_factor: 3.0 },
+    assert_eq!(calc(&MouseControl { scale_factor: 3.0 },
         0.0, 0.5), 2);
 
 }
@@ -198,7 +194,6 @@ fn axis_changed_works_for_left_stick_x() {
                 },
                 left_mouse_control: 
                     Some(MouseControl {
-                        deadzone_upper_limit: 0.12,
                         scale_factor: 5.12 }),
                 right_mouse_control: None,
                 current_left_stick_x: None,
@@ -238,7 +233,6 @@ fn axis_changed_works_for_left_stick_y() {
                 },
                 left_mouse_control: 
                     Some(MouseControl {
-                        deadzone_upper_limit: 0.12,
                         scale_factor: 5.12 }),
                 right_mouse_control: None,
                 current_left_stick_x: *current_left_stick_x,
@@ -280,7 +274,6 @@ fn axis_changed_works_for_right_stick_x() {
                 left_mouse_control: None,
                 right_mouse_control: 
                     Some(MouseControl {
-                        deadzone_upper_limit: 0.12,
                         scale_factor: 5.12 }),
                 current_left_stick_x: None,
                 current_left_stick_y: None,
@@ -321,7 +314,6 @@ fn axis_changed_works_for_right_stick_y() {
                 },
                 left_mouse_control: None,
                 right_mouse_control: Some(MouseControl {
-                        deadzone_upper_limit: 0.12,
                         scale_factor: 5.12 }),
                 current_left_stick_x: None,
                 current_left_stick_y: None,

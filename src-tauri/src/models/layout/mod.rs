@@ -249,7 +249,6 @@ impl SingleCardinalLever {
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct MouseControl {
-    pub deadzone_upper_limit: f32,
     pub scale_factor: f32,
 }
 
@@ -257,16 +256,7 @@ impl MouseControl {
     pub fn validate(
         &self,
         err_message_builder: ErrMessageBuilder) -> Result<(),String> {
-            if self.deadzone_upper_limit > 1.0 {
-                return Err(err_message_builder
-                    .branch(ErrMessageBuilderNode::Single { field: "deadzone_upper_limit".to_string() })
-                    .build_message(format!(
-                        "value ({}) is higher than the maximum acceptable 1.0",
-                        self.deadzone_upper_limit)));
-            }
-
             [
-                (self.deadzone_upper_limit, "deadzone_upper_limit"),
                 (self.scale_factor, "scale_factor"),
             ]
             .iter()

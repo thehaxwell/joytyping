@@ -124,11 +124,9 @@ fn fn_set_mouse_controls_works() {
 
     // setup for the rest of the assertions in this test
     let left_mouse_mouse_control = MouseControl {
-        deadzone_upper_limit: 0.2,
         scale_factor: 1.2,
     };
     let right_mouse_mouse_control = MouseControl {
-        deadzone_upper_limit: 0.999,
         scale_factor: 20.0,
     };
 
