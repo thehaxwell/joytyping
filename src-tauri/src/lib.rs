@@ -12,8 +12,8 @@ use input_controller::enigo_wrapper::EnigoWrapper;
 use input_controller::keyboard_input_controller::KeyboardInputController;
 use input_controller::mouse_input_controller;
 use quick_lookup_window::files::FilesDependenciesImpl;
-use settings::error_display_window::ErrorDisplayWindow;
-use settings::{Settings,SettingsDependenciesImpl};
+use settings::loader::error_display_window::ErrorDisplayWindow;
+use settings::loader::{Settings,SettingsDependenciesImpl};
 use notify::{Watcher,RecommendedWatcher, RecursiveMode, Config};
 use crate::tauri_app_handle_wrapper::TauriAppHandleWrapper;
 use tauri::Manager;
@@ -28,7 +28,6 @@ pub mod input_controller;
 pub mod quick_lookup_window;
 pub mod app_data_directory_manager;
 pub mod tauri_app_handle_wrapper;
-pub mod models;
 
 pub fn start_main_loop(
     handle: tauri::AppHandle
@@ -68,7 +67,7 @@ pub fn start_main_loop(
             None => 0
         });
 
-        let active_layout: models::layout::Layout;
+        let active_layout: settings::models::layout::Layout;
         match settings.load_layout(active_profile.layout_settings_relative_file_path.clone().into()) {
             Ok(data) => active_layout = data,
             Err(e) => {

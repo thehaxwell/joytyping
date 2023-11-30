@@ -1,4 +1,4 @@
-use crate::models::{layout::*, BrowserSourceCode, HeightAndWidth};
+use crate::settings::models::{layout::*, BrowserSourceCode, HeightAndWidth};
 use enigo::{Key, MouseButton};
 
 pub struct SetupConfig {

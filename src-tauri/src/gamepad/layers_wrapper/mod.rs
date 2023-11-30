@@ -1,7 +1,7 @@
 #[cfg(test)]
 use mockall::{automock, predicate::*};
 
-use crate::models::layout::{Layer, SwitchEventAndReaction, CardinalLevers, Switches};
+use crate::settings::models::layout::{Layer, SwitchEventAndReaction, CardinalLevers, Switches};
 
 use super::Switch;
 

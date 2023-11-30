@@ -1,4 +1,4 @@
-use crate::{models::{self, main_config::Theme}, tauri_app_handle_wrapper::MockTauriAppHandleTrait, quick_lookup_window::{files::MockFilesTrait, QuickLookupWindow, QuickLookupWindowState}};
+use crate::{settings::models::{self, main_config::Theme}, tauri_app_handle_wrapper::MockTauriAppHandleTrait, quick_lookup_window::{files::MockFilesTrait, QuickLookupWindow, QuickLookupWindowState}};
 
 fn setup_quick_lookup_window_settings_example() -> models::QuickLookupWindow {
     models::QuickLookupWindow{

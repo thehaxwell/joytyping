@@ -4,7 +4,7 @@ use serde::Deserialize;
 use std::{fmt, collections::HashSet};
 use serde::de::{self, Deserializer, Visitor, MapAccess};
 
-use crate::{settings::LayerNodeRef, gamepad::{Switch, gilrs_events::stick_switch_interpreter::StickSwitchButton}};
+use crate::{settings::loader::LayerNodeRef, gamepad::{Switch, gilrs_events::stick_switch_interpreter::StickSwitchButton}};
 
 use super::{QuickLookupWindow, err_message_builder::{ErrMessageBuilder, ErrMessageBuilderNode}};
 

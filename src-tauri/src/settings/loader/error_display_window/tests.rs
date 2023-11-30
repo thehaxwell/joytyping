@@ -1,6 +1,7 @@
 use mockall::predicate::eq;
 
-use crate::{models,settings::error_display_window::ErrorDisplayWindow, tauri_app_handle_wrapper::{MockTauriAppHandleTrait, self}};
+use crate::{settings::models, tauri_app_handle_wrapper::{MockTauriAppHandleTrait, self}};
+use super::ErrorDisplayWindow;
 
 struct ExampleError {
     message: String,

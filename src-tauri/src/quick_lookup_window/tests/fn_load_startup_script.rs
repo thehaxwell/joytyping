@@ -1,7 +1,7 @@
 use gilrs::Button;
 use mockall::predicate::eq;
 
-use crate::{tauri_app_handle_wrapper::{MockTauriAppHandleTrait, WindowOperationOutcome}, quick_lookup_window::{files::{MockFilesTrait, StartupScriptLoadError}, QuickLookupWindow, QuickLookupWindowState}, models::{self, main_config::Theme}, gamepad::Switch};
+use crate::{tauri_app_handle_wrapper::{MockTauriAppHandleTrait, WindowOperationOutcome}, quick_lookup_window::{files::{MockFilesTrait, StartupScriptLoadError}, QuickLookupWindow, QuickLookupWindowState}, settings::models::{self, main_config::Theme}, gamepad::Switch};
 
 const WINDOW_LABEL: &str = "quick-lookup";
 fn setup_quick_lookup_window_settings_example(

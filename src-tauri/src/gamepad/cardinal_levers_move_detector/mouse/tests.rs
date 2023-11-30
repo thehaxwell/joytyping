@@ -1,6 +1,6 @@
 use mockall::predicate::eq;
 
-use crate::{gamepad::{cardinal_levers_move_detector::MockCardinalLeversMoveDetectorTrait, InputEvent}, models::layout::{CardinalLevers, SingleCardinalLever}};
+use crate::{gamepad::{cardinal_levers_move_detector::MockCardinalLeversMoveDetectorTrait, InputEvent}, settings::models::layout::{CardinalLevers, SingleCardinalLever}};
 
 use {super::Mouse, super::MouseTrait};
 

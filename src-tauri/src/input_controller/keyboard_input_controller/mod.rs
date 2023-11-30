@@ -1,4 +1,4 @@
-use crate::models::layout::KeyboardInput;
+use crate::settings::models::layout::KeyboardInput;
 
 #[cfg(test)]
 use mockall::{automock, predicate::*};

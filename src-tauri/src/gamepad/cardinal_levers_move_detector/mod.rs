@@ -1,4 +1,4 @@
-use crate::models::main_config::DeadzoneUpperLimits;
+use crate::settings::models::main_config::DeadzoneUpperLimits;
 
 #[cfg(test)]
 use mockall::{automock, predicate::*};

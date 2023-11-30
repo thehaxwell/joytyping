@@ -1,4 +1,4 @@
-use crate::{models::main_config::Trigger2SwitchesClickThresholds, LeftOrRight};
+use crate::{settings::models::main_config::Trigger2SwitchesClickThresholds, LeftOrRight};
 
 use gilrs::Button;
 #[cfg(test)]

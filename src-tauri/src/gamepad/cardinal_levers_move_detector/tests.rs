@@ -1,4 +1,4 @@
-use crate::{gamepad::cardinal_levers_move_detector::{CardinalLeversMoveDetector, calc}, models::main_config::DeadzoneUpperLimits};
+use crate::{gamepad::cardinal_levers_move_detector::{CardinalLeversMoveDetector, calc}, settings::models::main_config::DeadzoneUpperLimits};
 
 use super::CardinalLeversMoveDetectorTrait;
 

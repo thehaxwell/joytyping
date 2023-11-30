@@ -1,4 +1,4 @@
-use crate::models::{main_config::*, HeightAndWidth, BrowserSourceCode};
+use crate::settings::models::{main_config::*, HeightAndWidth, BrowserSourceCode};
 
 pub struct SetupConfig {
     pub my_ps3_controller_stick_switches_click_thresholds_left_stick_left: f32,

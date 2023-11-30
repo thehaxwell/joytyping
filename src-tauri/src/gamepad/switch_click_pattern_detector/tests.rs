@@ -2,7 +2,7 @@ use std::time::Instant;
 
 use gilrs::Button;
 
-use crate::models::main_config::SwitchClickEventThresholds;
+use crate::settings::models::main_config::SwitchClickEventThresholds;
 
 use super::SwitchClickPatternDetector;
 use super::SwitchClickPatternDetectorTrait;

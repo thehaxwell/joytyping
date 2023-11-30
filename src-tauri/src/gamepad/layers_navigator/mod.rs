@@ -1,6 +1,6 @@
 use gilrs::Button;
 
-use crate::models::layout::{LayerSpecifier, SwitchEventAndReaction, Layer, SwitchOnClickReaction};
+use crate::settings::models::layout::{LayerSpecifier, SwitchEventAndReaction, Layer, SwitchOnClickReaction};
 
 use super::{Switch, switch_click_pattern_detector::SwitchClickPattern, gilrs_events::stick_switch_interpreter::StickSwitchButton};
 

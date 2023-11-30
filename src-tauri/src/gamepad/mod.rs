@@ -1,7 +1,7 @@
 use enigo::MouseButton;
 use gilrs::Button;
 
-use crate::{models::layout::{SwitchOnClickReaction, KeyboardInput}, quick_lookup_window::QuickLookupWindowTrait};
+use crate::{settings::models::layout::{SwitchOnClickReaction, KeyboardInput}, quick_lookup_window::QuickLookupWindowTrait};
 
 use self::{gilrs_events::{gilrs_wrapper::GilrsEventType, GilrsEventsTrait,stick_switch_interpreter::{StickSwitchButton,StickSwitchEvent}}, layers_navigator::{LayersNavigatorTrait, LayerVisitTrigger}, layers_wrapper::LayersWrapperTrait};
 

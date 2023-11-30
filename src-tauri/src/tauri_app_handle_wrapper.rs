@@ -5,7 +5,7 @@ use tauri::Manager;
 use mockall::{automock, predicate::*};
 
 use crate::quick_lookup_window::UpdateKeyboardEventPayload;
-use crate::models::HeightAndWidth;
+use crate::settings::models::HeightAndWidth;
 
 #[cfg_attr(test, automock)]
 pub trait TauriAppHandleTrait {

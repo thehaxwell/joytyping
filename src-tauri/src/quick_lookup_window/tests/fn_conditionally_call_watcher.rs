@@ -1,6 +1,6 @@
 use std::{path::Path, io::ErrorKind};
 
-use crate::{models::{self, main_config::Theme}, quick_lookup_window::{files::MockFilesTrait, QuickLookupWindow, QuickLookupWindowState}, tauri_app_handle_wrapper::MockTauriAppHandleTrait};
+use crate::{settings::models::{self, main_config::Theme}, quick_lookup_window::{files::MockFilesTrait, QuickLookupWindow, QuickLookupWindowState}, tauri_app_handle_wrapper::MockTauriAppHandleTrait};
 
 
 fn setup_quick_lookup_window_settings_example(js_path:String) -> models::QuickLookupWindow {

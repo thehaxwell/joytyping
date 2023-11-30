@@ -1,4 +1,4 @@
-use crate::{tauri_app_handle_wrapper::{self,TauriAppHandleTrait}, models::HeightAndWidth};
+use crate::{tauri_app_handle_wrapper::{self,TauriAppHandleTrait}, settings::models::HeightAndWidth};
 
 #[cfg(test)]
 mod tests;

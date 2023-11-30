@@ -1,6 +1,6 @@
 use gilrs::Button;
 
-use crate::{gamepad::gilrs_events::trigger_2_switch_interpreter::Trigger2SwitchInterpreter, LeftOrRight, models::main_config::Trigger2SwitchesClickThresholds};
+use crate::{gamepad::gilrs_events::trigger_2_switch_interpreter::Trigger2SwitchInterpreter, LeftOrRight, settings::models::main_config::Trigger2SwitchesClickThresholds};
 use super::Trigger2SwitchInterpreterTrait;
 
 use super::Trigger2SwitchEvent;

@@ -1,5 +1,5 @@
 use crate::LeftOrRight;
-use crate::models;
+use crate::settings::models;
 
 #[cfg(test)]
 use mockall::{automock, predicate::*};
