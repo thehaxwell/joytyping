@@ -81,7 +81,7 @@ pub struct Profile {
     pub switch_click_event_thresholds: SwitchClickEventThresholds,
     #[serde(default = "default_theme")]
     pub theme: Theme,
-    pub layout_config_relative_file_path: String,
+    pub layout_settings_relative_file_path: String,
 }
 fn default_stick_switches_click_thresholds() -> StickSwitchesClickThresholds {
     StickSwitchesClickThresholds {
@@ -149,8 +149,8 @@ impl Profile {
 
         Ok(Profile {
             name: self.name.clone(),
-            layout_config_relative_file_path: 
-                self.layout_config_relative_file_path.clone(),
+            layout_settings_relative_file_path: 
+                self.layout_settings_relative_file_path.clone(),
             stick_switches_click_thresholds: self.stick_switches_click_thresholds,
             stick_cardinal_levers: self.stick_cardinal_levers,
             trigger_2_switches_click_thresholds: self.trigger_2_switches_click_thresholds,

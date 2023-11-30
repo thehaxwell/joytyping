@@ -69,7 +69,7 @@ pub fn start_main_loop(
         });
 
         let active_layout: models::layout::Layout;
-        match settings.load_layout(active_profile.layout_config_relative_file_path.clone().into()) {
+        match settings.load_layout(active_profile.layout_settings_relative_file_path.clone().into()) {
             Ok(data) => active_layout = data,
             Err(e) => {
                let _ = settings_error_display_window.open_and_show(e);
@@ -96,7 +96,7 @@ pub fn start_main_loop(
                  //Try put it away in some struct
                  (||{ 
                    let mut path = std::path::PathBuf::from(
-                       active_profile.layout_config_relative_file_path.clone());
+                       active_profile.layout_settings_relative_file_path.clone());
                    path.pop(); // remove the file name from the path
                    Some(path)
                  })(),
