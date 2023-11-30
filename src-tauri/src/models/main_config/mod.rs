@@ -70,8 +70,11 @@ pub struct Global {
 #[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct Profile {
 	pub name: String,
+    #[serde(default = "default_stick_switches_click_thresholds")]
     pub stick_switches_click_thresholds: StickSwitchesClickThresholds,
+    #[serde(default = "default_stick_cardinal_levers")]
     pub stick_cardinal_levers: StickCardinalLevers,
+    #[serde(default = "default_trigger_2_switches_click_thresholds")]
     pub trigger_2_switches_click_thresholds: Trigger2SwitchesClickThresholds,
     pub left_upper_is_d_pad: bool,
     #[serde(default = "default_switch_click_event_thresholds")]
@@ -80,6 +83,32 @@ pub struct Profile {
     pub theme: Theme,
     pub layout_config_relative_file_path: String,
 }
+fn default_stick_switches_click_thresholds() -> StickSwitchesClickThresholds {
+    StickSwitchesClickThresholds {
+        left_stick_up: 0.5,
+        left_stick_down: 0.5,
+        left_stick_left: 0.5,
+        left_stick_right: 0.5,
+        right_stick_up: 0.5,
+        right_stick_down: 0.5,
+        right_stick_left: 0.5,
+        right_stick_right: 0.5,
+    }
+}
+
+fn default_stick_cardinal_levers() -> StickCardinalLevers {
+    StickCardinalLevers { 
+        deadzone_upper_limits: DeadzoneUpperLimits { 
+            left_stick: 0.0, right_stick: 0.0 },
+        mouse_controls: MouseControls { 
+            scroll_scale_factor: 1.0, cursor_move_scale_factor: 5.0 } 
+    }
+}
+
+fn default_trigger_2_switches_click_thresholds() -> Trigger2SwitchesClickThresholds {
+    Trigger2SwitchesClickThresholds { left_trigger_2: 0.3, right_trigger_2: 0.3 }
+}
+
 fn default_switch_click_event_thresholds() -> SwitchClickEventThresholds {
     SwitchClickEventThresholds {
         minimum_milliseconds_down_for_click_and_hold:
