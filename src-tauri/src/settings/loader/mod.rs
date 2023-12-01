@@ -66,7 +66,7 @@ impl Settings {
             .get_app_data_directory()
             .map_err(|()|SettingsLoadError::FileNotFound)
             .and_then(|mut path|{
-                path.push("start");
+                path.push("user");
                 path.set_extension("toml");
                 self.dependencies.read_to_string(path)
                     .map_err(|e|{
