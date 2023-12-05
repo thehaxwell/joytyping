@@ -24,7 +24,7 @@ fn setup_next_event_test(
         .expect_next()
         .return_const(
             GilrsEvent{
-                event: args.event,
+                event: args.event.clone(),
                 time: SystemTime::now(),
             });
 

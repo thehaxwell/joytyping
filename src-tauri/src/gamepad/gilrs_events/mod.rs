@@ -129,7 +129,7 @@ impl GilrsEventsTrait for GilrsEvents {
                             event: new_event, 
                         })
                     },
-                    _other => Some(gilrs_event),
+                    ref _other => Some(gilrs_event),
                 }
             },
             _other => None

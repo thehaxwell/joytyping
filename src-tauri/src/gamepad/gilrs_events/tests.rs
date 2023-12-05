@@ -1,4 +1,4 @@
-use crate::{gamepad::gilrs_events::{GilrsEvents,GilrsEventsTrait, stick_switch_interpreter::{StickSwitchButton, StickSwitchEvent}}, LeftOrRight};
+use crate::{gamepad::gilrs_events::{GilrsEvents,GilrsEventsTrait, stick_switch_interpreter::{StickSwitchButton, StickSwitchEvent}, gilrs_wrapper::GamepadInfo}, LeftOrRight};
 
 use super::{gilrs_wrapper::{MockGilrs, GilrsEventType, GilrsEvent}, stick_switch_interpreter::MockStickSwitchInterpreterTrait, trigger_2_switch_interpreter::{MockTrigger2SwitchInterpreterTrait, Trigger2SwitchEvent}};
 
@@ -18,7 +18,7 @@ fn setup_next_when_gilrs_next_event_is(event: GilrsEventType) -> Option<GilrsEve
         .expect_next_event()
         .times(1)
         .returning(move || Some(GilrsEvent {
-            event,
+            event: event.clone(),
             time: std::time::SystemTime::now(),
         }));
     mock_left_stick_switch_interpreter
@@ -66,7 +66,7 @@ fn next_passes_through_all_non_intercepted_events(){
     assert_eq!(res.event,event.clone());
     assert_just_now(res.time);
 
-    let event = GilrsEventType::Connected;
+    let event = GilrsEventType::Connected(Some(GamepadInfo{name: "PS3 Controller".to_string()}));
     let res = setup_next_when_gilrs_next_event_is(event.clone()).unwrap();
     assert_eq!(res.event,event.clone());
     assert_just_now(res.time);
@@ -244,13 +244,11 @@ fn setup_next_trigger_button_pressed_event(
     let mut mock_left_trigger_2_switch_interpreter = MockTrigger2SwitchInterpreterTrait::new();
     let mut mock_right_trigger_2_switch_interpreter = MockTrigger2SwitchInterpreterTrait::new();
 
-    let event = GilrsEventType::ButtonChanged(button,value);
-
     mock_gilrs
         .expect_next_event()
         .times(1)
         .returning(move || Some(GilrsEvent {
-            event,
+            event: GilrsEventType::ButtonChanged(button,value),
             time: std::time::SystemTime::now(),
         }));
     mock_left_stick_switch_interpreter
@@ -300,25 +298,25 @@ fn setup_next_trigger_button_pressed_event(
 fn next_correctly_changes_trigger_2_button_changed_events_to_button_pressed() {
     let res = setup_next_trigger_button_pressed_event(
         gilrs::ev::Button::LeftTrigger2,0.1452);
-    assert_eq!(res.unwrap().event,
+    assert_eq!(res.clone().unwrap().event,
         GilrsEventType::ButtonPressed(gilrs::ev::Button::LeftTrigger2));
-    assert_just_now(res.unwrap().time);
+    assert_just_now(res.clone().unwrap().time);
 
     let res = setup_next_trigger_button_pressed_event(
         gilrs::ev::Button::LeftTrigger2,0.321);
-    assert_eq!(res.unwrap().event,
+    assert_eq!(res.clone().unwrap().event,
         GilrsEventType::ButtonPressed(gilrs::ev::Button::LeftTrigger2));
-    assert_just_now(res.unwrap().time);
+    assert_just_now(res.clone().unwrap().time);
 
     let res = setup_next_trigger_button_pressed_event(
         gilrs::ev::Button::RightTrigger2,0.32);
-    assert_eq!(res.unwrap().event,
+    assert_eq!(res.clone().unwrap().event,
         GilrsEventType::ButtonPressed(gilrs::ev::Button::RightTrigger2));
-    assert_just_now(res.unwrap().time);
+    assert_just_now(res.clone().unwrap().time);
 
     let res = setup_next_trigger_button_pressed_event(
         gilrs::ev::Button::RightTrigger2,0.0001);
-    assert_eq!(res.unwrap().event,
+    assert_eq!(res.clone().unwrap().event,
         GilrsEventType::ButtonPressed(gilrs::ev::Button::RightTrigger2));
-    assert_just_now(res.unwrap().time);
+    assert_just_now(res.clone().unwrap().time);
 }

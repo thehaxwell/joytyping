@@ -38,7 +38,14 @@ impl Gilrs for GilrsWrapper {
                 gilrs::ev::EventType::ButtonReleased(button, _code) => GilrsEventType::ButtonReleased(button),              
                 gilrs::ev::EventType::ButtonChanged(button, value, _code) => GilrsEventType::ButtonChanged(button,value),
                 gilrs::ev::EventType::AxisChanged(axis, value, _code) => GilrsEventType::AxisChanged(axis, value, None),
-                gilrs::ev::EventType::Connected => GilrsEventType::Connected,
+                gilrs::ev::EventType::Connected => GilrsEventType::Connected(
+                    self.gilrs
+                        .connected_gamepad(id)
+                        .map(|gamepad|
+                             GamepadInfo{
+                                 name: gamepad.name().to_string() 
+                             })
+                ),
                 gilrs::ev::EventType::Disconnected => GilrsEventType::Disconnected,
                 gilrs::ev::EventType::Dropped => GilrsEventType::Dropped,
             };
@@ -62,21 +69,27 @@ impl Gilrs for GilrsWrapper {
     }
 }
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct GilrsEvent {
     pub event: GilrsEventType,
     pub time: std::time::SystemTime
 }
 
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum GilrsEventType {
     ButtonPressed(Button),
     ButtonRepeated(Button),
     ButtonReleased(Button),
     ButtonChanged(Button, f32),
     AxisChanged(Axis, f32, Option<StickSwitchEvent>),
-    Connected,
+    Connected(Option<GamepadInfo>),
     Disconnected,
     Dropped,
+}
+
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct GamepadInfo {
+    pub name: String,
 }
