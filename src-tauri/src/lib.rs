@@ -122,7 +122,7 @@ pub fn start_main_loop(
                 Box::new(GilrsWrapper::new()),
                 Box::new(StickSwitchInterpreter::new(
                     AxisClickThresholds::get_from_setting(
-                        active_profile.stick_switches_click_thresholds,
+                        active_profile.stick_switches.click_thresholds,
                         LeftOrRight::Left),
                     CardinalCustomButtons {
                         up: stick_switch_interpreter::StickSwitchButton::LeftStickUp,
@@ -133,7 +133,7 @@ pub fn start_main_loop(
                 )),
                 Box::new(StickSwitchInterpreter::new(
                     AxisClickThresholds::get_from_setting(
-                        active_profile.stick_switches_click_thresholds,
+                        active_profile.stick_switches.click_thresholds,
                         LeftOrRight::Right),
                     CardinalCustomButtons {
                         up: stick_switch_interpreter::StickSwitchButton::RightStickUp,
@@ -143,11 +143,11 @@ pub fn start_main_loop(
                     }
                 )),
                 Box::new(Trigger2SwitchInterpreter::new(
-                    active_profile.trigger_2_switches_click_thresholds,
+                    active_profile.trigger_2_switches.click_thresholds,
                     LeftOrRight::Left,
                 )),
                 Box::new(Trigger2SwitchInterpreter::new(
-                    active_profile.trigger_2_switches_click_thresholds,
+                    active_profile.trigger_2_switches.click_thresholds,
                     LeftOrRight::Right,
                 )),
             )),

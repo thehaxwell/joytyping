@@ -35,11 +35,12 @@ fn settings_data_validate_and_clone_and_set_layer_pointers_gives_the_right_error
 
     assert_eq!(
         res.unwrap_err(),
-        format!("{}\n{}\n{}\n{}\n{}",
+        format!("{}\n{}\n{}\n{}\n{}\n{}",
         "Error in",
         "> profiles: \"My PS3 Controller\"",
-        "   > stick_switches_click_thresholds",
-        "      > left_stick_left",
+        "   > stick_switches",
+        "      > click_thresholds",
+        "         > left_stick_left",
         "value (1.5) is higher than the maximum acceptable 1.0",));
 
 
@@ -51,11 +52,12 @@ fn settings_data_validate_and_clone_and_set_layer_pointers_gives_the_right_error
 
     assert_eq!(
         res.unwrap_err(),
-        format!("{}\n{}\n{}\n{}\n{}",
+        format!("{}\n{}\n{}\n{}\n{}\n{}",
         "Error in",
         "> profiles: \"My PS3 Controller\"",
-        "   > stick_switches_click_thresholds",
-        "      > left_stick_left",
+        "   > stick_switches",
+        "      > click_thresholds",
+        "         > left_stick_left",
         "value (1.21) is higher than the maximum acceptable 1.0",));
 
 
@@ -67,11 +69,12 @@ fn settings_data_validate_and_clone_and_set_layer_pointers_gives_the_right_error
 
     assert_eq!(
         res.unwrap_err(),
-        format!("{}\n{}\n{}\n{}\n{}",
+        format!("{}\n{}\n{}\n{}\n{}\n{}",
         "Error in",
         "> profiles: \"My PS3 Controller\"",
-        "   > stick_switches_click_thresholds",
-        "      > left_stick_left",
+        "   > stick_switches",
+        "      > click_thresholds",
+        "         > left_stick_left",
         "value (-0.1) is lower than the minimum acceptable 0.0",));
 
 
@@ -83,11 +86,12 @@ fn settings_data_validate_and_clone_and_set_layer_pointers_gives_the_right_error
 
     assert_eq!(
         res.unwrap_err(),
-        format!("{}\n{}\n{}\n{}\n{}",
+        format!("{}\n{}\n{}\n{}\n{}\n{}",
         "Error in",
         "> profiles: \"My PS3 Controller\"",
-        "   > stick_switches_click_thresholds",
-        "      > left_stick_left",
+        "   > stick_switches",
+        "      > click_thresholds",
+        "         > left_stick_left",
         "value (-1.07) is lower than the minimum acceptable 0.0",));
 
 
@@ -99,11 +103,12 @@ fn settings_data_validate_and_clone_and_set_layer_pointers_gives_the_right_error
 
     assert_eq!(
         res.unwrap_err(),
-        format!("{}\n{}\n{}\n{}\n{}",
+        format!("{}\n{}\n{}\n{}\n{}\n{}",
         "Error in",
         "> profiles: \"My PS3 Controller\"",
-        "   > trigger_2_switches_click_thresholds",
-        "      > right_trigger_2",
+        "   > trigger_2_switches",
+        "      > click_thresholds",
+        "         > right_trigger_2",
         "value (1.2) is higher than the maximum acceptable 1.0",));
 
 
@@ -115,11 +120,12 @@ fn settings_data_validate_and_clone_and_set_layer_pointers_gives_the_right_error
 
     assert_eq!(
         res.unwrap_err(),
-        format!("{}\n{}\n{}\n{}\n{}",
+        format!("{}\n{}\n{}\n{}\n{}\n{}",
         "Error in",
         "> profiles: \"My PS3 Controller\"",
-        "   > trigger_2_switches_click_thresholds",
-        "      > right_trigger_2",
+        "   > trigger_2_switches",
+        "      > click_thresholds",
+        "         > right_trigger_2",
         "value (-0.2) is lower than the minimum acceptable 0.0",));
 
 }

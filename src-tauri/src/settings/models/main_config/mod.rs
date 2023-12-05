@@ -70,12 +70,12 @@ pub struct Global {
 #[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct Profile {
 	pub name: String,
-    #[serde(default = "default_stick_switches_click_thresholds")]
-    pub stick_switches_click_thresholds: StickSwitchesClickThresholds,
+    #[serde(default = "default_stick_switches")]
+    pub stick_switches: StickSwitches,
     #[serde(default = "default_stick_cardinal_levers")]
     pub stick_cardinal_levers: StickCardinalLevers,
-    #[serde(default = "default_trigger_2_switches_click_thresholds")]
-    pub trigger_2_switches_click_thresholds: Trigger2SwitchesClickThresholds,
+    #[serde(default = "default_trigger_2_switches")]
+    pub trigger_2_switches: Trigger2Switches,
     pub left_upper_is_d_pad: bool,
     #[serde(default = "default_switch_click_event_thresholds")]
     pub switch_click_event_thresholds: SwitchClickEventThresholds,
@@ -83,30 +83,24 @@ pub struct Profile {
     pub theme: Theme,
     pub layout_settings_relative_file_path: String,
 }
-fn default_stick_switches_click_thresholds() -> StickSwitchesClickThresholds {
-    StickSwitchesClickThresholds {
-        left_stick_up: 0.5,
-        left_stick_down: 0.5,
-        left_stick_left: 0.5,
-        left_stick_right: 0.5,
-        right_stick_up: 0.5,
-        right_stick_down: 0.5,
-        right_stick_left: 0.5,
-        right_stick_right: 0.5,
+fn default_stick_switches() -> StickSwitches {
+    StickSwitches {
+        click_thresholds: default_stick_switches_click_thresholds(),
     }
+    
 }
 
 fn default_stick_cardinal_levers() -> StickCardinalLevers {
     StickCardinalLevers { 
-        deadzone_upper_limits: DeadzoneUpperLimits { 
-            left_stick: 0.0, right_stick: 0.0 },
-        mouse_controls: MouseControls { 
-            scroll_scale_factor: 1.0, cursor_move_scale_factor: 5.0 } 
+        deadzone_upper_limits: default_deadzone_upper_limits(),
+        mouse_controls: default_mouse_controls(), 
     }
 }
 
-fn default_trigger_2_switches_click_thresholds() -> Trigger2SwitchesClickThresholds {
-    Trigger2SwitchesClickThresholds { left_trigger_2: 0.3, right_trigger_2: 0.3 }
+fn default_trigger_2_switches() -> Trigger2Switches {
+    Trigger2Switches {
+        click_thresholds: default_trigger_2_switches_click_thresholds(),
+    }
 }
 
 fn default_switch_click_event_thresholds() -> SwitchClickEventThresholds {
@@ -132,28 +126,28 @@ impl Profile {
         &self,
         err_message_builder: ErrMessageBuilder) -> Result<Self,String> {
 
-        self.stick_switches_click_thresholds
+        self.stick_switches
             .validate(err_message_builder
                 .branch(ErrMessageBuilderNode::Single {
-                    field: "stick_switches_click_thresholds".to_string()}))?;
+                    field: "stick_switches".to_string()}))?;
 
         self.stick_cardinal_levers
             .validate(err_message_builder
                 .branch(ErrMessageBuilderNode::Single {
                     field: "stick_cardinal_levers".to_string()}))?;
 
-        self.trigger_2_switches_click_thresholds
+        self.trigger_2_switches
             .validate(err_message_builder
                 .branch(ErrMessageBuilderNode::Single {
-                    field: "trigger_2_switches_click_thresholds".to_string()}))?;
+                    field: "trigger_2_switches".to_string()}))?;
 
         Ok(Profile {
             name: self.name.clone(),
             layout_settings_relative_file_path: 
                 self.layout_settings_relative_file_path.clone(),
-            stick_switches_click_thresholds: self.stick_switches_click_thresholds,
+            stick_switches: self.stick_switches,
             stick_cardinal_levers: self.stick_cardinal_levers,
-            trigger_2_switches_click_thresholds: self.trigger_2_switches_click_thresholds,
+            trigger_2_switches: self.trigger_2_switches,
             left_upper_is_d_pad: self.left_upper_is_d_pad,
             switch_click_event_thresholds: self.switch_click_event_thresholds.clone(),
             theme: self.theme.clone(),
@@ -175,6 +169,39 @@ fn default_switch_click_event_threshold_milliseconds() -> u64 {500}
 pub enum Theme {
     Light,
     Dark,
+}
+
+#[derive(Deserialize, Debug, Clone, Copy, PartialEq)]
+pub struct StickSwitches {
+    #[serde(default = "default_stick_switches_click_thresholds")]
+    pub click_thresholds: StickSwitchesClickThresholds,
+}
+
+fn default_stick_switches_click_thresholds() -> StickSwitchesClickThresholds {
+    StickSwitchesClickThresholds {
+        left_stick_up: 0.5,
+        left_stick_down: 0.5,
+        left_stick_left: 0.5,
+        left_stick_right: 0.5,
+        right_stick_up: 0.5,
+        right_stick_down: 0.5,
+        right_stick_left: 0.5,
+        right_stick_right: 0.5,
+    }
+}
+
+impl StickSwitches {
+    fn validate(
+        &self,
+        err_message_builder: ErrMessageBuilder) -> Result<(),String> {
+
+        self.click_thresholds
+            .validate(err_message_builder
+                .branch(ErrMessageBuilderNode::Single {
+                    field: "click_thresholds".to_string()}))?;
+
+        Ok(())
+    }
 }
 
 #[derive(Deserialize, Debug, Clone, Copy, PartialEq)]
@@ -230,8 +257,18 @@ impl StickSwitchesClickThresholds {
 
 #[derive(Deserialize, Debug, Clone, Copy, PartialEq)]
 pub struct StickCardinalLevers {
+    #[serde(default = "default_deadzone_upper_limits")]
     pub deadzone_upper_limits: DeadzoneUpperLimits,
+    #[serde(default = "default_mouse_controls")]
     pub mouse_controls: MouseControls,
+}
+fn default_deadzone_upper_limits() -> DeadzoneUpperLimits {
+    DeadzoneUpperLimits { 
+        left_stick: 0.0, right_stick: 0.0 }
+}
+fn default_mouse_controls() -> MouseControls {
+    MouseControls { 
+        scroll_scale_factor: 1.0, cursor_move_scale_factor: 5.0 }
 }
 
 impl StickCardinalLevers {
@@ -317,6 +354,28 @@ impl MouseControls {
 }
 
 
+
+#[derive(Deserialize, Debug, Clone, Copy, PartialEq)]
+pub struct Trigger2Switches {
+    #[serde(default = "default_trigger_2_switches_click_thresholds")]
+    pub click_thresholds: Trigger2SwitchesClickThresholds,
+}
+fn default_trigger_2_switches_click_thresholds() -> Trigger2SwitchesClickThresholds {
+    Trigger2SwitchesClickThresholds { left_trigger_2: 0.3, right_trigger_2: 0.3 }
+}
+
+impl Trigger2Switches {
+    fn validate(
+        &self,
+        err_message_builder: ErrMessageBuilder) -> Result<(),String> {
+
+        self.click_thresholds
+            .validate(err_message_builder
+                .branch(ErrMessageBuilderNode::Single {
+                    field: "click_thresholds".to_string()}))?;
+        Ok(())
+    }
+}
 
 #[derive(Deserialize, Debug, Clone, Copy, PartialEq)]
 pub struct Trigger2SwitchesClickThresholds {

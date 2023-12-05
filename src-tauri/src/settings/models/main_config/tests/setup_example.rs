@@ -12,23 +12,27 @@ pub fn setup_example(config: SetupConfig) -> MainConfig {
         left_upper_is_d_pad: true,
         theme: Theme::Light,
         layout_settings_relative_file_path: "layout-name/main.toml".to_string(),
-        stick_switches_click_thresholds: StickSwitchesClickThresholds {
-            left_stick_up: 0.5,
-            left_stick_down: 0.5,
-            left_stick_left: config.my_ps3_controller_stick_switches_click_thresholds_left_stick_left,
-            left_stick_right: 0.5,
-            right_stick_up: 0.5,
-            right_stick_down: 0.5,
-            right_stick_left: 0.5,
-            right_stick_right: 0.5
+        stick_switches: StickSwitches {
+            click_thresholds: StickSwitchesClickThresholds {
+                left_stick_up: 0.5,
+                left_stick_down: 0.5,
+                left_stick_left: config.my_ps3_controller_stick_switches_click_thresholds_left_stick_left,
+                left_stick_right: 0.5,
+                right_stick_up: 0.5,
+                right_stick_down: 0.5,
+                right_stick_left: 0.5,
+                right_stick_right: 0.5
+            }
         },
         stick_cardinal_levers: StickCardinalLevers {
             deadzone_upper_limits: DeadzoneUpperLimits { left_stick: 0.12, right_stick: 0.21 },
             mouse_controls: MouseControls { scroll_scale_factor: 2.0, cursor_move_scale_factor: 5.3 },
         },
-        trigger_2_switches_click_thresholds: Trigger2SwitchesClickThresholds { 
-            left_trigger_2: 0.3,
-            right_trigger_2: config.my_ps3_controller_stick_switches_click_thresholds_right_trigger_2, 
+        trigger_2_switches: Trigger2Switches {
+            click_thresholds: Trigger2SwitchesClickThresholds { 
+                left_trigger_2: 0.3,
+                right_trigger_2: config.my_ps3_controller_stick_switches_click_thresholds_right_trigger_2, 
+            },
         },
         switch_click_event_thresholds: SwitchClickEventThresholds {
             minimum_milliseconds_down_for_click_and_hold: 500,
