@@ -11,7 +11,7 @@ struct SetupNextEventTestArgs {
 }
 
 fn setup_next_event_test(
-    args: SetupNextEventTestArgs) -> bool {
+    args: SetupNextEventTestArgs) -> Option<GilrsEventType> {
     let mut mock_switch_click_pattern_detector = MockSwitchClickPatternDetectorTrait::new();
     let mock_layers_wrapper = MockLayersWrapperTrait::new();
     let mut mock_gilrs_events = MockGilrsEventsTrait::new();
@@ -84,61 +84,67 @@ fn setup_next_event_test(
 
 #[test]
 fn button_pressed_events() {
-    assert!(setup_next_event_test(
+    assert_eq!(setup_next_event_test(
         SetupNextEventTestArgs {
             event: GilrsEventType::ButtonPressed(Button::East, ),
-        }));
-
-    assert!(setup_next_event_test(
+        }),Some(GilrsEventType::ButtonPressed(Button::East, )));
+    
+    assert_eq!(setup_next_event_test(
         SetupNextEventTestArgs {
             event: GilrsEventType::ButtonPressed(Button::RightTrigger, ),
-        }));
-
-    assert!(setup_next_event_test(
+        }),Some(GilrsEventType::ButtonPressed(Button::RightTrigger, )));
+    
+    assert_eq!(setup_next_event_test(
         SetupNextEventTestArgs {
             event: GilrsEventType::ButtonPressed(Button::Mode, ),
-        }));
+        }),Some(GilrsEventType::ButtonPressed(Button::Mode, )));
 }
 
 #[test]
 fn button_released_events() {
-    assert!(setup_next_event_test(
+    assert_eq!(setup_next_event_test(
         SetupNextEventTestArgs {
             event: GilrsEventType::ButtonReleased(Button::East, ),
-        }));
+        }),Some(GilrsEventType::ButtonReleased(Button::East, )));
 
-    assert!(setup_next_event_test(
+    assert_eq!(setup_next_event_test(
         SetupNextEventTestArgs {
             event: GilrsEventType::ButtonReleased(Button::RightTrigger, ),
-        }));
+        }),Some(GilrsEventType::ButtonReleased(Button::RightTrigger, )));
 
-    assert!(setup_next_event_test(
+    assert_eq!(setup_next_event_test(
         SetupNextEventTestArgs {
             event: GilrsEventType::ButtonReleased(Button::Mode, ),
-        }));
+        }),Some(GilrsEventType::ButtonReleased(Button::Mode, )));
 }
 
 #[test]
 fn axis_changed_events() {
-    assert!(setup_next_event_test(
+    assert_eq!(setup_next_event_test(
         SetupNextEventTestArgs {
             event: GilrsEventType::AxisChanged(
                gilrs::Axis::LeftStickX, 0.34, 
                Some(StickSwitchEvent::ButtonPressed(StickSwitchButton::RightStickUp))),
-        }));
+        }),Some(GilrsEventType::AxisChanged(
+               gilrs::Axis::LeftStickX, 0.34, 
+               Some(StickSwitchEvent::ButtonPressed(StickSwitchButton::RightStickUp)))));
 
-    assert!(setup_next_event_test(
+    assert_eq!(setup_next_event_test(
         SetupNextEventTestArgs {
             event: GilrsEventType::AxisChanged(
                gilrs::Axis::LeftStickY, 0.0, 
                Some(StickSwitchEvent::ButtonPressed(StickSwitchButton::RightStickUp))),
-        }));
+        }),Some(GilrsEventType::AxisChanged(
+               gilrs::Axis::LeftStickY, 0.0, 
+               Some(StickSwitchEvent::ButtonPressed(StickSwitchButton::RightStickUp)))));
 
-    assert!(setup_next_event_test(
+    assert_eq!(setup_next_event_test(
         SetupNextEventTestArgs {
             event: GilrsEventType::AxisChanged(
                gilrs::Axis::RightStickX, 0.34, 
                Some(StickSwitchEvent::ButtonPressed(StickSwitchButton::LeftStickRight))),
-        }));
+        }),Some(GilrsEventType::AxisChanged(
+               gilrs::Axis::RightStickX, 0.34, 
+               Some(StickSwitchEvent::ButtonPressed(StickSwitchButton::LeftStickRight)))));
 
 }

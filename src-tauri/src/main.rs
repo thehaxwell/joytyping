@@ -47,9 +47,9 @@ fn main() {
         })
         .setup(|app| {
             let handle = app.app_handle();
-
+            let id = app.config().tauri.bundle.identifier.clone();
             std::thread::spawn( move || {
-                start_main_loop(handle);
+                start_main_loop(handle,id);
             });
 
             Ok(())

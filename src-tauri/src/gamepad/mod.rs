@@ -178,7 +178,7 @@ impl Gamepad {
     }
 
     // returns true if there is yet another event
-    pub fn next_event(&mut self) -> bool{
+    pub fn next_event(&mut self) -> Option<GilrsEventType> {
         if let Some(event) = self.gilrs_events.next() {
             match event.event {
                 GilrsEventType::ButtonPressed(button, ) => {
@@ -207,26 +207,27 @@ impl Gamepad {
                         };
                     }
                 },
-                GilrsEventType::Connected(gamepad_info_opt) => {
-
-                    if let Some(gamepad_info) = gamepad_info_opt {
-                        println!("Connected: {}",gamepad_info.name);
-                    }
-                    else {
-                        println!("Connected unidentified gamepad");
-                    }
-                },
-                GilrsEventType::Disconnected => {
-                    print!("Disconnected!\n");
-                },
-                GilrsEventType::Dropped => {
-                    print!("Droppedn!\n");
-                }
+                ref _other => (),
+                // GilrsEventType::Connected(gamepad_info_opt) => {
+                //
+                //     if let Some(gamepad_info) = gamepad_info_opt {
+                //         println!("Connected: {}",gamepad_info.name);
+                //     }
+                //     else {
+                //         println!("Connected unidentified gamepad");
+                //     }
+                // },
+                // GilrsEventType::Disconnected => {
+                //     print!("Disconnected!\n");
+                // },
+                // GilrsEventType::Dropped => {
+                //     print!("Droppedn!\n");
+                // }
             }
-            true
+            Some(event.event)
         }
         else {
-            false
+            None
         }
     }
 }

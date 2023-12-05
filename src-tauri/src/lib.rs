@@ -3,7 +3,7 @@ use std::sync::mpsc::TryRecvError;
 use app_data_directory_manager::{AppDataDirectoryManager, AppDataDirectoryDependenciesImpl};
 use gamepad::cardinal_levers_move_detector::{CardinalLeversMoveDetector, self};
 use gamepad::gilrs_events::GilrsEvents;
-use gamepad::gilrs_events::gilrs_wrapper::GilrsWrapper;
+use gamepad::gilrs_events::gilrs_wrapper::{GilrsWrapper, GilrsEventType};
 use gamepad::gilrs_events::stick_switch_interpreter::{CardinalCustomButtons, StickSwitchInterpreter, AxisClickThresholds, self};
 use gamepad::gilrs_events::trigger_2_switch_interpreter::Trigger2SwitchInterpreter;
 use gamepad::layers_navigator::LayersNavigator;
@@ -21,6 +21,8 @@ use tauri::Manager;
 use crate::gamepad::switch_click_pattern_detector::SwitchClickPatternDetector;
 use quick_lookup_window::QuickLookupWindow;
 
+use tauri::api::notification::Notification;
+
 //TODO: see if we can remove the pub from these
 pub mod settings;
 pub mod gamepad;
@@ -30,7 +32,8 @@ pub mod app_data_directory_manager;
 pub mod tauri_app_handle_wrapper;
 
 pub fn start_main_loop(
-    handle: tauri::AppHandle
+    handle: tauri::AppHandle,
+    tauri_config_bundle_identifier: String,
     ){
     let mut settings_error_display_window = ErrorDisplayWindow::new(
         Box::new(TauriAppHandleWrapper::new(handle.clone())));
@@ -203,7 +206,19 @@ pub fn start_main_loop(
             }
 
             input_controller.trigger_input();
-            while gamepad.next_event() {}
+            loop {
+                match gamepad.next_event() {
+                    None => break,
+                    Some(GilrsEventType::Connected(Some(gamepad_info))) => {
+                        let _ = Notification::new(tauri_config_bundle_identifier.clone())
+                            .title("Controller connected")
+                            .body(format!("\"{}\" controller connected to Joytyping",gamepad_info.name))
+                            .show();
+
+                    }
+                    Some(_other) => ()
+                }
+            }
             if let Some(event) = gamepad.tick() {
                 input_controller.react_to_gamepad_event(event);
             }
@@ -218,7 +233,7 @@ pub fn start_main_loop(
         std::thread::sleep(std::time::Duration::from_millis(100));
         match interrupt_event_reciever.try_recv() {
             Ok(MainLoopInterruption::ReInitiailze) => {
-                start_main_loop(handle.clone());
+                start_main_loop(handle.clone(),tauri_config_bundle_identifier);
                 break;
             }
             _other => (),
