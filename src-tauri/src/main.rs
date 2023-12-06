@@ -3,6 +3,7 @@
 // use std::sync::mpsc;
 
 use tauri::SystemTray;
+use tauri::api::notification::Notification;
 use tauri::{CustomMenuItem, SystemTrayMenu, SystemTrayMenuItem, SystemTrayEvent};
 
 use tauri::Manager;
@@ -51,6 +52,10 @@ fn main() {
             std::thread::spawn( move || {
                 start_main_loop(handle,id);
             });
+            let _ = Notification::new(app.config().tauri.bundle.identifier.clone())
+                .title("Joytyping is running")
+                .body(format!("Joytyping is running in the background. {}",access_taskbar_options_instruction()))
+                .show();
 
             Ok(())
         })
@@ -64,6 +69,15 @@ fn main() {
             }
             _ => {}
         });
-
 }
 
+
+#[cfg(not(target_os="windows"))]
+fn access_taskbar_options_instruction() -> String {
+    "Click on the taskbar item to access options.".to_string()
+}
+
+#[cfg(target_os="windows")]
+fn access_taskbar_options_instruction() -> String {
+    "Right-click on the taskbar item to access options.".to_string()
+}
