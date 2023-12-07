@@ -19,7 +19,7 @@ use crate::tauri_app_handle_wrapper::TauriAppHandleWrapper;
 use tauri::Manager;
 
 use crate::gamepad::switch_click_pattern_detector::SwitchClickPatternDetector;
-use quick_lookup_window::QuickLookupWindow;
+use quick_lookup_window::{QuickLookupWindow, QuickLookupWindowTrait};
 
 use tauri::api::notification::Notification;
 
@@ -44,6 +44,9 @@ pub fn start_main_loop(
 
         // close any open window first while there's time
         let _ = settings_error_display_window.close();
+        // if let Err(e) = settings_error_display_window.build() {
+        //     panic!("Couldn't build settings-error-display-window: {}",e);
+        // }
         std::thread::sleep(std::time::Duration::from_millis(100));
 
         let mut settings = Settings::new(
@@ -118,6 +121,9 @@ pub fn start_main_loop(
         if let Err(e) = quick_lookup_window.load_startup_script() {
            let _ = settings_error_display_window.open_and_show(e);
            break 'main_loop_initializer_loop;
+        }
+        if let Err(e) = quick_lookup_window.build() {
+            panic!("Couldn't build quick-lookup-window: {}",e);
         }
 
         let mut gamepad = gamepad::Gamepad::new(

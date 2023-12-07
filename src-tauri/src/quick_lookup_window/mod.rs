@@ -14,7 +14,8 @@ mod tests;
 
 #[cfg_attr(test, automock)]
 pub trait QuickLookupWindowTrait {
-    fn show_or_open(&mut self, trigger_switch: Switch) -> Result<(), tauri::Error>;
+    fn show(&mut self, trigger_switch: Switch) -> Result<bool, tauri::Error>;
+    fn build(&mut self) -> Result<(), tauri::Error>;
     fn hide(&mut self, trigger_switch: Switch) -> Result<(), tauri::Error>;
     fn update(&mut self, layer: usize) -> Result<(), tauri::Error>;
 }
@@ -108,33 +109,37 @@ impl QuickLookupWindow {
 }
 
 impl QuickLookupWindowTrait for QuickLookupWindow {
-    fn show_or_open(&mut self, trigger_switch: Switch) -> Result<(), tauri::Error> {
-        if self.tauri_app_handle.show_window(WINDOW_LABEL)? 
-            == WindowOperationOutcome::WindowNotFound {
-            self.tauri_app_handle.create_window(
-                tauri_app_handle_wrapper::CreateWindowArgs{
-                    label: WINDOW_LABEL.to_string(),
-                    url: tauri::WindowUrl::App("quick-lookup.html".into()),
-                    initialization_script: 
-                        if let Some(init_script) = &self.initialization_script {
-                            Some(format!(
-                               "window.__START_LAYER__= {};{}", 
-                               self.current_layer,
-                               init_script))
-                        } else {
-                            None
-                        },
-                    title: Some("Joytyping Quick Lookup".to_string()),
-                    inner_size: Some(self.quick_lookup_window_settings.inner_size.clone()),
-                    center: Some(()),
-                    decorations: Some(false),
-                    always_on_top: Some(true),
-                    skip_taskbar: Some(true),
-                    focused: Some(false)
-                })?;
-        }
-        self.current_state = QuickLookupWindowState::Showing(trigger_switch);
+    fn build(&mut self) -> Result<(), tauri::Error> {
+        self.tauri_app_handle.create_window(
+            tauri_app_handle_wrapper::CreateWindowArgs{
+                label: WINDOW_LABEL.to_string(),
+                url: tauri::WindowUrl::App("quick-lookup.html".into()),
+                initialization_script: 
+                    if let Some(init_script) = &self.initialization_script {
+                        Some(format!(
+                           "window.__START_LAYER__= {};{}", 
+                           self.current_layer,
+                           init_script))
+                    } else {
+                        None
+                    },
+                title: Some("Joytyping Quick Lookup".to_string()),
+                inner_size: Some(self.quick_lookup_window_settings.inner_size.clone()),
+                center: Some(()),
+                decorations: Some(false),
+                always_on_top: Some(true),
+                skip_taskbar: Some(true),
+                focused: Some(false)
+            })?;
         Ok(())
+    }
+
+    fn show(&mut self, trigger_switch: Switch) -> Result<bool, tauri::Error> {
+        let window_wasnt_found = 
+            self.tauri_app_handle.show_window(WINDOW_LABEL)? 
+                == WindowOperationOutcome::WindowNotFound;
+        self.current_state = QuickLookupWindowState::Showing(trigger_switch);
+        Ok(!window_wasnt_found)
     }
 
     fn hide(&mut self, trigger_switch: Switch) -> Result<(), tauri::Error> {

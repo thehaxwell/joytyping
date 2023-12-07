@@ -80,6 +80,9 @@ impl TauriAppHandleTrait for TauriAppHandleWrapper {
             args.url,
         );
 
+        // make the window invisible upon creation
+        builder = builder.visible(false);
+
         if let Some(script) = args.initialization_script {
             builder = builder.initialization_script(&script);
         }
