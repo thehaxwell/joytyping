@@ -33,7 +33,7 @@ impl ErrorDisplayWindow {
             title: Some("Failed to load Joytyping settings".to_string()),
             initialization_script: Some(
                 format!("window.__ERROR_MESSAGE__ = `{}`;",err_string)),
-            inner_size: Some(HeightAndWidth{height: 400.0, width: 500.0}),
+            inner_size: Some(HeightAndWidth{height: 400.0, width: 600.0}),
             center: Some(()),
             decorations: None,
             always_on_top: None,
