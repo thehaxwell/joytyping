@@ -14,7 +14,7 @@ mod tests;
 
 #[cfg_attr(test, automock)]
 pub trait QuickLookupWindowTrait {
-    fn show(&mut self, trigger_switch: Switch) -> Result<bool, tauri::Error>;
+    fn show(&mut self, trigger_switch: Switch) -> Result<WindowOperationOutcome, tauri::Error>;
     fn build(&mut self) -> Result<(), tauri::Error>;
     fn hide(&mut self, trigger_switch: Switch) -> Result<(), tauri::Error>;
     fn update(&mut self, layer: usize) -> Result<(), tauri::Error>;
@@ -134,12 +134,10 @@ impl QuickLookupWindowTrait for QuickLookupWindow {
         Ok(())
     }
 
-    fn show(&mut self, trigger_switch: Switch) -> Result<bool, tauri::Error> {
-        let window_wasnt_found = 
-            self.tauri_app_handle.show_window(WINDOW_LABEL)? 
-                == WindowOperationOutcome::WindowNotFound;
+    fn show(&mut self, trigger_switch: Switch) -> Result<WindowOperationOutcome, tauri::Error> {
+        let res = self.tauri_app_handle.show_window(WINDOW_LABEL)?;
         self.current_state = QuickLookupWindowState::Showing(trigger_switch);
-        Ok(!window_wasnt_found)
+        Ok(res)
     }
 
     fn hide(&mut self, trigger_switch: Switch) -> Result<(), tauri::Error> {

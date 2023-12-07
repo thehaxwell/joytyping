@@ -41,6 +41,8 @@ impl ErrorDisplayWindow {
             focused: None,
         })?;
 
+        self.tauri_app_handle.show_window(WINDOW_LABEL)?;
+
         Ok(())
     }
 

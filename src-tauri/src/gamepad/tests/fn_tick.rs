@@ -2,7 +2,7 @@ use enigo::Key;
 use gilrs::Button;
 use mockall::predicate::*;
 
-use crate::{gamepad::{switch_click_pattern_detector::{MockSwitchClickPatternDetectorTrait, SwitchClickPattern}, gilrs_events::MockGilrsEventsTrait, layers_navigator::MockLayersNavigatorTrait, cardinal_levers_move_detector, Gamepad, InputEvent, Switch}, quick_lookup_window::MockQuickLookupWindowTrait, settings::models::layout::{LayerSpecifier, SwitchEventAndReaction, SwitchOnClickReaction, KeyboardInput}};
+use crate::{gamepad::{switch_click_pattern_detector::{MockSwitchClickPatternDetectorTrait, SwitchClickPattern}, gilrs_events::MockGilrsEventsTrait, layers_navigator::MockLayersNavigatorTrait, cardinal_levers_move_detector, Gamepad, InputEvent, Switch}, quick_lookup_window::MockQuickLookupWindowTrait, settings::models::layout::{LayerSpecifier, SwitchEventAndReaction, SwitchOnClickReaction, KeyboardInput}, tauri_app_handle_wrapper::WindowOperationOutcome};
 
 use super::super::{gilrs_events::stick_switch_interpreter::StickSwitchButton, layers_wrapper::MockLayersWrapperTrait, layers_navigator::LayerVisitTrigger};
 
@@ -1124,10 +1124,10 @@ fn setup_handles_show_quick_lookup_window(
             .return_const(args.current_layer_num);
 
         mock_quick_lookup_window
-            .expect_show_or_open()
+            .expect_show()
             .times(1)
             .with(eq(switch.clone()))
-            .returning(|_| Ok(()));
+            .returning(|_| Ok(WindowOperationOutcome::Success));
 
         mock_layers_navigator
             .expect_consumable_get_current_layer_index()

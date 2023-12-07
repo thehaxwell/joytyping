@@ -44,9 +44,6 @@ pub fn start_main_loop(
 
         // close any open window first while there's time
         let _ = settings_error_display_window.close();
-        // if let Err(e) = settings_error_display_window.build() {
-        //     panic!("Couldn't build settings-error-display-window: {}",e);
-        // }
         std::thread::sleep(std::time::Duration::from_millis(100));
 
         let mut settings = Settings::new(
