@@ -113,11 +113,18 @@ impl QuickLookupWindowTrait for QuickLookupWindow {
         self.tauri_app_handle.create_window(
             tauri_app_handle_wrapper::CreateWindowArgs{
                 label: WINDOW_LABEL.to_string(),
-                url: tauri::WindowUrl::App("quick-lookup.html".into()),
+                url: tauri::WindowUrl::App("index.html".into()),
                 initialization_script: 
                     if let Some(init_script) = &self.initialization_script {
                         Some(format!(
-                           "window.__START_LAYER__= {};{}", 
+                           "{}window.__START_LAYER__= {};{}", 
+                           // remove all styles
+                           r#"addEventListener("DOMContentLoaded", (event) => {
+                               document.querySelectorAll('[style]')
+                                  .forEach(el => el.removeAttribute('style'));
+                                document.querySelectorAll('link[rel="stylesheet"], style')
+                                  .forEach(el => el.parentNode.removeChild(el));
+                            });"#,
                            self.current_layer,
                            init_script))
                     } else {
