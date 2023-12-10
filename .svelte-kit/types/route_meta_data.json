@@ -1,0 +1,17 @@
+{
+	"/": [
+		"src/routes/+page.ts",
+		"src/routes/+layout.ts",
+		"src/routes/+layout.ts"
+	],
+	"/app": [
+		"src/routes/+layout.ts",
+		"src/routes/+layout.ts"
+	],
+	"/app/status": [
+		"src/routes/+layout.ts"
+	],
+	"/quick-lookup": [
+		"src/routes/+layout.ts"
+	]
+}
