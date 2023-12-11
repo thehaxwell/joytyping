@@ -29,7 +29,7 @@ impl ErrorDisplayWindow {
         self.tauri_app_handle.create_window(
             tauri_app_handle_wrapper::CreateWindowArgs {
             label: WINDOW_LABEL.to_string(), /* the unique window label */
-            url: tauri::WindowUrl::App("#/settings-load-error".into()),
+            url: tauri::WindowUrl::App("/app/status".into()),
             title: Some("Failed to load Joytyping settings".to_string()),
             initialization_script: Some(
                 format!("window.__ERROR_MESSAGE__ = `{}`;",err_string)),

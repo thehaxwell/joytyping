@@ -42,9 +42,9 @@ pub fn start_main_loop(
 
     'main_loop_initializer_loop: loop {
 
-        // close any open window first while there's time
-        let _ = settings_error_display_window.close();
-        std::thread::sleep(std::time::Duration::from_millis(100));
+        // // close any open window first while there's time
+        // let _ = settings_error_display_window.close();
+        // std::thread::sleep(std::time::Duration::from_millis(100));
 
         let mut settings = Settings::new(
             Box::new(SettingsDependenciesImpl),
@@ -120,7 +120,7 @@ pub fn start_main_loop(
            break 'main_loop_initializer_loop;
         }
         if let Err(e) = quick_lookup_window.build() {
-            panic!("Couldn't build quick-lookup-window: {}",e);
+            println!("Couldn't build quick-lookup-window: {}",e);
         }
 
         let mut gamepad = gamepad::Gamepad::new(

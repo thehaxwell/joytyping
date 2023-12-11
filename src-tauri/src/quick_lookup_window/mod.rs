@@ -108,6 +108,12 @@ impl QuickLookupWindow {
     }
 }
 
+impl Drop for QuickLookupWindow {
+    fn drop(&mut self) {
+        let _ = self.tauri_app_handle.close_window(WINDOW_LABEL);
+    }
+}
+
 impl QuickLookupWindowTrait for QuickLookupWindow {
     fn build(&mut self) -> Result<(), tauri::Error> {
         self.tauri_app_handle.create_window(

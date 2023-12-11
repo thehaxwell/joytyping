@@ -29,6 +29,7 @@ declare module '$env/static/private' {
 	export const LESSOPEN: string;
 	export const USER: string;
 	export const npm_config_user_agent: string;
+	export const TAURI_DEBUG: string;
 	export const XDG_SEAT: string;
 	export const npm_package_dependencies__tauri_apps_api: string;
 	export const XDG_SESSION_TYPE: string;
@@ -161,6 +162,7 @@ declare module '$env/dynamic/private' {
 		LESSOPEN: string;
 		USER: string;
 		npm_config_user_agent: string;
+		TAURI_DEBUG: string;
 		XDG_SEAT: string;
 		npm_package_dependencies__tauri_apps_api: string;
 		XDG_SESSION_TYPE: string;
