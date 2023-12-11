@@ -12,15 +12,7 @@
 //missing field \`click_thresholds\`
 //  `;
 
-  // let message = window.__ERROR_MESSAGE__;
-  // let lines = message.split("\n");
-  let message = `
-    Settings file not parsable: TOML parse error at line 11, column 1
-       |
-    11 | [profiles.right_stick]
-       | ^^^^^^^^^^^^^^^^^^^^^^
-    missing field \`click_thresholds\`
-      `;
+  let message = window.__ERROR_MESSAGE__;
   let lines = message.split("\n");
 
   function startMainLoop() {

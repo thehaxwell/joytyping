@@ -9,6 +9,7 @@
 		"src/routes/+layout.ts"
 	],
 	"/app/status": [
+		"src/routes/app/status/+page.ts",
 		"src/routes/+layout.ts"
 	],
 	"/quick-lookup": [
