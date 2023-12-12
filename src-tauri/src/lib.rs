@@ -160,7 +160,6 @@ pub fn start_main_loop(
             Box::new(LayersWrapper::new(active_layout.layers.clone(),active_profile.left_upper_is_d_pad)),
             Box::new(SwitchClickPatternDetector::new(active_profile.switch_click_event_thresholds)),
             Box::new(LayersNavigator::new(active_layout.layers,active_profile.left_upper_is_d_pad)),
-            Box::new(quick_lookup_window),
             Box::new(cardinal_levers_move_detector::mouse::Mouse::new(
                 // mouse_cursor_move_detector
                 Box::new(CardinalLeversMoveDetector::new(
@@ -222,8 +221,17 @@ pub fn start_main_loop(
                     Some(_other) => ()
                 }
             }
-            if let Some(event) = gamepad.tick() {
-                input_controller.react_to_gamepad_event(event);
+
+            match gamepad.next_command() {
+                Some(gamepad::Command::InputEvent(event))
+                    => input_controller.react_to_gamepad_event(event),
+                Some(gamepad::Command::QuickLookupWindowEvent(command))
+                    => {let _ = quick_lookup_window.react_to_command(command);},
+                Some(gamepad::Command::KeyUp(switch)) => {
+                    input_controller.react_to_gamepad_event(gamepad::InputEvent::KeyUp);
+                    let _ = quick_lookup_window.hide(switch);
+                },
+                None => (),
             }
         }
     }

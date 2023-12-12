@@ -22,7 +22,6 @@ pub struct Gamepad {
    layers: Box<dyn LayersWrapperTrait>,
    switch_click_pattern_detector: Box<dyn SwitchClickPatternDetectorTrait>,
    layers_navigator: Box<dyn LayersNavigatorTrait>,
-   quick_lookup_window: Box<dyn QuickLookupWindowTrait>,
    mouse_cardinal_levers_move_detector: Box<dyn cardinal_levers_move_detector::mouse::MouseTrait>,
 }
 
@@ -32,7 +31,6 @@ impl Gamepad {
        layers: Box<dyn LayersWrapperTrait>,
        switch_click_pattern_detector: Box<dyn SwitchClickPatternDetectorTrait>,
        layers_navigator: Box<dyn LayersNavigatorTrait>,
-       quick_lookup_window: Box<dyn QuickLookupWindowTrait>,
        mouse_cardinal_levers_move_detector: Box<dyn cardinal_levers_move_detector::mouse::MouseTrait>,
     ) -> Self {
         Gamepad{
@@ -41,14 +39,12 @@ impl Gamepad {
             switch_click_pattern_detector,
 
             layers_navigator,
-            quick_lookup_window,
             mouse_cardinal_levers_move_detector,
         }
     }
 
 
-    pub fn tick(&mut self) -> Option<InputEvent> {
-
+    pub fn next_command(&mut self) -> Option<Command> {
         let next_event_opt = self.switch_click_pattern_detector.tick();
 
         if let Some(next_event) = next_event_opt.clone() {
@@ -64,9 +60,9 @@ impl Gamepad {
                          switch.clone())
                        .and_then(|s_e_a_r| s_e_a_r.on_click) {
                     Some(SwitchOnClickReaction::Keyboard(keyboard_input)) 
-                    => return Some(InputEvent::KeyClick(keyboard_input)),
+                    => return Some(Command::InputEvent(InputEvent::KeyClick(keyboard_input))),
                     Some(SwitchOnClickReaction::Mouse(mouse_input)) 
-                    => return Some(InputEvent::MouseDown(mouse_input.button)),
+                    => return Some(Command::InputEvent(InputEvent::MouseDown(mouse_input.button))),
                     Some(SwitchOnClickReaction::MoveToLayer(layer_specifier))
                     => self.layers_navigator.move_to_layer(layer_specifier),
                     Some(SwitchOnClickReaction::VisitLayer(layer_specifier))
@@ -74,9 +70,9 @@ impl Gamepad {
                     Some(SwitchOnClickReaction::MoveToOrVisitLayer(layer_specifier))
                     => self.layers_navigator.move_to_or_visit_layer(LayerVisitTrigger::Click(switch),layer_specifier),
                     Some(SwitchOnClickReaction::ShowQuickLookupWindowOnHold)
-                    => {let _ = self.quick_lookup_window.show(switch);}
+                    => return Some(Command::QuickLookupWindowEvent(QuickLookupWindowEvent::ShowBySwitch(switch))),
                     Some(SwitchOnClickReaction::BoostMouseCursorByMultiplier(mul))
-                    => return Some(InputEvent::BoostMouseCursor(mul)),
+                    => return Some(Command::InputEvent(InputEvent::BoostMouseCursor(mul))),
                     _ => ()
                 }
 
@@ -108,7 +104,7 @@ impl Gamepad {
                     //
                     if let Some(SwitchOnClickReaction::Keyboard(keyboard_input)) 
                         = s_e_a_r.on_click {
-                        return Some(InputEvent::KeyDown(keyboard_input))
+                        return Some(Command::InputEvent(InputEvent::KeyDown(keyboard_input)))
                     }
                 };
             },
@@ -123,9 +119,9 @@ impl Gamepad {
                            |s_e_a_r| s_e_a_r.on_double_click
                                             .or_else(|| s_e_a_r.on_click )) {
                     Some(SwitchOnClickReaction::Keyboard(keyboard_input)) 
-                    => return Some(InputEvent::KeyClick(keyboard_input)),
+                    => return Some(Command::InputEvent(InputEvent::KeyClick(keyboard_input))),
                     Some(SwitchOnClickReaction::Mouse(mouse_input)) 
-                    => return Some(InputEvent::MouseDown(mouse_input.button)),
+                    => return Some(Command::InputEvent(InputEvent::MouseDown(mouse_input.button))),
                     Some(SwitchOnClickReaction::MoveToLayer(layer_specifier))
                     => self.layers_navigator.move_to_layer(layer_specifier),
                     Some(SwitchOnClickReaction::VisitLayer(layer_specifier))
@@ -133,9 +129,9 @@ impl Gamepad {
                     Some(SwitchOnClickReaction::MoveToOrVisitLayer(layer_specifier))
                     => self.layers_navigator.move_to_or_visit_layer(LayerVisitTrigger::DoubleClick(switch),layer_specifier),
                     Some(SwitchOnClickReaction::ShowQuickLookupWindowOnHold)
-                    => {let _ = self.quick_lookup_window.show(switch);}
+                    => return Some(Command::QuickLookupWindowEvent(QuickLookupWindowEvent::ShowBySwitch(switch))),
                     Some(SwitchOnClickReaction::BoostMouseCursorByMultiplier(mul))
-                    => return Some(InputEvent::BoostMouseCursor(mul)),
+                    => return Some(Command::InputEvent(InputEvent::BoostMouseCursor(mul))),
                     _ => ()
                 }
             },
@@ -150,31 +146,32 @@ impl Gamepad {
                                             .or_else(|| s_e_a_r.on_click )
                         ) {
                     Some(SwitchOnClickReaction::Keyboard(keyboard_input)) 
-                        => return Some(InputEvent::KeyDown(keyboard_input)),
+                        => return Some(Command::InputEvent(InputEvent::KeyDown(keyboard_input))),
                     _ => (),
 
                 };
             },
             Some(SwitchClickPattern::ClickEnd(switch)) => {
                 self.layers_navigator.undo_last_layer_visit_with_switch(switch.clone());
-                let _ = self.quick_lookup_window.hide(switch);
-                return Some(InputEvent::KeyUp);
+                // return Some(Command::QuickLookupWindowEvent(QuickLookupWindowEvent::HideIfMatchesSwitch(switch)));
+                // return Some(Command::InputEvent(InputEvent::KeyUp));
+                return Some(Command::KeyUp(switch));
             }
             None => (),
         };
 
         if let Some(new_layer_index) 
             = self.layers_navigator.consumable_get_current_layer_index() {
-            let _ = self
-                .quick_lookup_window
-                .update(new_layer_index);
 
             self.mouse_cardinal_levers_move_detector
                 .set_mouse_controls(self.layers.get_cardinal_levers(new_layer_index));
+
+            return Some(Command::QuickLookupWindowEvent(QuickLookupWindowEvent::EmitCurrentLayerNotification(new_layer_index)));
         }
 
         self.mouse_cardinal_levers_move_detector
             .tick()
+            .map(|input_event| Command::InputEvent(input_event))
     }
 
     // returns true if there is yet another event
@@ -233,6 +230,13 @@ impl Gamepad {
 }
 
 #[derive(Debug, Clone, PartialEq)]
+pub enum Command {
+    InputEvent(InputEvent),
+    QuickLookupWindowEvent(QuickLookupWindowEvent),
+    KeyUp(Switch),
+}
+
+#[derive(Debug, Clone, PartialEq)]
 pub enum InputEvent {
     KeyClick(KeyboardInput),
     KeyDown(KeyboardInput),
@@ -241,6 +245,12 @@ pub enum InputEvent {
     MouseScroll(i32,i32),
     KeyUp,
     BoostMouseCursor(u32),
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum QuickLookupWindowEvent {
+    ShowBySwitch(Switch),
+    EmitCurrentLayerNotification(usize),
 }
 
 #[derive(Debug,Clone,PartialEq)]

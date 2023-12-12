@@ -1,4 +1,4 @@
-use crate::{gamepad::Switch, tauri_app_handle_wrapper::{WindowOperationOutcome, EmitWindowEventPayload}, settings::models::{self, main_config::Theme}};
+use crate::{gamepad::{Switch, QuickLookupWindowEvent}, tauri_app_handle_wrapper::{WindowOperationOutcome, EmitWindowEventPayload}, settings::models::{self, main_config::Theme}};
 use crate::tauri_app_handle_wrapper::{self,TauriAppHandleTrait};
 
 #[cfg(test)]
@@ -11,7 +11,8 @@ pub mod files;
 #[cfg(test)]
 mod tests;
 
-
+// TODO: overhaul the quick_lookup_window api. It no longer needs to be mocked since it's accessed
+// directly in lib.rs
 #[cfg_attr(test, automock)]
 pub trait QuickLookupWindowTrait {
     fn show(&mut self, trigger_switch: Switch) -> Result<WindowOperationOutcome, tauri::Error>;
@@ -106,6 +107,14 @@ impl QuickLookupWindow {
             Ok(())
         }
     }
+
+    pub fn react_to_command(&mut self, command: QuickLookupWindowEvent) -> Result<(), tauri::Error> {
+        match command {
+            QuickLookupWindowEvent::ShowBySwitch(switch) => self.show(switch).map(|_|()),
+            QuickLookupWindowEvent::EmitCurrentLayerNotification(
+                new_layer_index) => self.update(new_layer_index)
+        }
+    }
 }
 
 #[cfg(not(test))]
@@ -182,6 +191,7 @@ impl QuickLookupWindowTrait for QuickLookupWindow {
             }))?;
         Ok(())
     }
+
 
 }
 

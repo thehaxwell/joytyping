@@ -74,7 +74,6 @@ fn setup_next_event_test(
        layers: Box::new(mock_layers_wrapper),
        switch_click_pattern_detector: Box::new(mock_switch_click_pattern_detector),
        layers_navigator: Box::new(mock_layers_navigator),
-       quick_lookup_window: Box::new(mock_quick_lookup_window),
        mouse_cardinal_levers_move_detector: 
            Box::new(mock_mouse_cardinal_levers_move_detector),
     };
