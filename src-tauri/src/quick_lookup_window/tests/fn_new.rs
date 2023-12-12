@@ -70,7 +70,7 @@ fn works_with_dev_quick_lookup_window_settings_set(){
                 css_file_path: None,
             }
         });
-    assert_eq!(quick_lookup_window.restart_on_change_file_path.unwrap(), "path/to/dev/file/bundle.js".to_string());
+    assert_eq!(quick_lookup_window.restart_on_change_file_path.clone().unwrap(), "path/to/dev/file/bundle.js".to_string());
     assert_eq!(quick_lookup_window.theme, Theme::Dark);
 
 }

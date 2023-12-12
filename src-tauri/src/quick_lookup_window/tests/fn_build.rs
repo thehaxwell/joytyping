@@ -28,7 +28,7 @@ fn works() {
         .expect_create_window()
         .with(eq(tauri_app_handle_wrapper::CreateWindowArgs{
                 label: WINDOW_LABEL.to_string(),
-                url: tauri::WindowUrl::App("quick-lookup.html".into()),
+                url: tauri::WindowUrl::App("/quick-lookup".into()),
                 initialization_script: 
                         Some(format!(
                            "window.__START_LAYER__= 0;{}", 
@@ -72,7 +72,7 @@ fn handles_create_window_error_correctly() {
         .expect_create_window()
         .with(eq(tauri_app_handle_wrapper::CreateWindowArgs{
                 label: WINDOW_LABEL.to_string(),
-                url: tauri::WindowUrl::App("quick-lookup.html".into()),
+                url: tauri::WindowUrl::App("/quick-lookup".into()),
                 initialization_script: 
                         Some(format!(
                            "window.__START_LAYER__= 0;{}", 

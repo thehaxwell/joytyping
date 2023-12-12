@@ -108,6 +108,7 @@ impl QuickLookupWindow {
     }
 }
 
+#[cfg(not(test))]
 impl Drop for QuickLookupWindow {
     fn drop(&mut self) {
         let _ = self.tauri_app_handle.close_window(WINDOW_LABEL);

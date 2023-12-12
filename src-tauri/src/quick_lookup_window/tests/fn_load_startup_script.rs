@@ -54,7 +54,7 @@ fn works_when_no_window_is_open() {
     assert!(quick_lookup_window.load_startup_script().is_ok());
     assert_eq!(quick_lookup_window.current_state,QuickLookupWindowState::Hidden);
 
-    assert_eq!(quick_lookup_window.initialization_script.unwrap(),
+    assert_eq!(quick_lookup_window.initialization_script.clone().unwrap(),
        format!("{}{}{}{}",
                "window.addEventListener(\"load\", (event) => {",
                "document.documentElement.setAttribute('data-theme','dark');",
@@ -103,7 +103,7 @@ fn works_when_a_window_is_open() {
     assert!(quick_lookup_window.load_startup_script().is_ok());
     assert_eq!(quick_lookup_window.current_state,QuickLookupWindowState::Hidden);
 
-    assert_eq!(quick_lookup_window.initialization_script.unwrap(),
+    assert_eq!(quick_lookup_window.initialization_script.clone().unwrap(),
        format!("{}{}{}{}",
                "window.addEventListener(\"load\", (event) => {",
                "document.documentElement.setAttribute('data-theme','light');",
@@ -160,7 +160,7 @@ fn works_when_css_is_expected_and_no_window_is_open() {
     assert!(quick_lookup_window.load_startup_script().is_ok());
     assert_eq!(quick_lookup_window.current_state,QuickLookupWindowState::Hidden);
 
-    assert_eq!(quick_lookup_window.initialization_script.unwrap(),
+    assert_eq!(quick_lookup_window.initialization_script.clone().unwrap(),
        format!("{}{}{}{}{}",
                "window.addEventListener(\"load\", (event) => {",
                "document.documentElement.setAttribute('data-theme','dark');",
