@@ -548,7 +548,9 @@ pub enum SwitchOnClickReaction {
     // come back to this layer when the click ends
     MoveToOrVisitLayer(LayerSpecifier),
 
+    // TODO: change to ShowQuickLookupWindowWhileKeydown, but this will be a major (vX.0.0) change
     ShowQuickLookupWindowOnHold,
+    ToggleQuickLookupWindow,
 
     BoostMouseCursorByMultiplier(u32),
 }

@@ -229,7 +229,7 @@ pub fn start_main_loop(
                     => {let _ = quick_lookup_window.react_to_command(command);},
                 Some(gamepad::Command::KeyUp(switch)) => {
                     input_controller.react_to_gamepad_event(gamepad::InputEvent::KeyUp);
-                    let _ = quick_lookup_window.hide(switch);
+                    let _ = quick_lookup_window.react_to_switch_keyup(switch);
                 },
                 None => (),
             }

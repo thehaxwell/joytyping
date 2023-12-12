@@ -70,7 +70,9 @@ impl Gamepad {
                     Some(SwitchOnClickReaction::MoveToOrVisitLayer(layer_specifier))
                     => self.layers_navigator.move_to_or_visit_layer(LayerVisitTrigger::Click(switch),layer_specifier),
                     Some(SwitchOnClickReaction::ShowQuickLookupWindowOnHold)
-                    => return Some(Command::QuickLookupWindowEvent(QuickLookupWindowEvent::ShowBySwitch(switch))),
+                    => return Some(Command::QuickLookupWindowEvent(QuickLookupWindowEvent::ShowUntilSwitchKeyup(switch))),
+                    Some(SwitchOnClickReaction::ToggleQuickLookupWindow)
+                    => return Some(Command::QuickLookupWindowEvent(QuickLookupWindowEvent::ToggleBySwitch(switch))),
                     Some(SwitchOnClickReaction::BoostMouseCursorByMultiplier(mul))
                     => return Some(Command::InputEvent(InputEvent::BoostMouseCursor(mul))),
                     _ => ()
@@ -129,7 +131,9 @@ impl Gamepad {
                     Some(SwitchOnClickReaction::MoveToOrVisitLayer(layer_specifier))
                     => self.layers_navigator.move_to_or_visit_layer(LayerVisitTrigger::DoubleClick(switch),layer_specifier),
                     Some(SwitchOnClickReaction::ShowQuickLookupWindowOnHold)
-                    => return Some(Command::QuickLookupWindowEvent(QuickLookupWindowEvent::ShowBySwitch(switch))),
+                    => return Some(Command::QuickLookupWindowEvent(QuickLookupWindowEvent::ShowUntilSwitchKeyup(switch))),
+                    Some(SwitchOnClickReaction::ToggleQuickLookupWindow)
+                    => return Some(Command::QuickLookupWindowEvent(QuickLookupWindowEvent::ToggleBySwitch(switch))),
                     Some(SwitchOnClickReaction::BoostMouseCursorByMultiplier(mul))
                     => return Some(Command::InputEvent(InputEvent::BoostMouseCursor(mul))),
                     _ => ()
@@ -249,8 +253,9 @@ pub enum InputEvent {
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum QuickLookupWindowEvent {
-    ShowBySwitch(Switch),
+    ShowUntilSwitchKeyup(Switch),
     EmitCurrentLayerNotification(usize),
+    ToggleBySwitch(Switch),
 }
 
 #[derive(Debug,Clone,PartialEq)]

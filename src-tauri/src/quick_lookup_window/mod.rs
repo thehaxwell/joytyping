@@ -31,6 +31,7 @@ pub struct QuickLookupWindow {
     quick_lookup_window_settings: models::QuickLookupWindow,
     restart_on_change_file_path: Option<String>,
     theme: Theme,
+hide_on_keyup: bool,
 }
 
 impl QuickLookupWindow {
@@ -54,6 +55,7 @@ impl QuickLookupWindow {
                 dev_quick_lookup_window_settings
                 .and_then(|sets|Some(sets.source_code.js_iife_bundle_file_path)),
             theme,
+            hide_on_keyup: false,
         }
     }
 
@@ -110,9 +112,28 @@ impl QuickLookupWindow {
 
     pub fn react_to_command(&mut self, command: QuickLookupWindowEvent) -> Result<(), tauri::Error> {
         match command {
-            QuickLookupWindowEvent::ShowBySwitch(switch) => self.show(switch).map(|_|()),
+            QuickLookupWindowEvent::ShowUntilSwitchKeyup(switch) => {
+                self.hide_on_keyup = true;
+                self.show(switch).map(|_|())
+            },
             QuickLookupWindowEvent::EmitCurrentLayerNotification(
-                new_layer_index) => self.update(new_layer_index)
+                new_layer_index) => self.update(new_layer_index),
+            QuickLookupWindowEvent::ToggleBySwitch(switch) => self.toggle_show_or_hide(switch).map(|_|()),
+        }
+    }
+
+    pub fn react_to_switch_keyup(&mut self, trigger_switch: Switch) -> Result<(), tauri::Error> {
+        if self.hide_on_keyup {
+            self.hide_on_keyup = false;
+            return self.hide(trigger_switch);
+        }
+        Ok(())
+    }
+
+    fn toggle_show_or_hide(&mut self, trigger_switch: Switch) -> Result<(), tauri::Error> {
+        match &self.current_state {
+            QuickLookupWindowState::Showing(switch) => self.hide(switch.clone()),
+            QuickLookupWindowState::Hidden => self.show(trigger_switch).map(|_|()),
         }
     }
 }
@@ -163,6 +184,7 @@ impl QuickLookupWindowTrait for QuickLookupWindow {
         self.current_state = QuickLookupWindowState::Showing(trigger_switch);
         Ok(res)
     }
+
 
     fn hide(&mut self, trigger_switch: Switch) -> Result<(), tauri::Error> {
         // only allow closing a window with the same 

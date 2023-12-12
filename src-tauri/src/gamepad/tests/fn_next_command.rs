@@ -1110,7 +1110,7 @@ fn handles_show_quick_lookup_window(){
             pattern: SwitchClickPattern::Click(Switch::Button(Button::DPadRight)),
         }
     ).unwrap(),
-    Command::QuickLookupWindowEvent(QuickLookupWindowEvent::ShowBySwitch(Switch::Button(Button::DPadRight))));
+    Command::QuickLookupWindowEvent(QuickLookupWindowEvent::ShowUntilSwitchKeyup(Switch::Button(Button::DPadRight))));
     
     assert_eq!(setup_handles_show_quick_lookup_window(
         SetupGamepadTickHandlesShowQuickLookupWindowEventsArgs {
@@ -1122,7 +1122,7 @@ fn handles_show_quick_lookup_window(){
             pattern: SwitchClickPattern::DoubleClick(Switch::Button(Button::South)),
         }
     ).unwrap(),
-    Command::QuickLookupWindowEvent(QuickLookupWindowEvent::ShowBySwitch(Switch::Button(Button::South))));
+    Command::QuickLookupWindowEvent(QuickLookupWindowEvent::ShowUntilSwitchKeyup(Switch::Button(Button::South))));
     
     
     assert_eq!(setup_handles_show_quick_lookup_window(
@@ -1135,10 +1135,14 @@ fn handles_show_quick_lookup_window(){
             pattern: SwitchClickPattern::DoubleClick(Switch::Button(Button::South)),
         }
     ).unwrap(),
-    Command::QuickLookupWindowEvent(QuickLookupWindowEvent::ShowBySwitch(Switch::Button(Button::South))));
+    Command::QuickLookupWindowEvent(QuickLookupWindowEvent::ShowUntilSwitchKeyup(Switch::Button(Button::South))));
     
 }
 
+#[test]
+fn handles_toggle_quick_lookup_window(){
+    //TODO: implement (hint: use handles_show_quick_lookup_window)
+}
 
 struct SetupGamepadTickHandlesClickEndSwitchPatternArgs {
     pattern: SwitchClickPattern,
