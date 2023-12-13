@@ -1141,7 +1141,42 @@ fn handles_show_quick_lookup_window(){
 
 #[test]
 fn handles_toggle_quick_lookup_window(){
-    //TODO: implement (hint: use handles_show_quick_lookup_window)
+    assert_eq!(setup_handles_show_quick_lookup_window(
+        SetupGamepadTickHandlesShowQuickLookupWindowEventsArgs {
+            current_layer_num: 100_usize,
+            source_switch_event_and_reaction: SwitchEventAndReaction {
+                on_click: Some(SwitchOnClickReaction::ToggleQuickLookupWindow),
+                on_double_click: None, 
+            },
+            pattern: SwitchClickPattern::Click(Switch::Button(Button::DPadRight)),
+        }
+    ).unwrap(),
+    Command::QuickLookupWindowEvent(QuickLookupWindowEvent::ToggleBySwitch(Switch::Button(Button::DPadRight))));
+    
+    assert_eq!(setup_handles_show_quick_lookup_window(
+        SetupGamepadTickHandlesShowQuickLookupWindowEventsArgs {
+            current_layer_num: 10_usize,
+            source_switch_event_and_reaction: SwitchEventAndReaction {
+                on_click: None,
+                on_double_click: Some(SwitchOnClickReaction::ToggleQuickLookupWindow),
+            },
+            pattern: SwitchClickPattern::DoubleClick(Switch::Button(Button::South)),
+        }
+    ).unwrap(),
+    Command::QuickLookupWindowEvent(QuickLookupWindowEvent::ToggleBySwitch(Switch::Button(Button::South))));
+    
+    
+    assert_eq!(setup_handles_show_quick_lookup_window(
+        SetupGamepadTickHandlesShowQuickLookupWindowEventsArgs {
+            current_layer_num: 10_usize,
+            source_switch_event_and_reaction: SwitchEventAndReaction {
+                on_click: Some(SwitchOnClickReaction::ToggleQuickLookupWindow),
+                on_double_click: None, 
+            },
+            pattern: SwitchClickPattern::DoubleClick(Switch::Button(Button::South)),
+        }
+    ).unwrap(),
+    Command::QuickLookupWindowEvent(QuickLookupWindowEvent::ToggleBySwitch(Switch::Button(Button::South))));
 }
 
 struct SetupGamepadTickHandlesClickEndSwitchPatternArgs {
