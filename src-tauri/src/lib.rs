@@ -123,6 +123,9 @@ pub fn start_main_loop(
             println!("Couldn't build quick-lookup-window: {}",e);
         }
 
+        let mut quick_lookup_window_controller = quick_lookup_window::controller
+            ::Controller::new(Box::new(quick_lookup_window));
+
         let mut gamepad = gamepad::Gamepad::new(
             Box::new(GilrsEvents::new(
                 Box::new(GilrsWrapper::new()),
@@ -226,10 +229,10 @@ pub fn start_main_loop(
                 Some(gamepad::Command::InputEvent(event))
                     => input_controller.react_to_gamepad_event(event),
                 Some(gamepad::Command::QuickLookupWindowEvent(command))
-                    => {let _ = quick_lookup_window.react_to_command(command);},
+                    => {let _ = quick_lookup_window_controller.react_to_command(command);},
                 Some(gamepad::Command::KeyUp(switch)) => {
                     input_controller.react_to_gamepad_event(gamepad::InputEvent::KeyUp);
-                    let _ = quick_lookup_window.react_to_switch_keyup(switch);
+                    let _ = quick_lookup_window_controller.react_to_switch_keyup(switch);
                 },
                 None => (),
             }

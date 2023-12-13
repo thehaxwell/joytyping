@@ -1,4 +1,4 @@
-use crate::{gamepad::{Switch, QuickLookupWindowEvent}, tauri_app_handle_wrapper::{WindowOperationOutcome, EmitWindowEventPayload}, settings::models::{self, main_config::Theme}};
+use crate::{tauri_app_handle_wrapper::{WindowOperationOutcome, EmitWindowEventPayload}, settings::models::{self, main_config::Theme}};
 use crate::tauri_app_handle_wrapper::{self,TauriAppHandleTrait};
 
 #[cfg(test)]
@@ -7,31 +7,27 @@ use mockall::{automock, predicate::*};
 use self::files::{FilesTrait, StartupScriptLoadError};
 
 pub mod files;
+pub mod controller;
 
 #[cfg(test)]
 mod tests;
 
-// TODO: overhaul the quick_lookup_window api. It no longer needs to be mocked since it's accessed
-// directly in lib.rs
 #[cfg_attr(test, automock)]
 pub trait QuickLookupWindowTrait {
-    fn show(&mut self, trigger_switch: Switch) -> Result<WindowOperationOutcome, tauri::Error>;
-    fn build(&mut self) -> Result<(), tauri::Error>;
-    fn hide(&mut self, trigger_switch: Switch) -> Result<(), tauri::Error>;
+    fn show(&mut self) -> Result<WindowOperationOutcome, tauri::Error>;
+    fn hide(&mut self) -> Result<WindowOperationOutcome, tauri::Error>;
     fn update(&mut self, layer: usize) -> Result<(), tauri::Error>;
 }
 
 const WINDOW_LABEL: &str = "quick-lookup";
 pub struct QuickLookupWindow {
     tauri_app_handle: Box<dyn TauriAppHandleTrait>,
-    current_state: QuickLookupWindowState,
     current_layer: usize,
     files: Box<dyn FilesTrait>,
     initialization_script: Option<String>,
     quick_lookup_window_settings: models::QuickLookupWindow,
     restart_on_change_file_path: Option<String>,
     theme: Theme,
-hide_on_keyup: bool,
 }
 
 impl QuickLookupWindow {
@@ -44,7 +40,6 @@ impl QuickLookupWindow {
        ) -> Self {
         Self { 
             tauri_app_handle,
-            current_state: QuickLookupWindowState::Hidden,
             initialization_script: None,
             current_layer: 0,
             files,
@@ -55,7 +50,6 @@ impl QuickLookupWindow {
                 dev_quick_lookup_window_settings
                 .and_then(|sets|Some(sets.source_code.js_iife_bundle_file_path)),
             theme,
-            hide_on_keyup: false,
         }
     }
 
@@ -83,11 +77,31 @@ impl QuickLookupWindow {
 
         self.initialization_script = Some(init_script);
 
-        if let Ok(WindowOperationOutcome::Success) 
-            = self.tauri_app_handle.close_window(WINDOW_LABEL) {
-                self.current_state = QuickLookupWindowState::Hidden;
-        }
+        Ok(())
+    }
 
+    pub fn build(&mut self) -> Result<(), tauri::Error> {
+        self.tauri_app_handle.create_window(
+            tauri_app_handle_wrapper::CreateWindowArgs{
+                label: WINDOW_LABEL.to_string(),
+                url: tauri::WindowUrl::App("/quick-lookup".into()),
+                initialization_script: 
+                    if let Some(init_script) = &self.initialization_script {
+                        Some(format!(
+                           "window.__START_LAYER__= {};{}", 
+                           self.current_layer,
+                           init_script))
+                    } else {
+                        None
+                    },
+                title: Some("Joytyping Quick Lookup".to_string()),
+                inner_size: Some(self.quick_lookup_window_settings.inner_size.clone()),
+                center: Some(()),
+                decorations: Some(false),
+                always_on_top: Some(true),
+                skip_taskbar: Some(true),
+                focused: Some(false)
+            })?;
         Ok(())
     }
 
@@ -110,32 +124,7 @@ impl QuickLookupWindow {
         }
     }
 
-    pub fn react_to_command(&mut self, command: QuickLookupWindowEvent) -> Result<(), tauri::Error> {
-        match command {
-            QuickLookupWindowEvent::ShowUntilSwitchKeyup(switch) => {
-                self.hide_on_keyup = true;
-                self.show(switch).map(|_|())
-            },
-            QuickLookupWindowEvent::EmitCurrentLayerNotification(
-                new_layer_index) => self.update(new_layer_index),
-            QuickLookupWindowEvent::ToggleBySwitch(switch) => self.toggle_show_or_hide(switch).map(|_|()),
-        }
-    }
 
-    pub fn react_to_switch_keyup(&mut self, trigger_switch: Switch) -> Result<(), tauri::Error> {
-        if self.hide_on_keyup {
-            self.hide_on_keyup = false;
-            return self.hide(trigger_switch);
-        }
-        Ok(())
-    }
-
-    fn toggle_show_or_hide(&mut self, trigger_switch: Switch) -> Result<(), tauri::Error> {
-        match &self.current_state {
-            QuickLookupWindowState::Showing(switch) => self.hide(switch.clone()),
-            QuickLookupWindowState::Hidden => self.show(trigger_switch).map(|_|()),
-        }
-    }
 }
 
 #[cfg(not(test))]
@@ -146,62 +135,6 @@ impl Drop for QuickLookupWindow {
 }
 
 impl QuickLookupWindowTrait for QuickLookupWindow {
-    fn build(&mut self) -> Result<(), tauri::Error> {
-        self.tauri_app_handle.create_window(
-            tauri_app_handle_wrapper::CreateWindowArgs{
-                label: WINDOW_LABEL.to_string(),
-                url: tauri::WindowUrl::App("/quick-lookup".into()),
-                initialization_script: 
-                    if let Some(init_script) = &self.initialization_script {
-                        Some(format!(
-                           "window.__START_LAYER__= {};{}", 
-                           // "{}window.__START_LAYER__= {};{}", 
-                           // // remove all styles
-                           // r#"addEventListener("DOMContentLoaded", (event) => {
-                           //     document.querySelectorAll('[style]')
-                           //        .forEach(el => el.removeAttribute('style'));
-                           //      document.querySelectorAll('link[rel="stylesheet"], style')
-                           //        .forEach(el => el.parentNode.removeChild(el));
-                           //  });"#,
-                           self.current_layer,
-                           init_script))
-                    } else {
-                        None
-                    },
-                title: Some("Joytyping Quick Lookup".to_string()),
-                inner_size: Some(self.quick_lookup_window_settings.inner_size.clone()),
-                center: Some(()),
-                decorations: Some(false),
-                always_on_top: Some(true),
-                skip_taskbar: Some(true),
-                focused: Some(false)
-            })?;
-        Ok(())
-    }
-
-    fn show(&mut self, trigger_switch: Switch) -> Result<WindowOperationOutcome, tauri::Error> {
-        let res = self.tauri_app_handle.show_window(WINDOW_LABEL)?;
-        self.current_state = QuickLookupWindowState::Showing(trigger_switch);
-        Ok(res)
-    }
-
-
-    fn hide(&mut self, trigger_switch: Switch) -> Result<(), tauri::Error> {
-        // only allow closing a window with the same 
-        // switch it was opened with
-        if let QuickLookupWindowState::Showing(switch) = &self.current_state {
-            if *switch != trigger_switch {
-                return Ok(());
-            }
-        }
-
-        if self.tauri_app_handle.hide_window(WINDOW_LABEL)?
-            == WindowOperationOutcome::Success {
-             self.current_state = QuickLookupWindowState::Hidden;
-        }
-        Ok(())
-    }
-
     fn update(&mut self, layer: usize) -> Result<(), tauri::Error> {
         self.current_layer = layer;
         self.tauri_app_handle.emit_window_event(
@@ -214,6 +147,13 @@ impl QuickLookupWindowTrait for QuickLookupWindow {
         Ok(())
     }
 
+    fn show(&mut self) -> Result<WindowOperationOutcome, tauri::Error> {
+        self.tauri_app_handle.show_window(WINDOW_LABEL)
+    }
+
+    fn hide(&mut self) -> Result<WindowOperationOutcome, tauri::Error>{
+        self.tauri_app_handle.hide_window(WINDOW_LABEL)
+    }
 
 }
 
@@ -222,8 +162,3 @@ pub struct UpdateKeyboardEventPayload {
   layer: usize,
 }
 
-#[derive(Debug,PartialEq)]
-enum QuickLookupWindowState {
-    Showing(Switch),
-    Hidden
-}

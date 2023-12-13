@@ -1,6 +1,6 @@
 use std::{path::Path, io::ErrorKind};
 
-use crate::{settings::models::{self, main_config::Theme}, quick_lookup_window::{files::MockFilesTrait, QuickLookupWindow, QuickLookupWindowState}, tauri_app_handle_wrapper::MockTauriAppHandleTrait};
+use crate::{settings::models::{self, main_config::Theme}, quick_lookup_window::{files::MockFilesTrait, QuickLookupWindow}, tauri_app_handle_wrapper::MockTauriAppHandleTrait};
 
 
 fn setup_quick_lookup_window_settings_example(js_path:String) -> models::QuickLookupWindow {
@@ -20,7 +20,6 @@ fn setup_quick_lookup_window_settings_example(js_path:String) -> models::QuickLo
 fn works() {
     let quick_lookup_window = QuickLookupWindow { 
         tauri_app_handle: Box::new(MockTauriAppHandleTrait::new()),
-        current_state: QuickLookupWindowState::Hidden,
         initialization_script: None,
         current_layer: 0,
         files: Box::new(MockFilesTrait::new()),
@@ -40,7 +39,6 @@ fn works() {
 
     let quick_lookup_window = QuickLookupWindow { 
         tauri_app_handle: Box::new(MockTauriAppHandleTrait::new()),
-        current_state: QuickLookupWindowState::Hidden,
         initialization_script: None,
         current_layer: 0,
         files: Box::new(MockFilesTrait::new()),
@@ -75,7 +73,6 @@ fn handles_errors_correctly() {
 
     let quick_lookup_window = QuickLookupWindow { 
         tauri_app_handle: Box::new(mock_tauri_app_handle),
-        current_state: QuickLookupWindowState::Hidden,
         initialization_script: None,
         current_layer: 0,
         files: Box::new(mock_files),

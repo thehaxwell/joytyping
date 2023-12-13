@@ -1,4 +1,4 @@
-use crate::{settings::models::{self, main_config::Theme}, tauri_app_handle_wrapper::MockTauriAppHandleTrait, quick_lookup_window::{files::MockFilesTrait, QuickLookupWindow, QuickLookupWindowState}};
+use crate::{settings::models::{self, main_config::Theme}, tauri_app_handle_wrapper::MockTauriAppHandleTrait, quick_lookup_window::{files::MockFilesTrait, QuickLookupWindow}};
 
 fn setup_quick_lookup_window_settings_example() -> models::QuickLookupWindow {
     models::QuickLookupWindow{
@@ -26,7 +26,6 @@ fn works_with_dev_quick_lookup_window_settings_not_set(){
         Theme::Light
     );
 
-    assert_eq!(quick_lookup_window.current_state, QuickLookupWindowState::Hidden);
     assert!(quick_lookup_window.initialization_script.is_none());
     assert_eq!(quick_lookup_window.current_layer, 0);
     assert_eq!(quick_lookup_window.quick_lookup_window_settings,setup_quick_lookup_window_settings_example());
@@ -57,7 +56,6 @@ fn works_with_dev_quick_lookup_window_settings_set(){
         Theme::Dark
     );
 
-    assert_eq!(quick_lookup_window.current_state, QuickLookupWindowState::Hidden);
     assert!(quick_lookup_window.initialization_script.is_none());
     assert_eq!(quick_lookup_window.current_layer, 0);
     assert_eq!(quick_lookup_window.quick_lookup_window_settings,models::QuickLookupWindow{
