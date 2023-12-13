@@ -1,6 +1,6 @@
 use mockall::predicate::eq;
 
-use crate::{quick_lookup_window::{controller::{Controller, QuickLookupWindowState}, MockQuickLookupWindowTrait}, gamepad::{Switch, QuickLookupWindowEvent}, tauri_app_handle_wrapper::WindowOperationOutcome};
+use crate::{quick_lookup_window::{controller::{Controller, QuickLookupWindowState}, MockQuickLookupWindowTrait}, gamepad_listener::{Switch, QuickLookupWindowEvent}, tauri_app_handle_wrapper::WindowOperationOutcome};
 
 #[test]
 fn works_for_show_until_switch_keyup() {

@@ -3,7 +3,7 @@ use std::time::SystemTime;
 use gilrs::Button;
 use mockall::predicate::eq;
 
-use crate::gamepad::{switch_click_pattern_detector::MockSwitchClickPatternDetectorTrait, layers_wrapper::MockLayersWrapperTrait, gilrs_events::{MockGilrsEventsTrait, gilrs_wrapper::{GilrsEvent, GilrsEventType}, stick_switch_interpreter::{StickSwitchEvent, StickSwitchButton}}, layers_navigator::MockLayersNavigatorTrait, cardinal_levers_move_detector, Listener};
+use crate::gamepad_listener::{switch_click_pattern_detector::MockSwitchClickPatternDetectorTrait, layers_wrapper::MockLayersWrapperTrait, gilrs_events::{MockGilrsEventsTrait, gilrs_wrapper::{GilrsEvent, GilrsEventType}, stick_switch_interpreter::{StickSwitchEvent, StickSwitchButton}}, layers_navigator::MockLayersNavigatorTrait, cardinal_levers_move_detector, Listener};
 
 struct SetupNextEventTestArgs {
     event: GilrsEventType,
@@ -68,7 +68,7 @@ fn setup_next_event_test(
         _ => (),
     }
 
-    let mut gamepad = Listener {
+    let mut gamepad_listener = Listener {
        gilrs_events: Box::new(mock_gilrs_events),
        layers: Box::new(mock_layers_wrapper),
        switch_click_pattern_detector: Box::new(mock_switch_click_pattern_detector),
@@ -77,7 +77,7 @@ fn setup_next_event_test(
            Box::new(mock_mouse_cardinal_levers_move_detector),
     };
 
-    gamepad.next_event()
+    gamepad_listener.next_event()
 }
 
 #[test]

@@ -1,4 +1,4 @@
-use crate::gamepad::InputEvent;
+use crate::gamepad_listener::InputEvent;
 
 use self::keyboard_input_controller::KeyboardInputControllerTrait;
 

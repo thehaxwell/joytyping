@@ -1,13 +1,13 @@
 use std::sync::mpsc::TryRecvError;
 
 use app_data_directory_manager::{AppDataDirectoryManager, AppDataDirectoryDependenciesImpl};
-use gamepad::cardinal_levers_move_detector::{CardinalLeversMoveDetector, self};
-use gamepad::gilrs_events::GilrsEvents;
-use gamepad::gilrs_events::gilrs_wrapper::{GilrsWrapper, GilrsEventType};
-use gamepad::gilrs_events::stick_switch_interpreter::{CardinalCustomButtons, StickSwitchInterpreter, AxisClickThresholds, self};
-use gamepad::gilrs_events::trigger_2_switch_interpreter::Trigger2SwitchInterpreter;
-use gamepad::layers_navigator::LayersNavigator;
-use gamepad::layers_wrapper::LayersWrapper;
+use gamepad_listener::cardinal_levers_move_detector::{CardinalLeversMoveDetector, self};
+use gamepad_listener::gilrs_events::GilrsEvents;
+use gamepad_listener::gilrs_events::gilrs_wrapper::{GilrsWrapper, GilrsEventType};
+use gamepad_listener::gilrs_events::stick_switch_interpreter::{CardinalCustomButtons, StickSwitchInterpreter, AxisClickThresholds, self};
+use gamepad_listener::gilrs_events::trigger_2_switch_interpreter::Trigger2SwitchInterpreter;
+use gamepad_listener::layers_navigator::LayersNavigator;
+use gamepad_listener::layers_wrapper::LayersWrapper;
 use input_controller::enigo_wrapper::EnigoWrapper;
 use input_controller::keyboard_input_controller::KeyboardInputController;
 use input_controller::mouse_input_controller;
@@ -18,14 +18,14 @@ use notify::{Watcher,RecommendedWatcher, RecursiveMode, Config};
 use crate::tauri_app_handle_wrapper::TauriAppHandleWrapper;
 use tauri::Manager;
 
-use crate::gamepad::switch_click_pattern_detector::SwitchClickPatternDetector;
+use crate::gamepad_listener::switch_click_pattern_detector::SwitchClickPatternDetector;
 use quick_lookup_window::{QuickLookupWindow, QuickLookupWindowTrait};
 
 use tauri::api::notification::Notification;
 
 //TODO: see if we can remove the pub from these
 pub mod settings;
-pub mod gamepad;
+pub mod gamepad_listener;
 pub mod input_controller;
 pub mod quick_lookup_window;
 pub mod app_data_directory_manager;
@@ -126,7 +126,7 @@ pub fn start_main_loop(
         let mut quick_lookup_window_controller = quick_lookup_window::controller
             ::Controller::new(Box::new(quick_lookup_window));
 
-        let mut gamepad = gamepad::Listener::new(
+        let mut gamepad_listener = gamepad_listener::Listener::new(
             Box::new(GilrsEvents::new(
                 Box::new(GilrsWrapper::new()),
                 Box::new(StickSwitchInterpreter::new(
@@ -212,7 +212,7 @@ pub fn start_main_loop(
 
             input_controller.trigger_input();
             loop {
-                match gamepad.next_event() {
+                match gamepad_listener.next_event() {
                     None => break,
                     Some(GilrsEventType::Connected(Some(gamepad_info))) => {
                         let _ = Notification::new(tauri_config_bundle_identifier.clone())
@@ -225,13 +225,13 @@ pub fn start_main_loop(
                 }
             }
 
-            match gamepad.next_command() {
-                Some(gamepad::Command::InputEvent(event))
+            match gamepad_listener.next_command() {
+                Some(gamepad_listener::Command::InputEvent(event))
                     => input_controller.react_to_gamepad_event(event),
-                Some(gamepad::Command::QuickLookupWindowEvent(command))
+                Some(gamepad_listener::Command::QuickLookupWindowEvent(command))
                     => {let _ = quick_lookup_window_controller.react_to_command(command);},
-                Some(gamepad::Command::KeyUp(switch)) => {
-                    input_controller.react_to_gamepad_event(gamepad::InputEvent::KeyUp);
+                Some(gamepad_listener::Command::KeyUp(switch)) => {
+                    input_controller.react_to_gamepad_event(gamepad_listener::InputEvent::KeyUp);
                     let _ = quick_lookup_window_controller.react_to_switch_keyup(switch);
                 },
                 None => (),

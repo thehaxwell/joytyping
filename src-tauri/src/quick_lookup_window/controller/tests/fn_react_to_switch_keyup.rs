@@ -1,4 +1,4 @@
-use crate::{quick_lookup_window::{controller::{Controller, QuickLookupWindowState}, MockQuickLookupWindowTrait}, gamepad::Switch, tauri_app_handle_wrapper::WindowOperationOutcome};
+use crate::{quick_lookup_window::{controller::{Controller, QuickLookupWindowState}, MockQuickLookupWindowTrait}, gamepad_listener::Switch, tauri_app_handle_wrapper::WindowOperationOutcome};
 
 
 #[test]

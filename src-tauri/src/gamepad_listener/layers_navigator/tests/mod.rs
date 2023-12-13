@@ -1,6 +1,6 @@
 use gilrs::Button;
 
-use crate::{gamepad::{layers_navigator::{LayersNavigator,LayersNavigatorTrait, LayerVisit, AvailableLayerVisitsFromLayer, tests::utils::{setup_haxwell_layout_layers_with_only_visits, setup_haxwell_layout_layers_and_their_available_layer_visits}}, Switch, switch_click_pattern_detector::SwitchClickPattern, gilrs_events::stick_switch_interpreter::StickSwitchButton}, settings::models::layout::{LayerSpecifier, SwitchOnClickReaction}};
+use crate::{gamepad_listener::{layers_navigator::{LayersNavigator,LayersNavigatorTrait, LayerVisit, AvailableLayerVisitsFromLayer, tests::utils::{setup_haxwell_layout_layers_with_only_visits, setup_haxwell_layout_layers_and_their_available_layer_visits}}, Switch, switch_click_pattern_detector::SwitchClickPattern, gilrs_events::stick_switch_interpreter::StickSwitchButton}, settings::models::layout::{LayerSpecifier, SwitchOnClickReaction}};
 
 use super::LayerVisitTrigger;
 
@@ -531,7 +531,7 @@ fn build_layer_visits_works() {
 }
 
 // this driver should use LayersNavigator 
-// the way gamepad::Listener would
+// the way gamepad_listener::Listener would
 struct LayersNavigatorDriver {
     layers_navigator: LayersNavigator,
 }

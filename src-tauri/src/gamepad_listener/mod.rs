@@ -209,21 +209,6 @@ impl Listener {
                     }
                 },
                 ref _other => (),
-                // GilrsEventType::Connected(gamepad_info_opt) => {
-                //
-                //     if let Some(gamepad_info) = gamepad_info_opt {
-                //         println!("Connected: {}",gamepad_info.name);
-                //     }
-                //     else {
-                //         println!("Connected unidentified gamepad");
-                //     }
-                // },
-                // GilrsEventType::Disconnected => {
-                //     print!("Disconnected!\n");
-                // },
-                // GilrsEventType::Dropped => {
-                //     print!("Droppedn!\n");
-                // }
             }
             Some(event.event)
         }

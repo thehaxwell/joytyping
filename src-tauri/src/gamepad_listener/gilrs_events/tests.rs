@@ -1,4 +1,4 @@
-use crate::{gamepad::gilrs_events::{GilrsEvents,GilrsEventsTrait, stick_switch_interpreter::{StickSwitchButton, StickSwitchEvent}, gilrs_wrapper::GamepadInfo}, LeftOrRight};
+use crate::{gamepad_listener::gilrs_events::{GilrsEvents,GilrsEventsTrait, stick_switch_interpreter::{StickSwitchButton, StickSwitchEvent}, gilrs_wrapper::GamepadInfo}, LeftOrRight};
 
 use super::{gilrs_wrapper::{MockGilrs, GilrsEventType, GilrsEvent}, stick_switch_interpreter::MockStickSwitchInterpreterTrait, trigger_2_switch_interpreter::{MockTrigger2SwitchInterpreterTrait, Trigger2SwitchEvent}};
 

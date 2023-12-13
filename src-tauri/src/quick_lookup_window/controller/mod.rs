@@ -1,4 +1,4 @@
-use crate::{tauri_app_handle_wrapper::WindowOperationOutcome, gamepad::{Switch, QuickLookupWindowEvent}};
+use crate::{tauri_app_handle_wrapper::WindowOperationOutcome, gamepad_listener::{Switch, QuickLookupWindowEvent}};
 
 use super::QuickLookupWindowTrait;
 
