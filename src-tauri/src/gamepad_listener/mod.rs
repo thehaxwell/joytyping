@@ -17,7 +17,7 @@ pub mod layers_wrapper;
 mod tests;
 
 
-pub struct Listener {
+pub struct GamepadListener {
    gilrs_events: Box<dyn GilrsEventsTrait>,
    layers: Box<dyn LayersWrapperTrait>,
    switch_click_pattern_detector: Box<dyn SwitchClickPatternDetectorTrait>,
@@ -25,7 +25,7 @@ pub struct Listener {
    mouse_cardinal_levers_move_detector: Box<dyn cardinal_levers_move_detector::mouse::MouseTrait>,
 }
 
-impl Listener {
+impl GamepadListener {
     pub fn new(
        gilrs_events: Box<dyn GilrsEventsTrait>,
        layers: Box<dyn LayersWrapperTrait>,
@@ -33,7 +33,7 @@ impl Listener {
        layers_navigator: Box<dyn LayersNavigatorTrait>,
        mouse_cardinal_levers_move_detector: Box<dyn cardinal_levers_move_detector::mouse::MouseTrait>,
     ) -> Self {
-        Listener{
+        GamepadListener{
             gilrs_events,
             layers,
             switch_click_pattern_detector,
@@ -92,7 +92,7 @@ impl Listener {
                     // Since SwitchClickPattern::ClickAndHold is fired a moment
                     // after SwitchClickPattern::Click, if the switch has
                     // been set to be a keyboard input on_click
-                    // Listener will fire InputEvent::KeyClick
+                    // GamepadListener will fire InputEvent::KeyClick
                     // event once, take a break, and InputEvent::KeyDown
                     // (which tell KeyboardInputController to fire the key in
                     // rapid-fire style). 

@@ -2,7 +2,7 @@ use enigo::Key;
 use gilrs::Button;
 use mockall::predicate::*;
 
-use crate::{gamepad_listener::{switch_click_pattern_detector::{MockSwitchClickPatternDetectorTrait, SwitchClickPattern}, gilrs_events::MockGilrsEventsTrait, layers_navigator::MockLayersNavigatorTrait, cardinal_levers_move_detector, InputEvent, Switch, Command, QuickLookupWindowEvent, Listener}, settings::models::layout::{LayerSpecifier, SwitchEventAndReaction, SwitchOnClickReaction, KeyboardInput}};
+use crate::{gamepad_listener::{switch_click_pattern_detector::{MockSwitchClickPatternDetectorTrait, SwitchClickPattern}, gilrs_events::MockGilrsEventsTrait, layers_navigator::MockLayersNavigatorTrait, cardinal_levers_move_detector, InputEvent, Switch, Command, QuickLookupWindowEvent, GamepadListener}, settings::models::layout::{LayerSpecifier, SwitchEventAndReaction, SwitchOnClickReaction, KeyboardInput}};
 
 use super::super::{gilrs_events::stick_switch_interpreter::StickSwitchButton, layers_wrapper::MockLayersWrapperTrait, layers_navigator::LayerVisitTrigger};
 
@@ -48,7 +48,7 @@ fn setup_handles_keyboard_input_events(
             .times(1)
             .return_const(layer_num);
 
-        let mut gamepad_listener = Listener {
+        let mut gamepad_listener = GamepadListener {
            gilrs_events: Box::new(mock_gilrs_events),
            layers: Box::new(mock_layers_wrapper),
            switch_click_pattern_detector: Box::new(mock_switch_click_pattern_detector),
@@ -654,7 +654,7 @@ fn setup_handles_move_to_layer_events(
             .with(eq(None))
             .return_const(());
 
-        let mut gamepad_listener = Listener {
+        let mut gamepad_listener = GamepadListener {
            gilrs_events: Box::new(mock_gilrs_events),
            layers: Box::new(mock_layers_wrapper),
            switch_click_pattern_detector: Box::new(mock_switch_click_pattern_detector),
@@ -808,7 +808,7 @@ fn setup_handles_visit_layer_events(
             .with(eq(None))
             .return_const(());
 
-        let mut gamepad_listener = Listener {
+        let mut gamepad_listener = GamepadListener {
            gilrs_events: Box::new(mock_gilrs_events),
            layers: Box::new(mock_layers_wrapper),
            switch_click_pattern_detector: Box::new(mock_switch_click_pattern_detector),
@@ -967,7 +967,7 @@ fn setup_handles_move_to_or_visit_layer_events(
             .return_const(());
 
 
-        let mut gamepad_listener = Listener {
+        let mut gamepad_listener = GamepadListener {
            gilrs_events: Box::new(mock_gilrs_events),
            layers: Box::new(mock_layers_wrapper),
            switch_click_pattern_detector: Box::new(mock_switch_click_pattern_detector),
@@ -1086,7 +1086,7 @@ fn setup_handles_show_quick_lookup_window(
             .times(1)
             .return_const(args.current_layer_num);
 
-        let mut gamepad_listener = Listener {
+        let mut gamepad_listener = GamepadListener {
            gilrs_events: Box::new(mock_gilrs_events),
            layers: Box::new(mock_layers_wrapper),
            switch_click_pattern_detector: Box::new(mock_switch_click_pattern_detector),
@@ -1219,7 +1219,7 @@ fn setup_processes_click_end_switch_pattern(
             .with(eq(switch.clone()))
             .return_const(());
 
-        let mut gamepad_listener = Listener {
+        let mut gamepad_listener = GamepadListener {
            gilrs_events: Box::new(mock_gilrs_events),
            layers: Box::new(mock_layers_wrapper),
            switch_click_pattern_detector: Box::new(mock_switch_click_pattern_detector),
@@ -1287,7 +1287,7 @@ fn setup_processes_mouse_move_events(
             .with()
             .return_const(args.mouse_input_event);
 
-        let mut gamepad_listener = Listener {
+        let mut gamepad_listener = GamepadListener {
            gilrs_events: Box::new(mock_gilrs_events),
            layers: Box::new(mock_layers_wrapper),
            switch_click_pattern_detector: Box::new(mock_switch_click_pattern_detector),
@@ -1378,7 +1378,7 @@ fn setup_handles_boost_mouse_by_multiplier_events(
             .times(1)
             .return_const(layer_num);
 
-        let mut gamepad_listener = Listener {
+        let mut gamepad_listener = GamepadListener {
            gilrs_events: Box::new(mock_gilrs_events),
            layers: Box::new(mock_layers_wrapper),
            switch_click_pattern_detector: Box::new(mock_switch_click_pattern_detector),
