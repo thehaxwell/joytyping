@@ -531,7 +531,7 @@ fn build_layer_visits_works() {
 }
 
 // this driver should use LayersNavigator 
-// the way gamepad::Gamepad would
+// the way gamepad::Listener would
 struct LayersNavigatorDriver {
     layers_navigator: LayersNavigator,
 }

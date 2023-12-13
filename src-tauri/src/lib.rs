@@ -126,7 +126,7 @@ pub fn start_main_loop(
         let mut quick_lookup_window_controller = quick_lookup_window::controller
             ::Controller::new(Box::new(quick_lookup_window));
 
-        let mut gamepad = gamepad::Gamepad::new(
+        let mut gamepad = gamepad::Listener::new(
             Box::new(GilrsEvents::new(
                 Box::new(GilrsWrapper::new()),
                 Box::new(StickSwitchInterpreter::new(
