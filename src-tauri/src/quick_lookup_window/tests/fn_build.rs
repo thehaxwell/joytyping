@@ -1,6 +1,6 @@
 use mockall::predicate::eq;
 
-use crate::{settings::models::{self, main_config::Theme}, quick_lookup_window::{files::MockFilesTrait, QuickLookupWindow, QuickLookupWindowTrait, QuickLookupWindowState}, tauri_app_handle_wrapper::{MockTauriAppHandleTrait, WindowOperationOutcome, self}, gamepad::Switch};
+use crate::{settings::models::{self, main_config::Theme}, quick_lookup_window::{files::MockFilesTrait, QuickLookupWindow}, tauri_app_handle_wrapper::{MockTauriAppHandleTrait, self}};
 
 const WINDOW_LABEL: &str = "quick-lookup";
 
@@ -45,7 +45,6 @@ fn works() {
 
     let mut quick_lookup_window = QuickLookupWindow { 
         tauri_app_handle: Box::new(mock_tauri_app_handle),
-        current_state: QuickLookupWindowState::Hidden,
         initialization_script: Some(initialization_script),
         current_layer: 0,
         files: Box::new(mock_files),
@@ -56,9 +55,6 @@ fn works() {
         theme: Theme::Light,
     };
     assert!(quick_lookup_window.build().is_ok());
-    assert_eq!(
-       quick_lookup_window.current_state,
-       QuickLookupWindowState::Hidden);
 }
 
 #[test]
@@ -89,7 +85,6 @@ fn handles_create_window_error_correctly() {
 
     let mut quick_lookup_window = QuickLookupWindow { 
         tauri_app_handle: Box::new(mock_tauri_app_handle),
-        current_state: QuickLookupWindowState::Hidden,
         initialization_script: Some(initialization_script),
         current_layer: 0,
         files: Box::new(mock_files),
@@ -103,7 +98,4 @@ fn handles_create_window_error_correctly() {
             .unwrap_err()
             .to_string(),
             "webview not found: invalid label or it was closed".to_string());
-    assert_eq!(
-       quick_lookup_window.current_state,
-       QuickLookupWindowState::Hidden);
 }

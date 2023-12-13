@@ -1,9 +1,7 @@
-use gilrs::Button;
 use mockall::predicate::eq;
 
-use crate::{tauri_app_handle_wrapper::{MockTauriAppHandleTrait, WindowOperationOutcome}, quick_lookup_window::{files::{MockFilesTrait, StartupScriptLoadError}, QuickLookupWindow, QuickLookupWindowState}, settings::models::{self, main_config::Theme}, gamepad::Switch};
+use crate::{tauri_app_handle_wrapper::MockTauriAppHandleTrait, quick_lookup_window::{files::{MockFilesTrait, StartupScriptLoadError}, QuickLookupWindow}, settings::models::{self, main_config::Theme}};
 
-const WINDOW_LABEL: &str = "quick-lookup";
 fn setup_quick_lookup_window_settings_example(
     source_code: models::BrowserSourceCode) -> models::QuickLookupWindow {
     models::QuickLookupWindow{
@@ -17,7 +15,7 @@ fn setup_quick_lookup_window_settings_example(
 
 #[test]
 fn works_when_no_window_is_open() {
-    let mut mock_tauri_app_handle = MockTauriAppHandleTrait::new();
+    let mock_tauri_app_handle = MockTauriAppHandleTrait::new();
     let mut mock_files = MockFilesTrait::new();
 
     mock_files
@@ -30,14 +28,8 @@ fn works_when_no_window_is_open() {
         .with(eq("path/to/file/bundle.js".to_string()))
         .returning(|_| Ok("console.log('this is the js code');".to_string()));
 
-    mock_tauri_app_handle
-        .expect_close_window()
-        .with(eq(WINDOW_LABEL))
-        .returning(|_| Ok(WindowOperationOutcome::WindowNotFound));
-
     let mut quick_lookup_window = QuickLookupWindow { 
         tauri_app_handle: Box::new(mock_tauri_app_handle),
-        current_state: QuickLookupWindowState::Hidden,
         initialization_script: None,
         current_layer: 0,
         files: Box::new(mock_files),
@@ -52,7 +44,6 @@ fn works_when_no_window_is_open() {
     };
 
     assert!(quick_lookup_window.load_startup_script().is_ok());
-    assert_eq!(quick_lookup_window.current_state,QuickLookupWindowState::Hidden);
 
     assert_eq!(quick_lookup_window.initialization_script.clone().unwrap(),
        format!("{}{}{}{}",
@@ -66,7 +57,7 @@ fn works_when_no_window_is_open() {
 
 #[test]
 fn works_when_a_window_is_open() {
-    let mut mock_tauri_app_handle = MockTauriAppHandleTrait::new();
+    let mock_tauri_app_handle = MockTauriAppHandleTrait::new();
     let mut mock_files = MockFilesTrait::new();
 
     mock_files
@@ -79,14 +70,8 @@ fn works_when_a_window_is_open() {
         .with(eq("path/to/file/bundle.js".to_string()))
         .returning(|_| Ok("console.log('this is the js code');".to_string()));
 
-    mock_tauri_app_handle
-        .expect_close_window()
-        .with(eq(WINDOW_LABEL))
-        .returning(|_| Ok(WindowOperationOutcome::Success));
-
     let mut quick_lookup_window = QuickLookupWindow { 
         tauri_app_handle: Box::new(mock_tauri_app_handle),
-        current_state: QuickLookupWindowState::Showing(Switch::Button(Button::South)),
         initialization_script: None,
         current_layer: 0,
         files: Box::new(mock_files),
@@ -101,7 +86,6 @@ fn works_when_a_window_is_open() {
     };
 
     assert!(quick_lookup_window.load_startup_script().is_ok());
-    assert_eq!(quick_lookup_window.current_state,QuickLookupWindowState::Hidden);
 
     assert_eq!(quick_lookup_window.initialization_script.clone().unwrap(),
        format!("{}{}{}{}",
@@ -115,7 +99,7 @@ fn works_when_a_window_is_open() {
 
 #[test]
 fn works_when_css_is_expected_and_no_window_is_open() {
-    let mut mock_tauri_app_handle = MockTauriAppHandleTrait::new();
+    let mock_tauri_app_handle = MockTauriAppHandleTrait::new();
     let mut mock_files = MockFilesTrait::new();
 
     let styles_code = "\
@@ -136,14 +120,8 @@ fn works_when_css_is_expected_and_no_window_is_open() {
         .with(eq("path/to/file/bundle.js".to_string()))
         .returning(|_| Ok("console.log('this is the js code');".to_string()));
 
-    mock_tauri_app_handle
-        .expect_close_window()
-        .with(eq(WINDOW_LABEL))
-        .returning(|_| Ok(WindowOperationOutcome::WindowNotFound));
-
     let mut quick_lookup_window = QuickLookupWindow { 
         tauri_app_handle: Box::new(mock_tauri_app_handle),
-        current_state: QuickLookupWindowState::Hidden,
         initialization_script: None,
         current_layer: 0,
         files: Box::new(mock_files),
@@ -158,7 +136,6 @@ fn works_when_css_is_expected_and_no_window_is_open() {
     };
 
     assert!(quick_lookup_window.load_startup_script().is_ok());
-    assert_eq!(quick_lookup_window.current_state,QuickLookupWindowState::Hidden);
 
     assert_eq!(quick_lookup_window.initialization_script.clone().unwrap(),
        format!("{}{}{}{}{}",
@@ -172,7 +149,7 @@ fn works_when_css_is_expected_and_no_window_is_open() {
 
 #[test]
 fn handles_load_css_error() {
-    let mut mock_tauri_app_handle = MockTauriAppHandleTrait::new();
+    let mock_tauri_app_handle = MockTauriAppHandleTrait::new();
     let mut mock_files = MockFilesTrait::new();
 
     mock_files
@@ -180,14 +157,8 @@ fn handles_load_css_error() {
         .with(eq(None))
         .returning(|_| Err(StartupScriptLoadError::FileNotFound("css_file_path".to_string())));
 
-    mock_tauri_app_handle
-        .expect_close_window()
-        .with(eq(WINDOW_LABEL))
-        .returning(|_| Ok(WindowOperationOutcome::WindowNotFound));
-
     let mut quick_lookup_window = QuickLookupWindow { 
         tauri_app_handle: Box::new(mock_tauri_app_handle),
-        current_state: QuickLookupWindowState::Hidden,
         initialization_script: None,
         current_layer: 0,
         files: Box::new(mock_files),
@@ -201,7 +172,6 @@ fn handles_load_css_error() {
         theme: Theme::Light,
     };
 
-    assert_eq!(quick_lookup_window.current_state,QuickLookupWindowState::Hidden);
     assert!(quick_lookup_window.initialization_script.is_none());
 
     assert_eq!(quick_lookup_window.load_startup_script().unwrap_err(),
@@ -211,7 +181,7 @@ fn handles_load_css_error() {
 
 #[test]
 fn handles_load_js_error() {
-    let mut mock_tauri_app_handle = MockTauriAppHandleTrait::new();
+    let mock_tauri_app_handle = MockTauriAppHandleTrait::new();
     let mut mock_files = MockFilesTrait::new();
 
     mock_files
@@ -224,14 +194,8 @@ fn handles_load_js_error() {
         .with(eq("path/to/file/bundle.js".to_string()))
         .returning(|_| Err(StartupScriptLoadError::FileNotFound("js_iife_bundle_file_path".to_string())));
 
-    mock_tauri_app_handle
-        .expect_close_window()
-        .with(eq(WINDOW_LABEL))
-        .returning(|_| Ok(WindowOperationOutcome::WindowNotFound));
-
     let mut quick_lookup_window = QuickLookupWindow { 
         tauri_app_handle: Box::new(mock_tauri_app_handle),
-        current_state: QuickLookupWindowState::Hidden,
         initialization_script: None,
         current_layer: 0,
         files: Box::new(mock_files),
@@ -245,7 +209,6 @@ fn handles_load_js_error() {
         theme: Theme::Dark,
     };
 
-    assert_eq!(quick_lookup_window.current_state,QuickLookupWindowState::Hidden);
     assert!(quick_lookup_window.initialization_script.is_none());
 
     assert_eq!(quick_lookup_window.load_startup_script().unwrap_err(),

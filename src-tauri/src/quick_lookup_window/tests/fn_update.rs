@@ -1,6 +1,6 @@
 use mockall::predicate::eq;
 
-use crate::{settings::models::{self, main_config::Theme}, quick_lookup_window::{files::MockFilesTrait, QuickLookupWindow, QuickLookupWindowTrait, QuickLookupWindowState, UpdateKeyboardEventPayload}, tauri_app_handle_wrapper::{MockTauriAppHandleTrait, WindowOperationOutcome, EmitWindowEventPayload}, gamepad::Switch};
+use crate::{settings::models::{self, main_config::Theme}, quick_lookup_window::{files::MockFilesTrait, QuickLookupWindow, QuickLookupWindowTrait, UpdateKeyboardEventPayload}, tauri_app_handle_wrapper::{MockTauriAppHandleTrait, WindowOperationOutcome, EmitWindowEventPayload}};
 
 
 const WINDOW_LABEL: &str = "quick-lookup";
@@ -35,7 +35,6 @@ fn works_when_no_window_is_open() {
 
     let mut quick_lookup_window = QuickLookupWindow { 
         tauri_app_handle: Box::new(mock_tauri_app_handle),
-        current_state: QuickLookupWindowState::Hidden,
         initialization_script: None,
         current_layer: 0,
         files: Box::new(mock_files),
@@ -67,7 +66,6 @@ fn works_when_a_window_is_open() {
 
     let mut quick_lookup_window = QuickLookupWindow { 
         tauri_app_handle: Box::new(mock_tauri_app_handle),
-        current_state: QuickLookupWindowState::Showing(Switch::Button(gilrs::Button::DPadUp)),
         initialization_script: None,
         current_layer: 0,
         files: Box::new(mock_files),
@@ -98,7 +96,6 @@ fn handles_emit_window_event_errors() {
 
     let mut quick_lookup_window = QuickLookupWindow { 
         tauri_app_handle: Box::new(mock_tauri_app_handle),
-        current_state: QuickLookupWindowState::Hidden,
         initialization_script: None,
         current_layer: 0,
         files: Box::new(mock_files),
