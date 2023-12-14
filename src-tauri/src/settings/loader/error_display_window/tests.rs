@@ -27,7 +27,7 @@ fn fn_open_and_show_works() {
         .expect_create_window()
         .with(eq(tauri_app_handle_wrapper::CreateWindowArgs{
                     label: WINDOW_LABEL.to_string(),
-                    url: tauri::WindowUrl::App("/app/status".into()),
+                    url: tauri::WindowUrl::App("/styled/app/status".into()),
                     initialization_script: 
                         Some(r#"window.__ERROR_MESSAGE__ = `Something went \`wrong\``;"#.to_string()),
                     title: Some("Failed to load Joytyping settings".to_string()),
@@ -68,7 +68,7 @@ fn fn_open_and_show_handles_create_window_error() {
         .expect_create_window()
         .with(eq(tauri_app_handle_wrapper::CreateWindowArgs{
                     label: WINDOW_LABEL.to_string(),
-                    url: tauri::WindowUrl::App("/app/status".into()),
+                    url: tauri::WindowUrl::App("/styled/app/status".into()),
                     initialization_script: 
                         Some(r#"window.__ERROR_MESSAGE__ = `Something went \`wrong\``;"#.to_string()),
                     title: Some("Failed to load Joytyping settings".to_string()),
@@ -105,7 +105,7 @@ fn fn_open_and_show_handles_show_window_error() {
         .expect_create_window()
         .with(eq(tauri_app_handle_wrapper::CreateWindowArgs{
                     label: WINDOW_LABEL.to_string(),
-                    url: tauri::WindowUrl::App("/app/status".into()),
+                    url: tauri::WindowUrl::App("/styled/app/status".into()),
                     initialization_script: 
                         Some(r#"window.__ERROR_MESSAGE__ = `Something went \`wrong\``;"#.to_string()),
                     title: Some("Failed to load Joytyping settings".to_string()),

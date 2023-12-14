@@ -39,7 +39,7 @@
         "height": 600,
         "resizable": true,
         "title": "Tauri App",
-        "url": "/app",
+        "url": "/styled/app",
         "width": 800
       }
     ]
