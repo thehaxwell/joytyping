@@ -44,7 +44,7 @@ impl AppDataDirectoryManager {
 
     #[cfg(target_os="windows")]
     fn get_app_data_path() -> String {
-        "AppData".to_string()
+        "AppData/Roaming".to_string()
     }
 
     #[cfg(not(target_os="windows"))]
