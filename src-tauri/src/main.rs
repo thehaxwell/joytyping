@@ -14,6 +14,12 @@ fn start_main_loop_command(app_handle: tauri::AppHandle) {
     app_handle.trigger_global("main-loop-interruption",Some("MainLoopInterruption::ReInitiailze".to_string()))
 }
 
+#[tauri::command]
+fn setup_settings_command(app_handle: tauri::AppHandle) {
+    //TODO: implement
+    app_handle.trigger_global("main-loop-interruption",Some("MainLoopInterruption::ReInitiailze".to_string()))
+}
+
 fn main() {
     let reload = CustomMenuItem::new("reload".to_string(), "Reload Settings");
     let quit = CustomMenuItem::new("quit".to_string(), "Quit");
@@ -25,7 +31,7 @@ fn main() {
     let system_tray = SystemTray::new().with_menu(tray_menu);
 
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![start_main_loop_command])
+        .invoke_handler(tauri::generate_handler![start_main_loop_command,setup_settings_command])
         .system_tray(system_tray)
         .on_system_tray_event(move |app_handle, event| match event {
           SystemTrayEvent::MenuItemClick { id, .. } => {

@@ -42,6 +42,7 @@ impl SettingsDependencies for SettingsDependenciesImpl {
     }
 }
 
+//TODO: rename to Loader
 pub struct Settings {
     dependencies: Box<dyn SettingsDependencies>,
     app_data_directory_manager: Box<dyn AppDataDirectoryManagerTrait>,

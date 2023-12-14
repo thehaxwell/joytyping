@@ -12,6 +12,7 @@ use input_controller::enigo_wrapper::EnigoWrapper;
 use input_controller::keyboard_input_controller::KeyboardInputController;
 use input_controller::mouse_input_controller;
 use quick_lookup_window::files::FilesDependenciesImpl;
+use settings::first_setup_window::FirstSetupWindow;
 use settings::loader::error_display_window::ErrorDisplayWindow;
 use settings::loader::{Settings,SettingsDependenciesImpl};
 use notify::{Watcher,RecommendedWatcher, RecursiveMode, Config};
@@ -40,7 +41,17 @@ pub fn start_main_loop(
 
     let mut interrupt_event_reciever = MainLoopInterruptionEventReciever::new(handle.clone());
 
+   let mut first_settings_setup_window = FirstSetupWindow::new(
+       Box::new(TauriAppHandleWrapper::new(handle.clone())));
+
     'main_loop_initializer_loop: loop {
+        // If first_settings_setup_window was opened then
+        // close it.
+        // This point would be reached at the end of the call to 
+        // fn setup_settings_command (in main.rs) when 
+        // the MainLoopInterruption::ReInitiailze event is emitted.
+        let _ = first_settings_setup_window.close();
+        std::thread::sleep(std::time::Duration::from_millis(100));
 
         // // close any open window first while there's time
         // let _ = settings_error_display_window.close();
@@ -55,6 +66,10 @@ pub fn start_main_loop(
         let mut settings_data;
         match settings.load_settings() {
             Ok(data) => settings_data = data,
+            Err(settings::loader::SettingsLoadError::FileNotFound) => {
+               let _ = first_settings_setup_window.open_and_show();
+               break 'main_loop_initializer_loop;
+            }
             Err(e) => {
                let _ = settings_error_display_window.open_and_show(e);
                break 'main_loop_initializer_loop;
