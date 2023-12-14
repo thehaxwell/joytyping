@@ -223,19 +223,20 @@ pub fn start_main_loop(
                     }
                     Some(_other) => ()
                 }
+
+                match gamepad_listener.next_command() {
+                    Some(gamepad_listener::Command::InputEvent(event))
+                        => input_controller.react_to_gamepad_event(event),
+                    Some(gamepad_listener::Command::QuickLookupWindowEvent(command))
+                        => {let _ = quick_lookup_window_controller.react_to_command(command);},
+                    Some(gamepad_listener::Command::KeyUp(switch)) => {
+                        input_controller.react_to_gamepad_event(gamepad_listener::InputEvent::KeyUp);
+                        let _ = quick_lookup_window_controller.react_to_switch_keyup(switch);
+                    },
+                    None => (),
+                }
             }
 
-            match gamepad_listener.next_command() {
-                Some(gamepad_listener::Command::InputEvent(event))
-                    => input_controller.react_to_gamepad_event(event),
-                Some(gamepad_listener::Command::QuickLookupWindowEvent(command))
-                    => {let _ = quick_lookup_window_controller.react_to_command(command);},
-                Some(gamepad_listener::Command::KeyUp(switch)) => {
-                    input_controller.react_to_gamepad_event(gamepad_listener::InputEvent::KeyUp);
-                    let _ = quick_lookup_window_controller.react_to_switch_keyup(switch);
-                },
-                None => (),
-            }
         }
     }
 
