@@ -1,6 +1,10 @@
 use bytes:: Bytes;
 use reqwest::Error;
 
+#[cfg(test)]
+use mockall::{automock, predicate::*};
+
+#[cfg_attr(test, automock)]
 pub trait ReqwestWrapperTrait {
     fn get_as_bytes(&self,path: String) -> Result<Bytes,Error>;
 }

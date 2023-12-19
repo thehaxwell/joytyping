@@ -11,6 +11,10 @@ use thiserror::Error;
 pub mod zip_archive_wrapper;
 pub mod reqwest_wrapper;
 
+#[cfg(test)]
+use mockall::{automock, predicate::*};
+
+#[cfg_attr(test, automock)]
 pub trait ZipDownloaderTrait {
     fn download_and_unzip(&mut self,
 		zip_url: String,
@@ -81,13 +85,13 @@ pub enum ZipDownloaderStage {
 
 #[derive(Error, Debug)]
 pub enum ZipDownloaderError {
-    #[error("IO error while {1:?}: {0}")]
+    #[error("IO error in {1:?} step: {0}")]
     IO(io::Error,ZipDownloaderStage),
 
-    #[error("Zip error while {1:?}: {0}")]
+    #[error("Zip error in {1:?} step: {0}")]
     Zip(zip::result::ZipError,ZipDownloaderStage),
 
-    #[error("Http error while {1:?}: {0}")]
+    #[error("Http error in {1:?} step: {0}")]
     Http(reqwest::Error,ZipDownloaderStage),
 }
 

@@ -1,5 +1,8 @@
 use crate::{zip_downloader::ZipDownloaderTrait, file_wrapper::FileWrapperTrait, app_data_directory_manager::AppDataDirectoryManagerTrait};
 
+#[cfg(test)]
+mod tests;
+
 pub struct FilesInitializer {
     zip_downloader: Box<dyn ZipDownloaderTrait>,
     file_handler: Box<dyn FileWrapperTrait>,

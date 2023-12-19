@@ -2,6 +2,10 @@ use std::{fs::{File, self}, path::{Path, PathBuf}, io};
 
 use zip::result::ZipError;
 
+#[cfg(test)]
+use mockall::{automock, predicate::*};
+
+#[cfg_attr(test, automock)]
 pub trait ZipArchiveWrapperTrait {
     fn unzip(&self, zip_file_path: &Path) -> Result<(),ZipArchiveError>;
 }

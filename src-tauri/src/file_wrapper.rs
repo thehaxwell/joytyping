@@ -3,6 +3,10 @@ use std::path::Path;
 use std::{fs::File, io};
 use std::io::{Write, ErrorKind};
 
+#[cfg(test)]
+use mockall::{automock, predicate::*};
+
+#[cfg_attr(test, automock)]
 pub trait FileWrapperTrait {
     fn create_and_write_all(&self,
 		path: &Path,
