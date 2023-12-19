@@ -2,6 +2,12 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 // use std::sync::mpsc;
 
+use joytyping::app_data_directory_manager::{AppDataDirectoryManager, AppDataDirectoryDependenciesImpl};
+use joytyping::file_wrapper::FileWrapper;
+use joytyping::settings::files_initializer::FilesInitializer;
+use joytyping::zip_downloader::ZipDownloader;
+use joytyping::zip_downloader::reqwest_wrapper::ReqwestWrapper;
+use joytyping::zip_downloader::zip_archive_wrapper::ZipArchiveWrapper;
 use tauri::SystemTray;
 use tauri::api::notification::Notification;
 use tauri::{CustomMenuItem, SystemTrayMenu, SystemTrayMenuItem, SystemTrayEvent};
@@ -16,7 +22,19 @@ fn start_main_loop_command(app_handle: tauri::AppHandle) {
 
 #[tauri::command]
 fn setup_settings_command(app_handle: tauri::AppHandle) {
-    //TODO: implement
+    println!("downloading layout...");
+    //TODO: return the result of initialize back to the caller(window) of this command
+    FilesInitializer::new(
+        Box::new(ZipDownloader::new(
+            Box::new(ZipArchiveWrapper),
+            Box::new(ReqwestWrapper),
+            Box::new(FileWrapper),)
+        ),
+        Box::new(FileWrapper),
+        Box::new(AppDataDirectoryManager::new(
+            Box::new(AppDataDirectoryDependenciesImpl))),
+    ).initialize().unwrap();
+
     app_handle.trigger_global("main-loop-interruption",Some("MainLoopInterruption::ReInitiailze".to_string()))
 }
 

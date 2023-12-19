@@ -20,7 +20,7 @@ use crate::tauri_app_handle_wrapper::TauriAppHandleWrapper;
 use tauri::Manager;
 
 use crate::gamepad_listener::switch_click_pattern_detector::SwitchClickPatternDetector;
-use quick_lookup_window::{QuickLookupWindow, QuickLookupWindowTrait};
+use quick_lookup_window::QuickLookupWindow;
 
 use tauri::api::notification::Notification;
 
@@ -31,6 +31,8 @@ pub mod input_controller;
 pub mod quick_lookup_window;
 pub mod app_data_directory_manager;
 pub mod tauri_app_handle_wrapper;
+pub mod zip_downloader;
+pub mod file_wrapper;
 
 pub fn start_main_loop(
     handle: tauri::AppHandle,
