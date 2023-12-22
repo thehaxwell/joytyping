@@ -691,6 +691,7 @@ impl KeyboardInput {
     // On windows, enigo::Key::Layout('A') is simply ignored
     // by enigo. So this function changes 'A' to 'a' and adds
     // enigo::Key::Shift to manually input the capital letters
+    #[cfg_attr(not(target_os="windows"), allow(dead_code))]
     fn new_fn_capital_letters_workaround(
         key: enigo::Key,
         mut modifiers: Vec<enigo::Key>,
