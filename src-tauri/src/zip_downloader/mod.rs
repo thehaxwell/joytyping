@@ -12,6 +12,9 @@ pub mod zip_archive_wrapper;
 pub mod reqwest_wrapper;
 
 #[cfg(test)]
+mod tests;
+
+#[cfg(test)]
 use mockall::{automock, predicate::*};
 
 #[cfg_attr(test, automock)]
@@ -76,7 +79,7 @@ impl ZipDownloaderTrait for ZipDownloader {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug,PartialEq)]
 pub enum ZipDownloaderStage {
     DownloadZip,
     Unzip,
@@ -91,7 +94,34 @@ pub enum ZipDownloaderError {
     #[error("Zip error in {1:?} step: {0}")]
     Zip(zip::result::ZipError,ZipDownloaderStage),
 
-    #[error("Http error in {1:?} step: {0}")]
-    Http(reqwest::Error,ZipDownloaderStage),
+    #[error("Http error in {1:?} step: {0:?}")]
+    Http(reqwest_wrapper::Error,ZipDownloaderStage),
 }
 
+impl PartialEq for ZipDownloaderError {
+    fn eq(&self, other: &ZipDownloaderError) -> bool {
+        match self {
+            ZipDownloaderError::IO(err_exp,stage_exp) 
+                => if let ZipDownloaderError::IO(err,stage) 
+                    = other {
+                        stage_exp == stage &&
+                        err_exp.to_string() == err.to_string()
+                    }
+                else { false }
+            ZipDownloaderError::Zip(err_exp,stage_exp) 
+                => if let ZipDownloaderError::Zip(err,stage) 
+                    = other {
+                        stage_exp == stage &&
+                        err_exp.to_string() == err.to_string()
+                    }
+                else { false }
+            ZipDownloaderError::Http(err_exp,stage_exp) 
+                => if let ZipDownloaderError::Http(err,stage) 
+                    = other {
+                        stage_exp == stage &&
+                        err_exp == err
+                    }
+                else { false }
+        }
+    }
+}
