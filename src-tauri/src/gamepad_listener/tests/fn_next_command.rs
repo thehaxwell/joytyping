@@ -4,14 +4,12 @@ use mockall::predicate::*;
 
 use crate::{gamepad_listener::{switch_click_pattern_detector::{MockSwitchClickPatternDetectorTrait, SwitchClickPattern}, gilrs_events::MockGilrsEventsTrait, layers_navigator::MockLayersNavigatorTrait, cardinal_levers_move_detector, InputEvent, Switch, Command, QuickLookupWindowEvent, GamepadListener}, settings::models::layout::{LayerSpecifier, SwitchEventAndReaction, SwitchOnClickReaction, KeyboardInput}};
 
-use super::super::{gilrs_events::stick_switch_interpreter::StickSwitchButton, layers_wrapper::MockLayersWrapperTrait, layers_navigator::LayerVisitTrigger};
+use super::super::{gilrs_events::stick_switch_interpreter::StickSwitchButton, layers_navigator::LayerVisitTrigger};
 
 fn setup_handles_keyboard_input_events(
-    layer_num: usize,
     source_switch_event_and_reaction: SwitchEventAndReaction,
     pattern: SwitchClickPattern) -> Option<Command> {
         let mut mock_switch_click_pattern_detector = MockSwitchClickPatternDetectorTrait::new();
-        let mut mock_layers_wrapper = MockLayersWrapperTrait::new();
         let mock_gilrs_events = MockGilrsEventsTrait::new();
         let mut mock_layers_navigator = MockLayersNavigatorTrait::new();
         let mock_mouse_cardinal_levers_move_detector 
@@ -36,21 +34,15 @@ fn setup_handles_keyboard_input_events(
             SwitchClickPattern::ClickEnd(sw) => sw,
         };
 
-        mock_layers_wrapper
+        mock_layers_navigator
             .expect_get_switch_event_and_reaction()
             .times(1)
-            .with(eq(layer_num),eq(switch))
+            .with(eq(switch))
             .return_const(
                 Some(source_switch_event_and_reaction));
 
-        mock_layers_navigator
-            .expect_get_current_layer_index()
-            .times(1)
-            .return_const(layer_num);
-
         let mut gamepad_listener = GamepadListener {
            gilrs_events: Box::new(mock_gilrs_events),
-           layers: Box::new(mock_layers_wrapper),
            switch_click_pattern_detector: Box::new(mock_switch_click_pattern_detector),
            layers_navigator: Box::new(mock_layers_navigator),
            mouse_cardinal_levers_move_detector: 
@@ -68,7 +60,6 @@ fn handles_keyboard_input_events(){
         };
        assert_eq!(
            setup_handles_keyboard_input_events(
-               0_usize,
                SwitchEventAndReaction {
                     on_click: Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
                     on_double_click: None, 
@@ -82,7 +73,6 @@ fn handles_keyboard_input_events(){
         };
        assert_eq!(
            setup_handles_keyboard_input_events(
-               1_usize,
                SwitchEventAndReaction {
 					on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
                     on_double_click: None, 
@@ -96,7 +86,6 @@ fn handles_keyboard_input_events(){
         };
        assert_eq!(
            setup_handles_keyboard_input_events(
-               2_usize,
                SwitchEventAndReaction {
 					on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
                     on_double_click: None, 
@@ -110,7 +99,6 @@ fn handles_keyboard_input_events(){
         };
        assert_eq!(
            setup_handles_keyboard_input_events(
-               10_usize,
                SwitchEventAndReaction {
 					on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
                     on_double_click: None, 
@@ -124,7 +112,6 @@ fn handles_keyboard_input_events(){
         };
        assert_eq!(
            setup_handles_keyboard_input_events(
-               100_usize,
                SwitchEventAndReaction {
 					on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
                     on_double_click: None, 
@@ -143,7 +130,6 @@ fn handles_keyboard_input_events(){
         };
        assert_eq!(
            setup_handles_keyboard_input_events(
-               0_usize,
                SwitchEventAndReaction {
 					on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
                     on_double_click: None, 
@@ -157,7 +143,6 @@ fn handles_keyboard_input_events(){
         };
        assert_eq!(
            setup_handles_keyboard_input_events(
-               1_usize,
                SwitchEventAndReaction {
 					on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
                     on_double_click: None, 
@@ -171,7 +156,6 @@ fn handles_keyboard_input_events(){
         };
        assert_eq!(
            setup_handles_keyboard_input_events(
-               2_usize,
                SwitchEventAndReaction {
 					on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
                     on_double_click: None, 
@@ -185,7 +169,6 @@ fn handles_keyboard_input_events(){
         };
        assert_eq!(
            setup_handles_keyboard_input_events(
-               10_usize,
                SwitchEventAndReaction {
 					on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
                     on_double_click: None, 
@@ -199,7 +182,6 @@ fn handles_keyboard_input_events(){
         };
        assert_eq!(
            setup_handles_keyboard_input_events(
-               100_usize,
                SwitchEventAndReaction {
 					on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
                     on_double_click: None, 
@@ -217,7 +199,6 @@ fn handles_keyboard_input_events(){
         };
        assert_eq!(
            setup_handles_keyboard_input_events(
-               0_usize,
                SwitchEventAndReaction {
 					on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
                     on_double_click: None, 
@@ -231,7 +212,6 @@ fn handles_keyboard_input_events(){
         };
        assert_eq!(
            setup_handles_keyboard_input_events(
-               1_usize,
                SwitchEventAndReaction {
 					on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
                     on_double_click: None, 
@@ -245,7 +225,6 @@ fn handles_keyboard_input_events(){
         };
        assert_eq!(
            setup_handles_keyboard_input_events(
-               2_usize,
                SwitchEventAndReaction {
 					on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
                     on_double_click: None, 
@@ -259,7 +238,6 @@ fn handles_keyboard_input_events(){
         };
        assert_eq!(
            setup_handles_keyboard_input_events(
-               10_usize,
                SwitchEventAndReaction {
 					on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
                     on_double_click: None, 
@@ -273,7 +251,6 @@ fn handles_keyboard_input_events(){
         };
        assert_eq!(
            setup_handles_keyboard_input_events(
-               100_usize,
                SwitchEventAndReaction {
 					on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
                     on_double_click: None, 
@@ -291,7 +268,6 @@ fn handles_keyboard_input_events(){
         };
        assert_eq!(
            setup_handles_keyboard_input_events(
-               0_usize,
                SwitchEventAndReaction {
 					on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
                     on_double_click: None, 
@@ -305,7 +281,6 @@ fn handles_keyboard_input_events(){
         };
        assert_eq!(
            setup_handles_keyboard_input_events(
-               1_usize,
                SwitchEventAndReaction {
 					on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
                     on_double_click: None, 
@@ -319,7 +294,6 @@ fn handles_keyboard_input_events(){
         };
        assert_eq!(
            setup_handles_keyboard_input_events(
-               2_usize,
                SwitchEventAndReaction {
 					on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
                     on_double_click: None, 
@@ -333,7 +307,6 @@ fn handles_keyboard_input_events(){
         };
        assert_eq!(
            setup_handles_keyboard_input_events(
-               10_usize,
                SwitchEventAndReaction {
 					on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
                     on_double_click: None, 
@@ -347,7 +320,6 @@ fn handles_keyboard_input_events(){
         };
        assert_eq!(
            setup_handles_keyboard_input_events(
-               100_usize,
                SwitchEventAndReaction {
 					on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
                     on_double_click: None, 
@@ -365,7 +337,6 @@ fn handles_keyboard_input_events(){
         };
        assert_eq!(
            setup_handles_keyboard_input_events(
-               0_usize,
                SwitchEventAndReaction {
 					on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
                     on_double_click: None, 
@@ -379,7 +350,6 @@ fn handles_keyboard_input_events(){
         };
        assert_eq!(
            setup_handles_keyboard_input_events(
-               1_usize,
                SwitchEventAndReaction {
 					on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
                     on_double_click: None, 
@@ -393,7 +363,6 @@ fn handles_keyboard_input_events(){
         };
        assert_eq!(
            setup_handles_keyboard_input_events(
-               2_usize,
                SwitchEventAndReaction {
 					on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
                     on_double_click: None, 
@@ -407,7 +376,6 @@ fn handles_keyboard_input_events(){
         };
        assert_eq!(
            setup_handles_keyboard_input_events(
-               10_usize,
                SwitchEventAndReaction {
 					on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
                     on_double_click: None, 
@@ -421,7 +389,6 @@ fn handles_keyboard_input_events(){
         };
        assert_eq!(
            setup_handles_keyboard_input_events(
-               100_usize,
                SwitchEventAndReaction {
 					on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
                     on_double_click: None, 
@@ -439,7 +406,6 @@ fn handles_keyboard_input_events(){
         };
        assert_eq!(
            setup_handles_keyboard_input_events(
-               0_usize,
                SwitchEventAndReaction {
 					on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
                     on_double_click: None, 
@@ -453,7 +419,6 @@ fn handles_keyboard_input_events(){
         };
        assert_eq!(
            setup_handles_keyboard_input_events(
-               1_usize,
                SwitchEventAndReaction {
 					on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
                     on_double_click: None, 
@@ -467,7 +432,6 @@ fn handles_keyboard_input_events(){
         };
        assert_eq!(
            setup_handles_keyboard_input_events(
-               2_usize,
                SwitchEventAndReaction {
 					on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
                     on_double_click: None, 
@@ -481,7 +445,6 @@ fn handles_keyboard_input_events(){
         };
        assert_eq!(
            setup_handles_keyboard_input_events(
-               10_usize,
                SwitchEventAndReaction {
 					on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
                     on_double_click: None, 
@@ -495,7 +458,6 @@ fn handles_keyboard_input_events(){
         };
        assert_eq!(
            setup_handles_keyboard_input_events(
-               100_usize,
                SwitchEventAndReaction {
 					on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
                     on_double_click: None, 
@@ -513,7 +475,6 @@ fn handles_keyboard_input_events(){
         };
        assert_eq!(
            setup_handles_keyboard_input_events(
-               0_usize,
                SwitchEventAndReaction {
 					on_click: None,
                     on_double_click: Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())), 
@@ -527,7 +488,6 @@ fn handles_keyboard_input_events(){
         };
        assert_eq!(
            setup_handles_keyboard_input_events(
-               1_usize,
                SwitchEventAndReaction {
 					on_click: None,
                     on_double_click: Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())), 
@@ -541,7 +501,6 @@ fn handles_keyboard_input_events(){
         };
        assert_eq!(
            setup_handles_keyboard_input_events(
-               2_usize,
                SwitchEventAndReaction {
 					on_click: None,
                     on_double_click: Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())), 
@@ -555,7 +514,6 @@ fn handles_keyboard_input_events(){
         };
        assert_eq!(
            setup_handles_keyboard_input_events(
-               10_usize,
                SwitchEventAndReaction {
 					on_click: None,
                     on_double_click: Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())), 
@@ -569,7 +527,6 @@ fn handles_keyboard_input_events(){
         };
        assert_eq!(
            setup_handles_keyboard_input_events(
-               100_usize,
                SwitchEventAndReaction {
 					on_click: None,
                     on_double_click: Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())), 
@@ -581,7 +538,6 @@ fn handles_keyboard_input_events(){
 }
 
 struct SetupGamepadTickHandlesMoveToLayerEventsArgs{
-    current_layer_num: usize,
     new_layer_index: usize,
     layer_specifier: LayerSpecifier, 
     source_switch_event_and_reaction: SwitchEventAndReaction,
@@ -593,7 +549,6 @@ fn setup_handles_move_to_layer_events(
     ) -> Option<Command> {
 
         let mut mock_switch_click_pattern_detector = MockSwitchClickPatternDetectorTrait::new();
-        let mut mock_layers_wrapper = MockLayersWrapperTrait::new();
         let mock_gilrs_events = MockGilrsEventsTrait::new();
         let mut mock_layers_navigator = MockLayersNavigatorTrait::new();
         let mut mock_mouse_cardinal_levers_move_detector 
@@ -618,17 +573,12 @@ fn setup_handles_move_to_layer_events(
             SwitchClickPattern::ClickEnd(sw) => sw,
         };
 
-        mock_layers_wrapper
+        mock_layers_navigator
             .expect_get_switch_event_and_reaction()
             .times(1)
-            .with(eq(args.current_layer_num),eq(switch))
+            .with(eq(switch))
             .return_const(
                 Some(args.source_switch_event_and_reaction));
-
-        mock_layers_navigator
-            .expect_get_current_layer_index()
-            .times(1)
-            .return_const(args.current_layer_num);
 
         mock_layers_navigator
             .expect_move_to_layer()
@@ -642,11 +592,11 @@ fn setup_handles_move_to_layer_events(
             .with()
             .return_const(Some(args.new_layer_index));
 
-        mock_layers_wrapper
+        mock_layers_navigator
             .expect_get_cardinal_levers()
             .times(1)
-            .with(eq(args.new_layer_index))
-            .returning(|_| None);
+            .with()
+            .return_const(None);
 
         mock_mouse_cardinal_levers_move_detector
             .expect_set_mouse_controls()
@@ -656,7 +606,6 @@ fn setup_handles_move_to_layer_events(
 
         let mut gamepad_listener = GamepadListener {
            gilrs_events: Box::new(mock_gilrs_events),
-           layers: Box::new(mock_layers_wrapper),
            switch_click_pattern_detector: Box::new(mock_switch_click_pattern_detector),
            layers_navigator: Box::new(mock_layers_navigator),
            mouse_cardinal_levers_move_detector: 
@@ -673,7 +622,6 @@ fn handles_move_to_layer_events(){
         id: "some-id".to_string(), index_in_gamepad: Some(new_layer_index)};
     assert_eq!(setup_handles_move_to_layer_events(
         SetupGamepadTickHandlesMoveToLayerEventsArgs {
-            current_layer_num: 100_usize,
             new_layer_index,
             layer_specifier: layer_specifier.clone(),
             source_switch_event_and_reaction: SwitchEventAndReaction {
@@ -690,7 +638,6 @@ fn handles_move_to_layer_events(){
         id: "some-other-id".to_string(), index_in_gamepad: Some(new_layer_index)};
     assert_eq!(setup_handles_move_to_layer_events(
         SetupGamepadTickHandlesMoveToLayerEventsArgs {
-            current_layer_num: 10_usize,
             new_layer_index,
             layer_specifier: layer_specifier.clone(),
             source_switch_event_and_reaction: SwitchEventAndReaction {
@@ -708,7 +655,6 @@ fn handles_move_to_layer_events(){
         id: "some-id".to_string(), index_in_gamepad: Some(new_layer_index)};
     assert_eq!(setup_handles_move_to_layer_events(
         SetupGamepadTickHandlesMoveToLayerEventsArgs {
-            current_layer_num: 10_usize,
             new_layer_index,
             layer_specifier: layer_specifier.clone(),
             source_switch_event_and_reaction: SwitchEventAndReaction {
@@ -723,7 +669,6 @@ fn handles_move_to_layer_events(){
 
 
 struct SetupGamepadTickHandlesVisitLayerEventsArgs{
-    current_layer_num: usize,
     new_layer_index: usize,
     layer_specifier: LayerSpecifier, 
     source_switch_event_and_reaction: SwitchEventAndReaction,
@@ -735,7 +680,6 @@ fn setup_handles_visit_layer_events(
     ) -> Option<Command> {
 
         let mut mock_switch_click_pattern_detector = MockSwitchClickPatternDetectorTrait::new();
-        let mut mock_layers_wrapper = MockLayersWrapperTrait::new();
         let mock_gilrs_events = MockGilrsEventsTrait::new();
         let mut mock_layers_navigator = MockLayersNavigatorTrait::new();
         let mut mock_mouse_cardinal_levers_move_detector 
@@ -760,17 +704,12 @@ fn setup_handles_visit_layer_events(
             SwitchClickPattern::ClickEnd(sw) => sw,
         };
 
-        mock_layers_wrapper
+        mock_layers_navigator
             .expect_get_switch_event_and_reaction()
             .times(1)
-            .with(eq(args.current_layer_num),eq(switch))
+            .with(eq(switch))
             .return_const(
                 Some(args.source_switch_event_and_reaction));
-
-        mock_layers_navigator
-            .expect_get_current_layer_index()
-            .times(1)
-            .return_const(args.current_layer_num);
 
         match args.pattern {
             SwitchClickPattern::Click(sw)=> {
@@ -796,11 +735,11 @@ fn setup_handles_visit_layer_events(
             .with()
             .return_const(Some(args.new_layer_index));
 
-        mock_layers_wrapper
+        mock_layers_navigator
             .expect_get_cardinal_levers()
             .times(1)
-            .with(eq(args.new_layer_index))
-            .returning(|_| None);
+            .with()
+            .returning(|| None);
 
         mock_mouse_cardinal_levers_move_detector
             .expect_set_mouse_controls()
@@ -810,7 +749,6 @@ fn setup_handles_visit_layer_events(
 
         let mut gamepad_listener = GamepadListener {
            gilrs_events: Box::new(mock_gilrs_events),
-           layers: Box::new(mock_layers_wrapper),
            switch_click_pattern_detector: Box::new(mock_switch_click_pattern_detector),
            layers_navigator: Box::new(mock_layers_navigator),
            mouse_cardinal_levers_move_detector: 
@@ -827,7 +765,6 @@ fn handles_visit_layer_events() {
         id: "some-id".to_string(), index_in_gamepad: Some(new_layer_index)};
     assert_eq!(setup_handles_visit_layer_events(
         SetupGamepadTickHandlesVisitLayerEventsArgs {
-            current_layer_num: 100_usize,
             new_layer_index,
             layer_specifier: layer_specifier.clone(),
             source_switch_event_and_reaction: SwitchEventAndReaction {
@@ -845,7 +782,6 @@ fn handles_visit_layer_events() {
         id: "some-other-id".to_string(), index_in_gamepad: Some(new_layer_index)};
     assert_eq!(setup_handles_visit_layer_events(
         SetupGamepadTickHandlesVisitLayerEventsArgs {
-            current_layer_num: 10_usize,
             new_layer_index,
             layer_specifier: layer_specifier.clone(),
             source_switch_event_and_reaction: SwitchEventAndReaction {
@@ -863,7 +799,6 @@ fn handles_visit_layer_events() {
         id: "some-id".to_string(), index_in_gamepad: Some(new_layer_index)};
     assert_eq!(setup_handles_visit_layer_events(
         SetupGamepadTickHandlesVisitLayerEventsArgs {
-            current_layer_num: 10_usize,
             new_layer_index,
             layer_specifier: layer_specifier.clone(),
             source_switch_event_and_reaction: SwitchEventAndReaction {
@@ -880,7 +815,6 @@ fn handles_visit_layer_events() {
 
 
 struct SetupGamepadTickHandlesMoveToOrVisitLayerEventsArgs{
-    current_layer_num: usize,
     new_layer_index: usize,
     layer_specifier: LayerSpecifier, 
     source_switch_event_and_reaction: SwitchEventAndReaction,
@@ -892,7 +826,6 @@ fn setup_handles_move_to_or_visit_layer_events(
     ) -> Option<Command> {
 
         let mut mock_switch_click_pattern_detector = MockSwitchClickPatternDetectorTrait::new();
-        let mut mock_layers_wrapper = MockLayersWrapperTrait::new();
         let mock_gilrs_events = MockGilrsEventsTrait::new();
         let mut mock_layers_navigator = MockLayersNavigatorTrait::new();
         let mut mock_mouse_cardinal_levers_move_detector 
@@ -917,17 +850,12 @@ fn setup_handles_move_to_or_visit_layer_events(
             SwitchClickPattern::ClickEnd(sw) => sw,
         };
 
-        mock_layers_wrapper
+        mock_layers_navigator
             .expect_get_switch_event_and_reaction()
             .times(1)
-            .with(eq(args.current_layer_num),eq(switch))
+            .with(eq(switch))
             .return_const(
                 Some(args.source_switch_event_and_reaction));
-
-        mock_layers_navigator
-            .expect_get_current_layer_index()
-            .times(1)
-            .return_const(args.current_layer_num);
 
         match args.pattern {
             SwitchClickPattern::Click(sw)=> {
@@ -953,12 +881,11 @@ fn setup_handles_move_to_or_visit_layer_events(
             .with()
             .return_const(Some(args.new_layer_index));
 
-
-        mock_layers_wrapper
+        mock_layers_navigator
             .expect_get_cardinal_levers()
             .times(1)
-            .with(eq(args.new_layer_index))
-            .returning(|_| None);
+            .with()
+            .returning(|| None);
 
         mock_mouse_cardinal_levers_move_detector
             .expect_set_mouse_controls()
@@ -966,10 +893,8 @@ fn setup_handles_move_to_or_visit_layer_events(
             .with(eq(None))
             .return_const(());
 
-
         let mut gamepad_listener = GamepadListener {
            gilrs_events: Box::new(mock_gilrs_events),
-           layers: Box::new(mock_layers_wrapper),
            switch_click_pattern_detector: Box::new(mock_switch_click_pattern_detector),
            layers_navigator: Box::new(mock_layers_navigator),
            mouse_cardinal_levers_move_detector:
@@ -986,7 +911,6 @@ fn handles_move_to_or_visit_layer_events() {
         id: "some-id".to_string(), index_in_gamepad: Some(new_layer_index)};
     assert_eq!(setup_handles_move_to_or_visit_layer_events(
         SetupGamepadTickHandlesMoveToOrVisitLayerEventsArgs {
-            current_layer_num: 100_usize,
             new_layer_index,
             layer_specifier: layer_specifier.clone(),
             source_switch_event_and_reaction: SwitchEventAndReaction {
@@ -1004,7 +928,6 @@ fn handles_move_to_or_visit_layer_events() {
         id: "some-other-id".to_string(), index_in_gamepad: Some(new_layer_index)};
     assert_eq!(setup_handles_move_to_or_visit_layer_events(
         SetupGamepadTickHandlesMoveToOrVisitLayerEventsArgs {
-            current_layer_num: 10_usize,
             new_layer_index,
             layer_specifier: layer_specifier.clone(),
             source_switch_event_and_reaction: SwitchEventAndReaction {
@@ -1022,7 +945,6 @@ fn handles_move_to_or_visit_layer_events() {
         id: "some-id".to_string(), index_in_gamepad: Some(new_layer_index)};
     assert_eq!(setup_handles_move_to_or_visit_layer_events(
         SetupGamepadTickHandlesMoveToOrVisitLayerEventsArgs {
-            current_layer_num: 10_usize,
             new_layer_index,
             layer_specifier: layer_specifier.clone(),
             source_switch_event_and_reaction: SwitchEventAndReaction {
@@ -1039,7 +961,6 @@ fn handles_move_to_or_visit_layer_events() {
 
 
 struct SetupGamepadTickHandlesShowQuickLookupWindowEventsArgs{
-    current_layer_num: usize,
     source_switch_event_and_reaction: SwitchEventAndReaction,
     pattern: SwitchClickPattern,
 }
@@ -1049,7 +970,6 @@ fn setup_handles_show_quick_lookup_window(
     ) -> Option<Command> {
 
         let mut mock_switch_click_pattern_detector = MockSwitchClickPatternDetectorTrait::new();
-        let mut mock_layers_wrapper = MockLayersWrapperTrait::new();
         let mock_gilrs_events = MockGilrsEventsTrait::new();
         let mut mock_layers_navigator = MockLayersNavigatorTrait::new();
         let mock_mouse_cardinal_levers_move_detector 
@@ -1074,21 +994,15 @@ fn setup_handles_show_quick_lookup_window(
             SwitchClickPattern::ClickEnd(sw) => sw,
         };
 
-        mock_layers_wrapper
+        mock_layers_navigator
             .expect_get_switch_event_and_reaction()
             .times(1)
-            .with(eq(args.current_layer_num),eq(switch.clone()))
+            .with(eq(switch.clone()))
             .return_const(
                 Some(args.source_switch_event_and_reaction));
 
-        mock_layers_navigator
-            .expect_get_current_layer_index()
-            .times(1)
-            .return_const(args.current_layer_num);
-
         let mut gamepad_listener = GamepadListener {
            gilrs_events: Box::new(mock_gilrs_events),
-           layers: Box::new(mock_layers_wrapper),
            switch_click_pattern_detector: Box::new(mock_switch_click_pattern_detector),
            layers_navigator: Box::new(mock_layers_navigator),
            mouse_cardinal_levers_move_detector:
@@ -1102,7 +1016,6 @@ fn setup_handles_show_quick_lookup_window(
 fn handles_show_quick_lookup_window(){
     assert_eq!(setup_handles_show_quick_lookup_window(
         SetupGamepadTickHandlesShowQuickLookupWindowEventsArgs {
-            current_layer_num: 100_usize,
             source_switch_event_and_reaction: SwitchEventAndReaction {
                 on_click: Some(SwitchOnClickReaction::ShowQuickLookupWindowOnHold),
                 on_double_click: None, 
@@ -1114,7 +1027,6 @@ fn handles_show_quick_lookup_window(){
     
     assert_eq!(setup_handles_show_quick_lookup_window(
         SetupGamepadTickHandlesShowQuickLookupWindowEventsArgs {
-            current_layer_num: 10_usize,
             source_switch_event_and_reaction: SwitchEventAndReaction {
                 on_click: None,
                 on_double_click: Some(SwitchOnClickReaction::ShowQuickLookupWindowOnHold),
@@ -1127,7 +1039,6 @@ fn handles_show_quick_lookup_window(){
     
     assert_eq!(setup_handles_show_quick_lookup_window(
         SetupGamepadTickHandlesShowQuickLookupWindowEventsArgs {
-            current_layer_num: 10_usize,
             source_switch_event_and_reaction: SwitchEventAndReaction {
                 on_click: Some(SwitchOnClickReaction::ShowQuickLookupWindowOnHold),
                 on_double_click: None, 
@@ -1143,7 +1054,6 @@ fn handles_show_quick_lookup_window(){
 fn handles_toggle_quick_lookup_window(){
     assert_eq!(setup_handles_show_quick_lookup_window(
         SetupGamepadTickHandlesShowQuickLookupWindowEventsArgs {
-            current_layer_num: 100_usize,
             source_switch_event_and_reaction: SwitchEventAndReaction {
                 on_click: Some(SwitchOnClickReaction::ToggleQuickLookupWindow),
                 on_double_click: None, 
@@ -1155,7 +1065,6 @@ fn handles_toggle_quick_lookup_window(){
     
     assert_eq!(setup_handles_show_quick_lookup_window(
         SetupGamepadTickHandlesShowQuickLookupWindowEventsArgs {
-            current_layer_num: 10_usize,
             source_switch_event_and_reaction: SwitchEventAndReaction {
                 on_click: None,
                 on_double_click: Some(SwitchOnClickReaction::ToggleQuickLookupWindow),
@@ -1168,7 +1077,6 @@ fn handles_toggle_quick_lookup_window(){
     
     assert_eq!(setup_handles_show_quick_lookup_window(
         SetupGamepadTickHandlesShowQuickLookupWindowEventsArgs {
-            current_layer_num: 10_usize,
             source_switch_event_and_reaction: SwitchEventAndReaction {
                 on_click: Some(SwitchOnClickReaction::ToggleQuickLookupWindow),
                 on_double_click: None, 
@@ -1188,7 +1096,6 @@ fn setup_processes_click_end_switch_pattern(
     ) -> Option<Command> {
 
         let mut mock_switch_click_pattern_detector = MockSwitchClickPatternDetectorTrait::new();
-        let mock_layers_wrapper = MockLayersWrapperTrait::new();
         let mock_gilrs_events = MockGilrsEventsTrait::new();
         let mut mock_layers_navigator = MockLayersNavigatorTrait::new();
         let mock_mouse_cardinal_levers_move_detector 
@@ -1221,7 +1128,6 @@ fn setup_processes_click_end_switch_pattern(
 
         let mut gamepad_listener = GamepadListener {
            gilrs_events: Box::new(mock_gilrs_events),
-           layers: Box::new(mock_layers_wrapper),
            switch_click_pattern_detector: Box::new(mock_switch_click_pattern_detector),
            layers_navigator: Box::new(mock_layers_navigator),
            mouse_cardinal_levers_move_detector:
@@ -1264,7 +1170,6 @@ fn setup_processes_mouse_move_events(
     ) -> Option<Command> {
 
         let mut mock_switch_click_pattern_detector = MockSwitchClickPatternDetectorTrait::new();
-        let mock_layers_wrapper = MockLayersWrapperTrait::new();
         let mock_gilrs_events = MockGilrsEventsTrait::new();
         let mut mock_layers_navigator = MockLayersNavigatorTrait::new();
         let mut mock_mouse_cardinal_levers_move_detector 
@@ -1289,7 +1194,6 @@ fn setup_processes_mouse_move_events(
 
         let mut gamepad_listener = GamepadListener {
            gilrs_events: Box::new(mock_gilrs_events),
-           layers: Box::new(mock_layers_wrapper),
            switch_click_pattern_detector: Box::new(mock_switch_click_pattern_detector),
            layers_navigator: Box::new(mock_layers_navigator),
            mouse_cardinal_levers_move_detector:
@@ -1337,11 +1241,9 @@ fn processes_mouse_move_events(){
 }
 
 fn setup_handles_boost_mouse_by_multiplier_events(
-    layer_num: usize,
     source_switch_event_and_reaction: SwitchEventAndReaction,
     pattern: SwitchClickPattern) -> Option<Command> {
         let mut mock_switch_click_pattern_detector = MockSwitchClickPatternDetectorTrait::new();
-        let mut mock_layers_wrapper = MockLayersWrapperTrait::new();
         let mock_gilrs_events = MockGilrsEventsTrait::new();
         let mut mock_layers_navigator = MockLayersNavigatorTrait::new();
         let mock_mouse_cardinal_levers_move_detector 
@@ -1366,21 +1268,15 @@ fn setup_handles_boost_mouse_by_multiplier_events(
             SwitchClickPattern::ClickEnd(sw) => sw,
         };
 
-        mock_layers_wrapper
+        mock_layers_navigator
             .expect_get_switch_event_and_reaction()
             .times(1)
-            .with(eq(layer_num),eq(switch))
+            .with(eq(switch))
             .return_const(
                 Some(source_switch_event_and_reaction));
 
-        mock_layers_navigator
-            .expect_get_current_layer_index()
-            .times(1)
-            .return_const(layer_num);
-
         let mut gamepad_listener = GamepadListener {
            gilrs_events: Box::new(mock_gilrs_events),
-           layers: Box::new(mock_layers_wrapper),
            switch_click_pattern_detector: Box::new(mock_switch_click_pattern_detector),
            layers_navigator: Box::new(mock_layers_navigator),
            mouse_cardinal_levers_move_detector: 
@@ -1394,7 +1290,6 @@ fn setup_handles_boost_mouse_by_multiplier_events(
 fn handles_boost_mouse_by_multiplier_events(){
    assert_eq!(
        setup_handles_boost_mouse_by_multiplier_events(
-           0_usize,
            SwitchEventAndReaction {
                 on_click: Some(SwitchOnClickReaction::BoostMouseCursorByMultiplier(3)),
                 on_double_click: None, 
@@ -1404,7 +1299,6 @@ fn handles_boost_mouse_by_multiplier_events(){
 
    assert_eq!(
        setup_handles_boost_mouse_by_multiplier_events(
-           2_usize,
            SwitchEventAndReaction {
                 on_click: Some(SwitchOnClickReaction::BoostMouseCursorByMultiplier(100)),
                 on_double_click: None, 
@@ -1414,7 +1308,6 @@ fn handles_boost_mouse_by_multiplier_events(){
 
    assert_eq!(
        setup_handles_boost_mouse_by_multiplier_events(
-           99_usize,
            SwitchEventAndReaction {
                 on_click: Some(SwitchOnClickReaction::BoostMouseCursorByMultiplier(99999)),
                 on_double_click: None, 
@@ -1429,7 +1322,6 @@ fn handles_boost_mouse_by_multiplier_events(){
    // ----------------
    assert_eq!(
        setup_handles_boost_mouse_by_multiplier_events(
-           0_usize,
            SwitchEventAndReaction {
                 on_click: Some(SwitchOnClickReaction::BoostMouseCursorByMultiplier(3)),
                 on_double_click: None, 
@@ -1439,7 +1331,6 @@ fn handles_boost_mouse_by_multiplier_events(){
 
    assert_eq!(
        setup_handles_boost_mouse_by_multiplier_events(
-           2_usize,
            SwitchEventAndReaction {
                 on_click: Some(SwitchOnClickReaction::BoostMouseCursorByMultiplier(100)),
                 on_double_click: None, 
@@ -1449,7 +1340,6 @@ fn handles_boost_mouse_by_multiplier_events(){
 
    assert_eq!(
        setup_handles_boost_mouse_by_multiplier_events(
-           99_usize,
            SwitchEventAndReaction {
                 on_click: Some(SwitchOnClickReaction::BoostMouseCursorByMultiplier(99999)),
                 on_double_click: None, 
@@ -1462,7 +1352,6 @@ fn handles_boost_mouse_by_multiplier_events(){
     // -------------
    assert_eq!(
        setup_handles_boost_mouse_by_multiplier_events(
-           0_usize,
            SwitchEventAndReaction {
                 on_click: Some(SwitchOnClickReaction::BoostMouseCursorByMultiplier(3)),
                 on_double_click: None, 
@@ -1472,7 +1361,6 @@ fn handles_boost_mouse_by_multiplier_events(){
 
    assert_eq!(
        setup_handles_boost_mouse_by_multiplier_events(
-           2_usize,
            SwitchEventAndReaction {
                 on_click: Some(SwitchOnClickReaction::BoostMouseCursorByMultiplier(100)),
                 on_double_click: None, 
@@ -1482,7 +1370,6 @@ fn handles_boost_mouse_by_multiplier_events(){
 
    assert_eq!(
        setup_handles_boost_mouse_by_multiplier_events(
-           99_usize,
            SwitchEventAndReaction {
                 on_click: Some(SwitchOnClickReaction::BoostMouseCursorByMultiplier(99999)),
                 on_double_click: None, 
@@ -1497,7 +1384,6 @@ fn handles_boost_mouse_by_multiplier_events(){
 
    assert_eq!(
        setup_handles_boost_mouse_by_multiplier_events(
-           0_usize,
            SwitchEventAndReaction {
                 on_click: None,
                 on_double_click: Some(SwitchOnClickReaction::BoostMouseCursorByMultiplier(3)), 
@@ -1507,7 +1393,6 @@ fn handles_boost_mouse_by_multiplier_events(){
 
    assert_eq!(
        setup_handles_boost_mouse_by_multiplier_events(
-           2_usize,
            SwitchEventAndReaction {
                 on_click: None,
                 on_double_click: Some(SwitchOnClickReaction::BoostMouseCursorByMultiplier(100)), 
@@ -1517,7 +1402,6 @@ fn handles_boost_mouse_by_multiplier_events(){
 
    assert_eq!(
        setup_handles_boost_mouse_by_multiplier_events(
-           99_usize,
            SwitchEventAndReaction {
                 on_click: None,
                 on_double_click: Some(SwitchOnClickReaction::BoostMouseCursorByMultiplier(99999)), 
@@ -1534,7 +1418,6 @@ fn handles_boost_mouse_by_multiplier_events(){
 				//         };
 				//        assert_eq!(
 				//            setup_handles_keyboard_input_events(
-				//                0_usize,
 				//                SwitchEventAndReaction {
 				// 	on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
 				//                     on_double_click: None, 
@@ -1548,7 +1431,6 @@ fn handles_boost_mouse_by_multiplier_events(){
 				//         };
 				//        assert_eq!(
 				//            setup_handles_keyboard_input_events(
-				//                1_usize,
 				//                SwitchEventAndReaction {
 				// 	on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
 				//                     on_double_click: None, 
@@ -1562,7 +1444,6 @@ fn handles_boost_mouse_by_multiplier_events(){
 				//         };
 				//        assert_eq!(
 				//            setup_handles_keyboard_input_events(
-				//                2_usize,
 				//                SwitchEventAndReaction {
 				// 	on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
 				//                     on_double_click: None, 
@@ -1576,7 +1457,6 @@ fn handles_boost_mouse_by_multiplier_events(){
 				//         };
 				//        assert_eq!(
 				//            setup_handles_keyboard_input_events(
-				//                10_usize,
 				//                SwitchEventAndReaction {
 				// 	on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
 				//                     on_double_click: None, 
@@ -1590,7 +1470,6 @@ fn handles_boost_mouse_by_multiplier_events(){
 				//         };
 				//        assert_eq!(
 				//            setup_handles_keyboard_input_events(
-				//                100_usize,
 				//                SwitchEventAndReaction {
 				// 	on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
 				//                     on_double_click: None, 
@@ -1608,7 +1487,6 @@ fn handles_boost_mouse_by_multiplier_events(){
 				//         };
 				//        assert_eq!(
 				//            setup_handles_keyboard_input_events(
-				//                0_usize,
 				//                SwitchEventAndReaction {
 				// 	on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
 				//                     on_double_click: None, 
@@ -1622,7 +1500,6 @@ fn handles_boost_mouse_by_multiplier_events(){
 				//         };
 				//        assert_eq!(
 				//            setup_handles_keyboard_input_events(
-				//                1_usize,
 				//                SwitchEventAndReaction {
 				// 	on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
 				//                     on_double_click: None, 
@@ -1636,7 +1513,6 @@ fn handles_boost_mouse_by_multiplier_events(){
 				//         };
 				//        assert_eq!(
 				//            setup_handles_keyboard_input_events(
-				//                2_usize,
 				//                SwitchEventAndReaction {
 				// 	on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
 				//                     on_double_click: None, 
@@ -1650,7 +1526,6 @@ fn handles_boost_mouse_by_multiplier_events(){
 				//         };
 				//        assert_eq!(
 				//            setup_handles_keyboard_input_events(
-				//                10_usize,
 				//                SwitchEventAndReaction {
 				// 	on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
 				//                     on_double_click: None, 
@@ -1664,7 +1539,6 @@ fn handles_boost_mouse_by_multiplier_events(){
 				//         };
 				//        assert_eq!(
 				//            setup_handles_keyboard_input_events(
-				//                100_usize,
 				//                SwitchEventAndReaction {
 				// 	on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
 				//                     on_double_click: None, 
@@ -1682,7 +1556,6 @@ fn handles_boost_mouse_by_multiplier_events(){
 				//         };
 				//        assert_eq!(
 				//            setup_handles_keyboard_input_events(
-				//                0_usize,
 				//                SwitchEventAndReaction {
 				// 	on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
 				//                     on_double_click: None, 
@@ -1696,7 +1569,6 @@ fn handles_boost_mouse_by_multiplier_events(){
 				//         };
 				//        assert_eq!(
 				//            setup_handles_keyboard_input_events(
-				//                1_usize,
 				//                SwitchEventAndReaction {
 				// 	on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
 				//                     on_double_click: None, 
@@ -1710,7 +1582,6 @@ fn handles_boost_mouse_by_multiplier_events(){
 				//         };
 				//        assert_eq!(
 				//            setup_handles_keyboard_input_events(
-				//                2_usize,
 				//                SwitchEventAndReaction {
 				// 	on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
 				//                     on_double_click: None, 
@@ -1724,7 +1595,6 @@ fn handles_boost_mouse_by_multiplier_events(){
 				//         };
 				//        assert_eq!(
 				//            setup_handles_keyboard_input_events(
-				//                10_usize,
 				//                SwitchEventAndReaction {
 				// 	on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
 				//                     on_double_click: None, 
@@ -1738,7 +1608,6 @@ fn handles_boost_mouse_by_multiplier_events(){
 				//         };
 				//        assert_eq!(
 				//            setup_handles_keyboard_input_events(
-				//                100_usize,
 				//                SwitchEventAndReaction {
 				// 	on_click:Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())),
 				//                     on_double_click: None, 
@@ -1756,7 +1625,6 @@ fn handles_boost_mouse_by_multiplier_events(){
 				//         };
 				//        assert_eq!(
 				//            setup_handles_keyboard_input_events(
-				//                0_usize,
 				//                SwitchEventAndReaction {
 				// 	on_click: None,
 				//                     on_double_click: Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())), 
@@ -1770,7 +1638,6 @@ fn handles_boost_mouse_by_multiplier_events(){
 				//         };
 				//        assert_eq!(
 				//            setup_handles_keyboard_input_events(
-				//                1_usize,
 				//                SwitchEventAndReaction {
 				// 	on_click: None,
 				//                     on_double_click: Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())), 
@@ -1784,7 +1651,6 @@ fn handles_boost_mouse_by_multiplier_events(){
 				//         };
 				//        assert_eq!(
 				//            setup_handles_keyboard_input_events(
-				//                2_usize,
 				//                SwitchEventAndReaction {
 				// 	on_click: None,
 				//                     on_double_click: Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())), 
@@ -1798,7 +1664,6 @@ fn handles_boost_mouse_by_multiplier_events(){
 				//         };
 				//        assert_eq!(
 				//            setup_handles_keyboard_input_events(
-				//                10_usize,
 				//                SwitchEventAndReaction {
 				// 	on_click: None,
 				//                     on_double_click: Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())), 
@@ -1812,7 +1677,6 @@ fn handles_boost_mouse_by_multiplier_events(){
 				//         };
 				//        assert_eq!(
 				//            setup_handles_keyboard_input_events(
-				//                100_usize,
 				//                SwitchEventAndReaction {
 				// 	on_click: None,
 				//                     on_double_click: Some(SwitchOnClickReaction::Keyboard(keyboard_input.clone())), 

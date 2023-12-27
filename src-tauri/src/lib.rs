@@ -7,7 +7,7 @@ use gamepad_listener::gilrs_events::gilrs_wrapper::{GilrsWrapper, GilrsEventType
 use gamepad_listener::gilrs_events::stick_switch_interpreter::{CardinalCustomButtons, StickSwitchInterpreter, AxisClickThresholds, self};
 use gamepad_listener::gilrs_events::trigger_2_switch_interpreter::Trigger2SwitchInterpreter;
 use gamepad_listener::layers_navigator::LayersNavigator;
-use gamepad_listener::layers_wrapper::LayersWrapper;
+use gamepad_listener::layers_navigator::layers_wrapper::LayersWrapper;
 use input_controller::enigo_wrapper::EnigoWrapper;
 use input_controller::keyboard_input_controller::KeyboardInputController;
 use input_controller::mouse_input_controller;
@@ -177,9 +177,10 @@ pub fn start_main_loop(
                     LeftOrRight::Right,
                 )),
             )),
-            Box::new(LayersWrapper::new(active_layout.layers.clone(),active_profile.left_upper_is_d_pad)),
             Box::new(SwitchClickPatternDetector::new(active_profile.switch_click_event_thresholds)),
-            Box::new(LayersNavigator::new(active_layout.layers,active_profile.left_upper_is_d_pad)),
+            Box::new(LayersNavigator::new(
+                Box::new(LayersWrapper::new(active_layout.layers.clone(),active_profile.left_upper_is_d_pad)),
+                active_layout.layers,active_profile.left_upper_is_d_pad)),
             Box::new(cardinal_levers_move_detector::mouse::Mouse::new(
                 // mouse_cursor_move_detector
                 Box::new(CardinalLeversMoveDetector::new(

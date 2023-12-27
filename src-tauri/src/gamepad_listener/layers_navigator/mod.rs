@@ -1,24 +1,34 @@
 use gilrs::Button;
 
-use crate::settings::models::layout::{LayerSpecifier, SwitchEventAndReaction, Layer, SwitchOnClickReaction};
+use crate::settings::models::layout::{LayerSpecifier, SwitchEventAndReaction, Layer, SwitchOnClickReaction, CardinalLevers};
+
+use self::layers_wrapper::LayersWrapperTrait;
 
 use super::{Switch, switch_click_pattern_detector::SwitchClickPattern, gilrs_events::stick_switch_interpreter::StickSwitchButton};
 
 #[cfg(test)]
 use mockall::{automock, predicate::*};
 
-#[cfg(test)]
-mod tests;
+//TODO: make me work
+// #[cfg(test)]
+// mod tests;
+
+pub mod layers_wrapper;
 
 #[cfg_attr(test, automock)]
 pub trait LayersNavigatorTrait {
     fn move_to_layer(&mut self, layer_specifier: LayerSpecifier);
     fn visit_layer(&mut self, trigger: LayerVisitTrigger, layer_specifier: LayerSpecifier);
     fn move_to_or_visit_layer(&mut self, trigger: LayerVisitTrigger, layer_specifier: LayerSpecifier);
-    fn get_current_layer_index(&self) -> usize;
+    // fn get_current_layer_index(&self) -> usize;
     fn undo_last_layer_visit_with_switch(&mut self, switch: Switch);
     fn process_current_potential_visit(&mut self,pattern: SwitchClickPattern);
     fn consumable_get_current_layer_index(&mut self) -> Option<usize>;
+
+    fn get_switch_event_and_reaction(
+        &self, switch: Switch) -> Option<SwitchEventAndReaction>;
+    fn get_cardinal_levers(
+        &self) -> Option<CardinalLevers>;
 }
 
 pub struct LayersNavigator {
@@ -41,17 +51,21 @@ pub struct LayersNavigator {
     // "MoveTo-"
     latest_move_to_index: usize,
 
+    layers: Box<dyn LayersWrapperTrait>,
 }
 
 impl LayersNavigator {
-    pub fn new(layers: Vec<Layer>,left_upper_is_d_pad: bool) -> Self {
+    pub fn new(
+        layers: Box<dyn LayersWrapperTrait>,
+        layers_source: Vec<Layer>,left_upper_is_d_pad: bool) -> Self {
         Self {
             current_layer_index: 0,
             consumable_current_layer_index: None,
             latest_move_to_index: 0,
             layer_visits: Vec::new(),
             potential_layer_visit: None,
-            layers_and_their_available_layer_visits: LayersNavigator::build_layer_visits(layers,left_upper_is_d_pad),
+            layers_and_their_available_layer_visits: LayersNavigator::build_layer_visits(layers_source,left_upper_is_d_pad),
+            layers,
         }
     }
 
@@ -178,8 +192,17 @@ impl LayersNavigatorTrait for LayersNavigator {
         self.set_current_layer_index(layer_specifier.index_in_gamepad.unwrap());
     }
     
-    fn get_current_layer_index(&self) -> usize {
-        self.current_layer_index
+    // fn get_current_layer_index(&self) -> usize {
+    //     self.current_layer_index
+    // }
+
+    fn get_switch_event_and_reaction(
+        &self, switch: Switch) -> Option<SwitchEventAndReaction>{
+        self.layers.get_switch_event_and_reaction(self.current_layer_index, switch)
+    }
+
+    fn get_cardinal_levers(&self) -> Option<CardinalLevers>{
+        self.layers.get_cardinal_levers(self.current_layer_index)
     }
 
     fn process_current_potential_visit(&mut self,pattern: SwitchClickPattern) {

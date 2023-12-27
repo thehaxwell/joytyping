@@ -3,7 +3,7 @@ use gilrs::Button;
 
 use crate::settings::models::layout::{SwitchOnClickReaction, KeyboardInput};
 
-use self::{gilrs_events::{gilrs_wrapper::GilrsEventType, GilrsEventsTrait,stick_switch_interpreter::{StickSwitchButton,StickSwitchEvent}}, layers_navigator::{LayersNavigatorTrait, LayerVisitTrigger}, layers_wrapper::LayersWrapperTrait};
+use self::{gilrs_events::{gilrs_wrapper::GilrsEventType, GilrsEventsTrait,stick_switch_interpreter::{StickSwitchButton,StickSwitchEvent}}, layers_navigator::{LayersNavigatorTrait, LayerVisitTrigger}};
 
 use self::switch_click_pattern_detector::{SwitchClickPatternDetectorTrait, SwitchClickPattern};
 
@@ -11,15 +11,12 @@ pub mod gilrs_events;
 pub mod switch_click_pattern_detector;
 pub mod layers_navigator;
 pub mod cardinal_levers_move_detector;
-pub mod layers_wrapper;
 
 #[cfg(test)]
 mod tests;
 
-
 pub struct GamepadListener {
    gilrs_events: Box<dyn GilrsEventsTrait>,
-   layers: Box<dyn LayersWrapperTrait>,
    switch_click_pattern_detector: Box<dyn SwitchClickPatternDetectorTrait>,
    layers_navigator: Box<dyn LayersNavigatorTrait>,
    mouse_cardinal_levers_move_detector: Box<dyn cardinal_levers_move_detector::mouse::MouseTrait>,
@@ -28,14 +25,12 @@ pub struct GamepadListener {
 impl GamepadListener {
     pub fn new(
        gilrs_events: Box<dyn GilrsEventsTrait>,
-       layers: Box<dyn LayersWrapperTrait>,
        switch_click_pattern_detector: Box<dyn SwitchClickPatternDetectorTrait>,
        layers_navigator: Box<dyn LayersNavigatorTrait>,
        mouse_cardinal_levers_move_detector: Box<dyn cardinal_levers_move_detector::mouse::MouseTrait>,
     ) -> Self {
         GamepadListener{
             gilrs_events,
-            layers,
             switch_click_pattern_detector,
 
             layers_navigator,
@@ -70,8 +65,7 @@ impl GamepadListener {
                         LayerVisitTrigger::Click(switch.clone())
                     };
 
-                match self.layers.get_switch_event_and_reaction(
-                         self.layers_navigator.get_current_layer_index(),
+                match self.layers_navigator.get_switch_event_and_reaction(
                          switch.clone())
                        .and_then(|s_e_a_r| if is_double_click {
                            // this is useful to allow typing a letter twice fast,
@@ -105,8 +99,7 @@ impl GamepadListener {
             }
             Some(SwitchClickPattern::ClickAndHold(switch)) 
                 | Some(SwitchClickPattern::DoubleClickAndHold(switch)) => {
-                let reaction_opt = self.layers.get_switch_event_and_reaction(
-                    self.layers_navigator.get_current_layer_index(),
+                let reaction_opt = self.layers_navigator.get_switch_event_and_reaction(
                     switch.clone()).and_then(
                         |s_e_a_r| if is_double_click {
                             // if on_double_click (or fallback to on_click) is set to
@@ -272,7 +265,7 @@ impl GamepadListener {
             = self.layers_navigator.consumable_get_current_layer_index() {
 
             self.mouse_cardinal_levers_move_detector
-                .set_mouse_controls(self.layers.get_cardinal_levers(new_layer_index));
+                .set_mouse_controls(self.layers_navigator.get_cardinal_levers());
 
             return Some(Command::QuickLookupWindowEvent(QuickLookupWindowEvent::EmitCurrentLayerNotification(new_layer_index)));
         }
