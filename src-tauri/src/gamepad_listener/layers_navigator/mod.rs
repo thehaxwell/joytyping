@@ -9,9 +9,8 @@ use super::{Switch, switch_click_pattern_detector::SwitchClickPattern, gilrs_eve
 #[cfg(test)]
 use mockall::{automock, predicate::*};
 
-//TODO: make me work
-// #[cfg(test)]
-// mod tests;
+#[cfg(test)]
+mod tests;
 
 pub mod layers_wrapper;
 

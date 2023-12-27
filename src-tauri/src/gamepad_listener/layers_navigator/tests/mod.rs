@@ -1,6 +1,8 @@
+use enigo::Key;
 use gilrs::Button;
+use mockall::predicate::eq;
 
-use crate::{gamepad_listener::{layers_navigator::{LayersNavigator,LayersNavigatorTrait, LayerVisit, AvailableLayerVisitsFromLayer, tests::utils::{setup_haxwell_layout_layers_with_only_visits, setup_haxwell_layout_layers_and_their_available_layer_visits}}, Switch, switch_click_pattern_detector::SwitchClickPattern, gilrs_events::stick_switch_interpreter::StickSwitchButton}, settings::models::layout::{LayerSpecifier, SwitchOnClickReaction}};
+use crate::{gamepad_listener::{layers_navigator::{LayersNavigator,LayersNavigatorTrait, LayerVisit, AvailableLayerVisitsFromLayer, tests::utils::{setup_haxwell_layout_layers_with_only_visits, setup_haxwell_layout_layers_and_their_available_layer_visits}, layers_wrapper::MockLayersWrapperTrait}, Switch, switch_click_pattern_detector::SwitchClickPattern, gilrs_events::stick_switch_interpreter::StickSwitchButton}, settings::models::layout::{LayerSpecifier, SwitchOnClickReaction, SwitchEventAndReaction, KeyboardInput, CardinalLevers, SingleCardinalLever}};
 
 use super::LayerVisitTrigger;
 
@@ -15,6 +17,7 @@ fn consumable_get_current_layer_index_works() {
        layer_visits: Vec::new(),
        potential_layer_visit: None,
        layers_and_their_available_layer_visits: Vec::new(),
+       layers: Box::new(MockLayersWrapperTrait::new()),
     };
     assert_eq!(layers_navigator.consumable_get_current_layer_index().unwrap(),6);
     assert!(layers_navigator.consumable_get_current_layer_index().is_none());
@@ -26,8 +29,117 @@ fn consumable_get_current_layer_index_works() {
        layer_visits: Vec::new(),
        potential_layer_visit: None,
        layers_and_their_available_layer_visits: Vec::new(),
+       layers: Box::new(MockLayersWrapperTrait::new()),
     };
     assert!(layers_navigator.consumable_get_current_layer_index().is_none());
+}
+
+fn setup_get_switch_event_and_reaction_works(
+        current_layer_index: usize,
+        switch: Switch,
+        switch_event_and_reaction_opt: Option<SwitchEventAndReaction>,
+    ) -> Option<SwitchEventAndReaction> {
+    let mut mock_layers_wrapper = MockLayersWrapperTrait::new();
+
+    mock_layers_wrapper
+        .expect_get_switch_event_and_reaction()
+        .with(eq(current_layer_index), eq(switch.clone()))
+        .times(1)
+        .return_const(switch_event_and_reaction_opt);
+
+    let layers_navigator = LayersNavigator {
+       current_layer_index,
+       consumable_current_layer_index: Some(6),
+       latest_move_to_index: 0,
+       layer_visits: Vec::new(),
+       potential_layer_visit: None,
+       layers_and_their_available_layer_visits: Vec::new(),
+       layers: Box::new(mock_layers_wrapper),
+    };
+
+    layers_navigator.get_switch_event_and_reaction(switch)
+}
+
+#[test]
+fn get_switch_event_and_reaction_works() {
+    let s_e_a_r = Some(SwitchEventAndReaction{
+            on_click: None,
+            on_double_click: None,
+        });
+    assert_eq!(
+        setup_get_switch_event_and_reaction_works(
+            0,
+            Switch::Button(Button::C),
+            s_e_a_r.clone()),s_e_a_r);
+
+    let s_e_a_r = Some(SwitchEventAndReaction{
+            on_click: Some(SwitchOnClickReaction::Keyboard(KeyboardInput{
+                key: Key::Layout('I'),
+                modifiers: vec![]
+            })),
+            on_double_click: None,
+        });
+    assert_eq!(
+        setup_get_switch_event_and_reaction_works(
+            12,
+            Switch::Button(Button::South),
+            s_e_a_r.clone()),s_e_a_r);
+
+    let s_e_a_r = None;
+    assert_eq!(
+        setup_get_switch_event_and_reaction_works(
+            120,
+            Switch::StickSwitchButton(StickSwitchButton::LeftStickUp),
+            s_e_a_r.clone()),s_e_a_r);
+}
+
+
+fn setup_get_cardinal_levers_works(
+        current_layer_index: usize,
+        cardinal_levers_opt: Option<CardinalLevers>,
+    ) -> Option<CardinalLevers> {
+    let mut mock_layers_wrapper = MockLayersWrapperTrait::new();
+
+    mock_layers_wrapper
+        .expect_get_cardinal_levers()
+        .with(eq(current_layer_index))
+        .times(1)
+        .return_const(cardinal_levers_opt);
+
+    let layers_navigator = LayersNavigator {
+       current_layer_index,
+       consumable_current_layer_index: Some(6),
+       latest_move_to_index: 0,
+       layer_visits: Vec::new(),
+       potential_layer_visit: None,
+       layers_and_their_available_layer_visits: Vec::new(),
+       layers: Box::new(mock_layers_wrapper),
+    };
+
+    layers_navigator.get_cardinal_levers()
+}
+#[test]
+fn get_cardinal_levers_works() {
+    let cardinal_levers = Some(CardinalLevers{
+        left_stick: Some(SingleCardinalLever::ControlMouseCursor),
+        right_stick: None,
+    });
+    assert_eq!(
+        setup_get_cardinal_levers_works(0,cardinal_levers.clone()),
+        cardinal_levers);
+
+    let cardinal_levers = Some(CardinalLevers{
+        left_stick: Some(SingleCardinalLever::ControlMouseScrollwheel),
+        right_stick: Some(SingleCardinalLever::ControlMouseCursor),
+    });
+    assert_eq!(
+        setup_get_cardinal_levers_works(3,cardinal_levers.clone()),
+        cardinal_levers);
+
+    let cardinal_levers = None;
+    assert_eq!(
+        setup_get_cardinal_levers_works(500,cardinal_levers.clone()),
+        cardinal_levers);
 }
 
 #[test]
@@ -39,6 +151,7 @@ fn visit_layer_works() {
        layer_visits: Vec::new(),
        potential_layer_visit: None,
        layers_and_their_available_layer_visits: Vec::new(),
+       layers: Box::new(MockLayersWrapperTrait::new()),
     };
 
     [
@@ -100,6 +213,7 @@ fn move_to_layer_works() {
        layer_visits: Vec::new(),
        potential_layer_visit: None,
        layers_and_their_available_layer_visits: Vec::new(),
+       layers: Box::new(MockLayersWrapperTrait::new()),
     };
 
     [1,4,2,4,6,7,323,23,56,3,9]
@@ -130,6 +244,7 @@ fn visit_or_move_to_layer_works() {
        layer_visits: Vec::new(),
        potential_layer_visit: None,
        layers_and_their_available_layer_visits: Vec::new(),
+       layers: Box::new(MockLayersWrapperTrait::new()),
     };
 
 
@@ -276,6 +391,7 @@ fn undo_last_layer_visit_with_switch_works() {
                 ]
             },
        ],
+       layers: Box::new(MockLayersWrapperTrait::new()),
     };
 
     // undo the last visit (the 5th)
@@ -332,6 +448,7 @@ fn setup_layers_navigator_with_potential_layer_visit(
        potential_layer_visit: 
            potential_layer_visit_init_opt.clone(),
        layers_and_their_available_layer_visits: Vec::new(),
+       layers: Box::new(MockLayersWrapperTrait::new()),
     };
 
     layers_navigator.process_current_potential_visit(
@@ -591,6 +708,7 @@ fn scenario_double_click_to_go_from_layer_0_to_4() {
        potential_layer_visit: None,
        layers_and_their_available_layer_visits:
            LayersNavigator::build_layer_visits(setup_haxwell_layout_layers_with_only_visits(),true),
+       layers: Box::new(MockLayersWrapperTrait::new()),
     });
 
     let switch = Switch::Button(Button::RightTrigger);
@@ -666,6 +784,7 @@ fn scenario_double_click_to_go_from_layer_4_to_0() {
        potential_layer_visit: None,
        layers_and_their_available_layer_visits:
            LayersNavigator::build_layer_visits(setup_haxwell_layout_layers_with_only_visits(),true),
+       layers: Box::new(MockLayersWrapperTrait::new()),
     });
 
     let switch = Switch::Button(Button::RightTrigger);
@@ -731,5 +850,4 @@ fn scenario_double_click_to_go_from_layer_4_to_0() {
     assert_eq!(layers_navigator_driver.layers_navigator.latest_move_to_index,0);
 
 }
-
 
