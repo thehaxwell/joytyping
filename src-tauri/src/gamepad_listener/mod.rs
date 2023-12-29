@@ -1,9 +1,8 @@
-use enigo::MouseButton;
 use gilrs::Button;
 
-use crate::settings::models::layout::{SwitchOnClickReaction, KeyboardInput};
+use crate::{settings::models::layout::SwitchOnClickReaction, quick_lookup_window, input_controller::InputControllerTrait};
 
-use self::{gilrs_events::{gilrs_wrapper::GilrsEventType, GilrsEventsTrait,stick_switch_interpreter::{StickSwitchButton,StickSwitchEvent}}, layers_navigator::{LayersNavigatorTrait, LayerVisitTrigger}};
+use self::{gilrs_events::{gilrs_wrapper::GilrsEventType, GilrsEventsTrait,stick_switch_interpreter::{StickSwitchButton,StickSwitchEvent}}, layers_navigator::{LayersNavigatorTrait, LayerVisitTrigger}, cardinal_levers_move_detector::mouse::MouseEvent};
 
 use self::switch_click_pattern_detector::{SwitchClickPatternDetectorTrait, SwitchClickPattern};
 
@@ -18,16 +17,24 @@ mod tests;
 pub struct GamepadListener {
    gilrs_events: Box<dyn GilrsEventsTrait>,
    switch_click_pattern_detector: Box<dyn SwitchClickPatternDetectorTrait>,
-   layers_navigator: Box<dyn LayersNavigatorTrait>,
+   layers_navigator: Box<dyn layers_navigator::controller::ControllerTrait>,
    mouse_cardinal_levers_move_detector: Box<dyn cardinal_levers_move_detector::mouse::MouseTrait>,
+
+   // controllers
+   quick_lookup_window: Box<dyn quick_lookup_window::controller::ControllerTrait>,
+   input: Box<dyn InputControllerTrait>,
 }
 
 impl GamepadListener {
     pub fn new(
        gilrs_events: Box<dyn GilrsEventsTrait>,
        switch_click_pattern_detector: Box<dyn SwitchClickPatternDetectorTrait>,
-       layers_navigator: Box<dyn LayersNavigatorTrait>,
+       layers_navigator: Box<dyn layers_navigator::controller::ControllerTrait>,
        mouse_cardinal_levers_move_detector: Box<dyn cardinal_levers_move_detector::mouse::MouseTrait>,
+
+       // controllers
+       quick_lookup_window: Box<dyn quick_lookup_window::controller::ControllerTrait>,
+       input: Box<dyn InputControllerTrait>,
     ) -> Self {
         GamepadListener{
             gilrs_events,
@@ -35,84 +42,46 @@ impl GamepadListener {
 
             layers_navigator,
             mouse_cardinal_levers_move_detector,
+
+            quick_lookup_window,
+            input,
         }
     }
 
 
-    pub fn next_command(&mut self) -> Option<Command> {
+    pub fn next_command(&mut self) {
         let next_event_opt = self.switch_click_pattern_detector.tick();
 
-        if let Some(next_event) = next_event_opt.clone() {
-            self.layers_navigator
-                .process_current_potential_visit(
-                next_event);
-        }
+        let reaction = self.layers_navigator.process_switch_event(next_event_opt.clone());
 
-        let is_double_click = match next_event_opt.clone() {
-            Some(SwitchClickPattern::DoubleClick(_switch)) => { true }
-            Some(SwitchClickPattern::DoubleClickAndHold(_switch)) => { true }
-            _other => false
-        };
-
+        // end NEW
 
         match next_event_opt.clone() {
             Some(SwitchClickPattern::Click(switch)) 
                 | Some(SwitchClickPattern::DoubleClick(switch)) => {
-                let layer_visit_trigger 
-                    = if is_double_click {
-                        LayerVisitTrigger::DoubleClick(switch.clone())
-                    } else {
-                        LayerVisitTrigger::Click(switch.clone())
-                    };
-
-                match self.layers_navigator.get_switch_event_and_reaction(
-                         switch.clone())
-                       .and_then(|s_e_a_r| if is_double_click {
-                           // this is useful to allow typing a letter twice fast,
-                           // like "oo" in "look","book","too" etc.
-                           // the first click will be Click and the second DoubleClick
-                           s_e_a_r.on_double_click
-                                  .or_else(|| s_e_a_r.on_click )
-                           }
-                           else {
-                            s_e_a_r.on_click
-                        }) {
+                match reaction {
                     Some(SwitchOnClickReaction::Keyboard(keyboard_input)) 
-                    => return Some(Command::InputEvent(InputEvent::KeyClick(keyboard_input))),
+                    // => return Some(Command::InputEvent(InputEvent::KeyClick(keyboard_input))),
+                    => self.input.key_click(keyboard_input),
                     Some(SwitchOnClickReaction::Mouse(mouse_input)) 
-                    => return Some(Command::InputEvent(InputEvent::MouseDown(mouse_input.button))),
-                    Some(SwitchOnClickReaction::MoveToLayer(layer_specifier))
-                    => self.layers_navigator.move_to_layer(layer_specifier),
-                    Some(SwitchOnClickReaction::VisitLayer(layer_specifier))
-                    => self.layers_navigator.visit_layer(layer_visit_trigger,layer_specifier),
-                    Some(SwitchOnClickReaction::MoveToOrVisitLayer(layer_specifier))
-                    => self.layers_navigator.move_to_or_visit_layer(layer_visit_trigger,layer_specifier),
+                    // => return Some(Command::InputEvent(InputEvent::MouseDown(mouse_input.button))),
+                    => self.input.mouse_down(mouse_input.button),
                     Some(SwitchOnClickReaction::ShowQuickLookupWindowOnHold)
-                    => return Some(Command::QuickLookupWindowEvent(QuickLookupWindowEvent::ShowUntilSwitchKeyup(switch))),
+                    // => return Some(Command::QuickLookupWindowEvent(QuickLookupWindowEvent::ShowUntilSwitchKeyup(switch))),
+                    => {let _ = self.quick_lookup_window.show_until_switch_keyup(switch);},
                     Some(SwitchOnClickReaction::ToggleQuickLookupWindow)
-                    => return Some(Command::QuickLookupWindowEvent(QuickLookupWindowEvent::ToggleBySwitch(switch))),
+                    // => return Some(Command::QuickLookupWindowEvent(QuickLookupWindowEvent::ToggleBySwitch(switch))),
+                    => {let _ = self.quick_lookup_window.toggle_by_switch(switch);},
                     Some(SwitchOnClickReaction::BoostMouseCursorByMultiplier(mul))
-                    => return Some(Command::InputEvent(InputEvent::BoostMouseCursor(mul))),
+                    // => return Some(Command::InputEvent(InputEvent::BoostMouseCursor(mul))),
+                    => self.input.boost_mouse_cursor(mul),
                     _ => ()
                 }
 
             }
-            Some(SwitchClickPattern::ClickAndHold(switch)) 
-                | Some(SwitchClickPattern::DoubleClickAndHold(switch)) => {
-                let reaction_opt = self.layers_navigator.get_switch_event_and_reaction(
-                    switch.clone()).and_then(
-                        |s_e_a_r| if is_double_click {
-                            // if on_double_click (or fallback to on_click) is set to
-                            // type out some key, then hold down that key
-                            s_e_a_r.on_double_click
-                                   .or_else(|| s_e_a_r.on_click )
-                        }
-                        else {
-                            s_e_a_r.on_click
-                        }
-                    );
-
-                match reaction_opt {
+            Some(SwitchClickPattern::ClickAndHold(_switch)) 
+                | Some(SwitchClickPattern::DoubleClickAndHold(_switch)) => {
+                match reaction {
                     // if on_click is set to
                     // type out some key, then hold down that key
                     //
@@ -134,15 +103,17 @@ impl GamepadListener {
                     //  *Key press* |.............|..|..|..|..|..| *Key Release*
                     //
                     Some(SwitchOnClickReaction::Keyboard(keyboard_input) )
-                       => return Some(Command::InputEvent(InputEvent::KeyDown(keyboard_input))),
+                       // => return Some(Command::InputEvent(InputEvent::KeyDown(keyboard_input))),
+                       => self.input.key_down(keyboard_input),
                     _other => (),
                 }
             },
             Some(SwitchClickPattern::ClickEnd(switch)) => {
-                self.layers_navigator.undo_last_layer_visit_with_switch(switch.clone());
                 // return Some(Command::QuickLookupWindowEvent(QuickLookupWindowEvent::HideIfMatchesSwitch(switch)));
                 // return Some(Command::InputEvent(InputEvent::KeyUp));
-                return Some(Command::KeyUp(switch));
+                let _ = self.quick_lookup_window.react_to_keyup(switch.clone());
+                // return Some(Command::KeyUp(switch));
+                self.input.key_up();
             }
             None => (),
 
@@ -267,12 +238,21 @@ impl GamepadListener {
             self.mouse_cardinal_levers_move_detector
                 .set_mouse_controls(self.layers_navigator.get_cardinal_levers());
 
-            return Some(Command::QuickLookupWindowEvent(QuickLookupWindowEvent::EmitCurrentLayerNotification(new_layer_index)));
+            // return Some(Command::QuickLookupWindowEvent(QuickLookupWindowEvent::EmitCurrentLayerNotification(new_layer_index)));
+            let _ = self.quick_lookup_window.emit_current_layer_notification(new_layer_index);
         }
 
-        self.mouse_cardinal_levers_move_detector
-            .tick()
-            .map(|input_event| Command::InputEvent(input_event))
+        // self.mouse_cardinal_levers_move_detector
+        //     .tick()
+        //     .map(|input_event| Command::InputEvent(input_event))
+
+        match self.mouse_cardinal_levers_move_detector.tick() {
+            Some(MouseEvent::MoveCursor(x,y)) => self.input.move_mouse_cursor(x,y),
+            Some(MouseEvent::Scroll(x,y)) => self.input.mouse_scroll(x,y),
+            None => (),
+        }
+
+        self.input.trigger_input();
     }
 
     // returns true if there is yet another event
@@ -315,30 +295,22 @@ impl GamepadListener {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
-pub enum Command {
-    InputEvent(InputEvent),
-    QuickLookupWindowEvent(QuickLookupWindowEvent),
-    KeyUp(Switch),
-}
-
-#[derive(Debug, Clone, PartialEq)]
-pub enum InputEvent {
-    KeyClick(KeyboardInput),
-    KeyDown(KeyboardInput),
-    MouseDown(MouseButton),
-    MoveMouseCursor(i32,i32),
-    MouseScroll(i32,i32),
-    KeyUp,
-    BoostMouseCursor(u32),
-}
-
-#[derive(Debug, Clone, PartialEq)]
-pub enum QuickLookupWindowEvent {
-    ShowUntilSwitchKeyup(Switch),
-    EmitCurrentLayerNotification(usize),
-    ToggleBySwitch(Switch),
-}
+// #[derive(Debug, Clone, PartialEq)]
+// pub enum Command {
+//     InputEvent(InputEvent),
+//     KeyUp(Switch),
+// }
+//
+// #[derive(Debug, Clone, PartialEq)]
+// pub enum InputEvent {
+//     KeyClick(KeyboardInput),
+//     KeyDown(KeyboardInput),
+//     MouseDown(MouseButton),
+//     MoveMouseCursor(i32,i32),
+//     MouseScroll(i32,i32),
+//     KeyUp,
+//     BoostMouseCursor(u32),
+// }
 
 #[derive(Debug,Clone,PartialEq)]
 pub enum Switch {

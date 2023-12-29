@@ -6,13 +6,14 @@ use self::layers_wrapper::LayersWrapperTrait;
 
 use super::{Switch, switch_click_pattern_detector::SwitchClickPattern, gilrs_events::stick_switch_interpreter::StickSwitchButton};
 
+pub mod layers_wrapper;
+pub mod controller;
+
 #[cfg(test)]
 use mockall::{automock, predicate::*};
 
 #[cfg(test)]
 mod tests;
-
-pub mod layers_wrapper;
 
 #[cfg_attr(test, automock)]
 pub trait LayersNavigatorTrait {
