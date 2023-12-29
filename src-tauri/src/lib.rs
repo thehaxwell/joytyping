@@ -229,6 +229,11 @@ pub fn start_main_loop(
             }
 
             loop {
+                // next_command can produce something
+                // when there's no next_event, namely
+                // ClickAndHold/DoubleClickAndHold since
+                // these rely on no key_up for some time
+                gamepad_listener.next_command();
                 match gamepad_listener.next_event() {
                     None => break,
                     Some(GilrsEventType::Connected(Some(gamepad_info))) => {
@@ -240,16 +245,6 @@ pub fn start_main_loop(
                     }
                     Some(_other) => ()
                 }
-                gamepad_listener.next_command();
-                // match gamepad_listener.next_command() {
-                //     Some(gamepad_listener::Command::InputEvent(event))
-                //         => input_controller.react_to_gamepad_event(event),
-                //     Some(gamepad_listener::Command::KeyUp(switch)) => {
-                //         input_controller.react_to_gamepad_event(gamepad_listener::InputEvent::KeyUp);
-                //     },
-                //     None => (),
-                // }
-                // input_controller.trigger_input();
             }
 
         }
