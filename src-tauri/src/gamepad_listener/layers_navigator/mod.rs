@@ -23,6 +23,7 @@ pub trait LayersNavigatorTrait {
     // fn get_current_layer_index(&self) -> usize;
     fn undo_last_layer_visit_with_switch(&mut self, switch: Switch);
     fn process_current_potential_visit(&mut self,pattern: SwitchClickPattern);
+    //TODO: rename to get_new_layer_index_consumably
     fn consumable_get_current_layer_index(&mut self) -> Option<usize>;
 
     fn get_switch_event_and_reaction(
